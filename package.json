@@ -1,4 +1,5 @@
 {
+  "homepage":"https://DecoCrafttech.github.io/Truck-message-v-1.1",
   "name": "truck",
   "version": "0.1.0",
   "private": true,
@@ -36,6 +37,8 @@
     "wowjs": "^1.1.3"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
