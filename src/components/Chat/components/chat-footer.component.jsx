@@ -19,9 +19,9 @@ function ChatFooter({chatId, receipt}) {
 
     if(socket){
       socket.emit('send_message',{
-        user_id: 1,
-        person_id :2,
-        room_id: 3,
+        user_id: userDetails?.user_id,
+        person_id : receipt?.id,
+        room_id: 0 ,
         message: inputRef.current.value
       })
     }
