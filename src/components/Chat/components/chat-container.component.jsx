@@ -5,16 +5,18 @@ import { useDispatch, useSelector } from "react-redux";
 import { getSocket, disConnectSocket } from "../../../socket";
 import { updateCurrentUserMessage, updateUserMessage } from "../../../Storage/Slices/chat-slice";
 import axios from "axios";
+import Cookies from 'js-cookie'
 
 function ChatContainer({ receipt }) {
   const messages = useSelector((state) => state?.chat);
-  const { userDetails } = useSelector((state) => state.login);
+  const userDetails = Cookies.get('usrin') ? window.atob(Cookies.get('usrin')) : '';
+  // const { userDetails } = useSelector((state) => state.login);
   const [chatId, setChatId] = useState(null)
   const dispatch = useDispatch();
   
   const fetchConversation = async () => {
     const response = await axios.get(
-      `https://truck.truckmessage.com/get_conversation?user_id=${userDetails?.user_id}&person_id=${receipt?.id}`
+      `https://truck.truckmessage.com/get_conversation?user_id=${userDetails}&person_id=${receipt?.id}`
     );
     
    response?.data?.data.forEach(msg=>{
@@ -36,14 +38,15 @@ function ChatContainer({ receipt }) {
 
   useEffect(() => {
     const socket = getSocket();
+
     socket.on("connect", function () {
       console.log("Connect");
     });
 
-    if(receipt?.id && userDetails?.user_id){
+    if(receipt?.id && userDetails){
       socket.emit("join_room", {
         person_id: receipt.id,
-        user_id: userDetails.user_id,
+        user_id: userDetails,
       });
     }
    
@@ -54,14 +57,14 @@ function ChatContainer({ receipt }) {
       }
       if (
         data?.data?.message &&
-        data?.success &&
-        data.data?.user_id !== userDetails?.user_id
+        data?.success && 
+        data.data?.user_id !== userDetails
       ) {
         console.log(
           data?.data?.message,
           data?.success,
           data.data?.user_id,
-          userDetails?.user_id
+          userDetails
         );
         dispatch(
           updateUserMessage({
@@ -92,7 +95,6 @@ function ChatContainer({ receipt }) {
     >
       <ChatPanel messages={messages} />
       <ChatFooter chatId={chatId} receipt={receipt} />
-      {chatId && <ChatFooter chatId={chatId} receipt={receipt} />}
     </div>
   );
 }

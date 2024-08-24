@@ -84,9 +84,7 @@ const Navbar = () => {
 
                     dispatch(updateIsLoggedIn(true));
                     document.getElementById("closeSignInModel").click();
-                } else {
-                    toast.error("Login failed")
-                }
+                }   
             } catch (err) {
                 toast.error(err.code)
             }

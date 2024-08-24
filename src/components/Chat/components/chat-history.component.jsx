@@ -1,26 +1,27 @@
 import React, { useEffect, useState } from "react";
 import ChatUser from "./chat-user.componet";
 import axios from 'axios'
-import { useSelector } from "react-redux";
+import Cookies from 'js-cookie'
 
 
 function ChatHistory({onConversationClick, receipt}) {
   const [userList, setUserList] = useState([])
-  const {userDetails} = useSelector(state=>state?.login)
+  const userDetails = Cookies.get('usrin') ? window.atob(Cookies.get('usrin')) : '';
 
   
   useEffect(()=>{
     const fetchHistory = async () => {
-      const response = await axios.get(`https://truck.truckmessage.com/get_conversation_history?user_id=${userDetails?.user_id}`)
+      const response = await axios.get(`https://truck.truckmessage.com/get_conversation_history?user_id=${userDetails}`)
 
       const usrList = response.data.filter(item=>item.person_id !== receipt?.id)
 
       setUserList(usrList) 
+      console.log(response.data)
     }
-    if(userDetails.user_id){
+    if(userDetails){
       fetchHistory()
     }
-  },[userDetails.user_id])
+  },[userDetails])
   
   return (
     <div

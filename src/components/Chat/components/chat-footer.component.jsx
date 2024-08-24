@@ -3,10 +3,12 @@ import ChatInput from "./chat-input.componnet";
 import { updateCurrentUserMessage } from "../../../Storage/Slices/chat-slice";
 import { useRef } from "react";
 import { getSocket } from "../../../socket";
-import Cookie from 'js-cookie'
+import Cookies from 'js-cookie'
 
 function ChatFooter({chatId, receipt}) {
-  const {userDetails} = useSelector(state=>state?.login)
+  // const {userDetails} = useSelector(state=>state?.login)
+  const userDetails = Cookies.get('usrin') ? window.atob(Cookies.get('usrin')) : '';
+
   const inputRef = useRef();
   const dispatch = useDispatch();
   const clearInput = () => {
@@ -18,10 +20,11 @@ function ChatFooter({chatId, receipt}) {
     const socket = getSocket();
 
     if(socket){
+      console.log(socket)
       socket.emit('send_message',{
-        user_id: userDetails?.user_id,
+        user_id: userDetails,
         person_id : receipt?.id,
-        room_id: 0 ,
+        room_id: chatId ,
         message: inputRef.current.value
       })
     }
