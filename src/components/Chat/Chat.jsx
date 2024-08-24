@@ -4,6 +4,8 @@ import axios from "axios";
 import ChatHistory from "./components/chat-history.component";
 import ChatContainer from "./components/chat-container.component";
 import Cookies from "js-cookie";
+import { useDispatch } from "react-redux";
+import { updateUserDetails } from "../../Storage/Slices/LoginSlice";
 
 // the query string for you.
 function useQuery() {
@@ -14,6 +16,7 @@ function ChatView() {
   const query = useQuery(); 
   const person_id = query?.get('person_id')
   const [receipt, setReceipt] = useState(null)
+  const dispatch = useDispatch();
 
   useEffect(()=>{
     const fetchRecript = async ()=>{
@@ -26,16 +29,14 @@ function ChatView() {
         if(userId){
         setReceipt({
           name: response.data.data[1].name,
-          id: window.atob(Cookies.get("usrin"))
+          id: window.atob(userId)
         })
-
-        // console.log({
-        //   name: response.data.data[1].name,
-        //   id: window.atob(Cookies.get("usrin"))
-        // })
+ 
+        dispatch(updateUserDetails(response.data.data[1]))
       }
      }
     }
+
     if(person_id){
       fetchRecript()
     }

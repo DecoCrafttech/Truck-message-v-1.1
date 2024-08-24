@@ -3,6 +3,7 @@ import ChatInput from "./chat-input.componnet";
 import { updateCurrentUserMessage } from "../../../Storage/Slices/chat-slice";
 import { useRef } from "react";
 import { getSocket } from "../../../socket";
+import Cookie from 'js-cookie'
 
 function ChatFooter({chatId, receipt}) {
   const {userDetails} = useSelector(state=>state?.login)
@@ -15,14 +16,16 @@ function ChatFooter({chatId, receipt}) {
   };
   const handleSendMessage = () => {
     const socket = getSocket();
+
     if(socket){
       socket.emit('send_message',{
-        user_id: userDetails?.id,
-        person_id : receipt?.id,
-        room_id: chatId,
+        user_id: 1,
+        person_id :2,
+        room_id: 3,
         message: inputRef.current.value
       })
     }
+    
     dispatch(
       updateCurrentUserMessage({
         role: "currentUser",
@@ -34,6 +37,7 @@ function ChatFooter({chatId, receipt}) {
   const handleOnEnterKey = () => {
     handleSendMessage();
   };
+
   return (
     <div className="row">
       <div className="col-10">

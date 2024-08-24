@@ -11,13 +11,13 @@ function ChatContainer({ receipt }) {
   const { userDetails } = useSelector((state) => state.login);
   const [chatId, setChatId] = useState(null)
   const dispatch = useDispatch();
+  
   const fetchConversation = async () => {
     const response = await axios.get(
-      `https://truck.truckmessage.com/get_conversation?user_id=${userDetails?.id}&person_id=${receipt?.person_id}`
+      `https://truck.truckmessage.com/get_conversation?user_id=${userDetails?.user_id}&person_id=${receipt?.id}`
     );
     
    response?.data?.data.forEach(msg=>{
-    console.log(msg);
     if(msg?.user_id === userDetails.id){
       dispatch(updateCurrentUserMessage({
         id:msg.id,
@@ -33,33 +33,35 @@ function ChatContainer({ receipt }) {
     }
    })
   };
+
   useEffect(() => {
     const socket = getSocket();
     socket.on("connect", function () {
       console.log("Connect");
     });
-    if(receipt?.id && userDetails?.id){
+
+    if(receipt?.id && userDetails?.user_id){
       socket.emit("join_room", {
-        person_id: receipt?.id,
-        user_id: userDetails?.id,
+        person_id: receipt.id,
+        user_id: userDetails.user_id,
       });
     }
    
     socket.on("message_response", (data) => {
-      console.log(data);
-      if(data?.chat_id){
-        setChatId(data?.chat_id)
+      console.log(data)
+      if(data.chat_id){
+        setChatId(data.chat_id)
       }
       if (
         data?.data?.message &&
         data?.success &&
-        data.data?.user_id.toString() !== userDetails?.id.toString()
+        data.data?.user_id !== userDetails?.user_id
       ) {
         console.log(
           data?.data?.message,
           data?.success,
           data.data?.user_id,
-          userDetails?.id.toString()
+          userDetails?.user_id
         );
         dispatch(
           updateUserMessage({
@@ -69,16 +71,17 @@ function ChatContainer({ receipt }) {
         );
       }
     });
+    
     return () => {
       disConnectSocket();
     };
   }, []);
 
-  useEffect(() => {
-    if (userDetails?.id && receipt.person_id) {
+  useEffect(() => { 
+    if (userDetails.user_id && receipt.id) {
       fetchConversation();
     }
-  }, [userDetails?.id ,receipt.person_id]);
+  }, [userDetails.user_id ,receipt.id]);
 
   return (
     <div
@@ -88,6 +91,7 @@ function ChatContainer({ receipt }) {
       className="col-9 d-flex flex-column justify-content-end"
     >
       <ChatPanel messages={messages} />
+      <ChatFooter chatId={chatId} receipt={receipt} />
       {chatId && <ChatFooter chatId={chatId} receipt={receipt} />}
     </div>
   );

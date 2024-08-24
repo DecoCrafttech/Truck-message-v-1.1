@@ -113,7 +113,9 @@ const Navbar = () => {
                 state: operatingStates,
                 phone_number: phoneNumber,
                 password: password,
-                operating_city: operatingStates
+                operating_city: operatingStates,
+                email:"test@gmail.com",
+                pincode:627415
             };
 
             console.log(registrationData)

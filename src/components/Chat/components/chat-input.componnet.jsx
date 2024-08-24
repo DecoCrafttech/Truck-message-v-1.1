@@ -31,6 +31,7 @@ const ChatInput = forwardRef((props, ref) => {
       onEnterKey();
     }
   };
+  
   return (
     <input
       ref={inputRef}

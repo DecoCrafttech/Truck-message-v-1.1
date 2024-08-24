@@ -486,7 +486,7 @@ const PortfolioV1 = () => {
     }
 
     const handleMessageClick = (card) => {
-        navigate(`/chat?person_id=${card.id}`);
+        navigate(`/chat?person_id=${card.user_id}`);
     };
 
     return (

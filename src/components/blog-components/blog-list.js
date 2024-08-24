@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 import { FaUserAlt } from "react-icons/fa";
@@ -48,7 +48,7 @@ const BlogList = () => {
 
     const [showingFromLocation, setShowingFromLocation] = useState("");
     const [showingToLocation, setShowingToLocation] = useState("");
-    const [isDataFiltered,setIsDataFiltered] = useState(false)
+    const [isDataFiltered, setIsDataFiltered] = useState(false)
 
     const handleLocation = (selectedLocation) => {
         if (selectedLocation) {
@@ -77,7 +77,7 @@ const BlogList = () => {
                 setCards(res.data.data)
                 toast.success(res.data.message)
                 document.getElementById("closeFilterBox").click()
-                
+
             } else {
                 toast.error(res.data.message)
             }
@@ -125,7 +125,7 @@ const BlogList = () => {
 
     const initialRender = async () => {
         try {
-             await axios.get('https://truck.truckmessage.com/all_buy_sell_details')
+            await axios.get('https://truck.truckmessage.com/all_buy_sell_details')
                 .then(response => {
                     if (response.data.success && Array.isArray(response.data.data)) {
                         setCards(response.data.data);
@@ -577,7 +577,7 @@ const BlogList = () => {
 
                         <div className="col-lg-12">
                             <div className='row'>
-                                <div className="col-lg-8">
+                                <div className="col-8 col-lg-12">
                                     {/* Search Widget */}
                                     <div className="ltn__search-widget mb-0">
                                         <form action="">
@@ -585,7 +585,7 @@ const BlogList = () => {
                                         </form>
                                     </div>
                                 </div>
-                                <div className="col-lg-4 row">
+                                <div className="col-lg-4 row d-lg-none">
                                     <div className='col-8'>
                                         {/* Filter */}
                                         <button type="button" className="filterbtn col-12" data-bs-toggle="modal" data-bs-target="#buySellfilter" >Filter</button>
@@ -690,64 +690,127 @@ const BlogList = () => {
                 </div>
             </div>
 
-            <div className='container'>
-                <div className="row row-cols-1 row-cols-md-3 g-4">
-                    {currentCards.map(card => (
-                        <div className="col" key={card.buy_sell_id}>
-                            <div className="card card h-100 shadow truckcard">
-                                <span className='object-fit-fill rounded justify-content-center d-flex'>
-                                    <img
-                                        className="m-3 rounded-3 justify-content-center d-flex"
-                                        src={card.images.length > 0 ? card.images[0] : ''}
-                                        alt="truck message Logo - All in one truck solutions"
-                                        style={{ width: '390px', height: '290px', objectFit: 'cover' }}
+            <div className='container-fluid px-5 blog-list-filter-min-height'>
+                <div className="row">
+                    <div className="col-2">
+                        <div className="row">
+                            <div className="col-12">
+                                <h6>Brand</h6>
+                                <div className="input-item input-item-name ltn__custom-icon">
+                                    <input type="text" name="material" placeholder="Enter brand" onChange={(e) => SetfilterModelData({ ...filterModelData, brand: e.target.value })} />
+                                </div>
+                            </div>
+                            <div className="col-12">
+                                <h6>Model</h6>
+                                <div className="input-item input-item-name ltn__custom-icon">
+                                    <input type="text" name="tone" placeholder="Enter Model" onChange={(e) => SetfilterModelData({ ...filterModelData, model: e.target.value })} />
+                                </div>
+                            </div>
+                            <div className="col-12">
+                                <h6>Location</h6>
+                                <div className="input-item input-item-name">
+                                    <Autocomplete name="to_location"
+                                        className="google-location location-input bg-transparent py-2"
+                                        apiKey="AIzaSyA09V2FtRwNpWu7Xh8hc7nf-HOqO7rbFqw"
+                                        onPlaceSelected={(place) => {
+                                            if (place) {
+                                                handleLocation(place.address_components);
+                                            }
+                                        }}
+                                        value={showingToLocation}
+                                        onChange={(e) => setShowingToLocation(e.target.value)}
                                     />
-                                </span>
-                                <div className="card-body">
-                                    <div className='col-12 col-md-12 mb-2 text-wrap'>
-                                        <div className='row'>
-                                            <div className='col-8 col-md-8 text-start ps-0'>
-                                                <h5 className="card-title text-wrap">{card.brand}</h5>
-                                            </div>
-                                            <p className='.fs-6 mb-0 reviewtext '>
-                                        {/* Generate the star ratings based on the response */}
-                                        {[...Array(5)].map((_, index) => (
-                                            <span key={index} className="float-right">
-                                                <i className={`text-warning fa fa-star ${index < card.rating  ? '' : 'text-muted'}`}></i>
-                                            </span>
-                                        ))}
-                                        <span>({card.review_count})</span>
-                                    </p>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label><FaLocationDot className="me-2 text-danger" />{card.location}</label>
-                                    </div>
-                                    <div>
-                                        <div className="row">
-                                            <div className="col-6 col-md-6"><FaUserAlt className="me-2" />
-                                                {card.owner_name}
-                                            </div>
-                                            <div className="col-6 col-md-6"><FaTruckFast className="me-2" />
-                                                {card.vehicle_number}
-                                            </div>
-                                            <div className="col-6 col-md-6"><BsFillCalendar2DateFill className="me-2" />
-                                                {card.model}
-                                            </div>
-                                            <div className="col-6 col-md-6"><RiPinDistanceFill className="me-2" />
-                                                {card.kms_driven} kms
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <hr />
-                                    <div className='d-flex gap-2'>
-                                        <Link to="/product-details" className='apara' onClick={() => handleSaveBusAndSellId(card)}>view details </Link>                                        <link></link>
+                                </div>
+                            </div>
+                            <div className="col-12">
+                                <h6>Vehicle Number</h6>
+                                <div className="input-item input-item-email ltn__custom-icon">
+                                    <input type="tel" name="contact_no" placeholder="Type your Vehicle Number" value={filterModelData.vehicle_number} onChange={(e) => SetfilterModelData({ ...filterModelData, vehicle_number: e.target.value })} required />
+                                </div>
+                            </div>
+                            <div className="col-12">
+                                <h6>Kilometers driven</h6>
+                                <div className="tel-item">
+                                    <input type="number" name="kms driven" className="w-100 py-4" placeholder="Type Kms driven" value={filterModelData.kms_driven} onChange={(e) => SetfilterModelData({ ...filterModelData, kms_driven: e.target.value })} required />
+                                </div>
+                            </div>
+                            <div className="col-12">
+                                <h6>Contact Number</h6>
+                                <div className="input-item input-item-email ltn__custom-icon">
+                                    <input type="tel" name="contact_no" placeholder="Type your contact number" value={filterModelData.contact_no} onChange={(e) => SetfilterModelData({ ...filterModelData, contact_no: e.target.value })} required />
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="col-12">
+                                    <h6>Descriptions (Optional)</h6>
+                                    <div className="input-item input-item-textarea ltn__custom-icon">
+                                        <textarea name="description" placeholder="Enter a text here" value={filterModelData.description} onChange={(e) => SetfilterModelData({ ...filterModelData, description: e.target.value })} required />
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    ))}
+                    </div>
+                    <div className="col-10">
+                        <div className="row row-cols-1 row-cols-md-3 g-4">
+                            {currentCards.map(card => (
+                                <div className="col" key={card.buy_sell_id}>
+                                    <div className="card card h-100 shadow truckcard">
+                                        <span className='object-fit-fill rounded justify-content-center d-flex'>
+                                            <img
+                                                className="m-3 rounded-3 justify-content-center d-flex"
+                                                src={card.images.length > 0 ? card.images[0] : ''}
+                                                alt="truck message Logo - All in one truck solutions"
+                                                style={{ width: '390px', height: '290px', objectFit: 'cover' }}
+                                            />
+                                        </span>
+                                        <div className="card-body">
+                                            <div className='col-12 col-md-12 mb-2 text-wrap'>
+                                                <div className='row'>
+                                                    <div className='col-8 col-md-8 text-start ps-0'>
+                                                        <h5 className="card-title text-wrap">{card.brand}</h5>
+                                                    </div>
+                                                    <p className='.fs-6 mb-0 reviewtext '>
+                                                        {/* Generate the star ratings based on the response */}
+                                                        {[...Array(5)].map((_, index) => (
+                                                            <span key={index} className="float-right">
+                                                                <i className={`text-warning fa fa-star ${index < card.rating ? '' : 'text-muted'}`}></i>
+                                                            </span>
+                                                        ))}
+                                                        <span>({card.review_count})</span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label><FaLocationDot className="me-2 text-danger" />{card.location}</label>
+                                            </div>
+                                            <div>
+                                                <div className="row">
+                                                    <div className="col-6 col-md-6"><FaUserAlt className="me-2" />
+                                                        {card.owner_name}
+                                                    </div>
+                                                    <div className="col-6 col-md-6"><FaTruckFast className="me-2" />
+                                                        {card.vehicle_number}
+                                                    </div>
+                                                    <div className="col-6 col-md-6"><BsFillCalendar2DateFill className="me-2" />
+                                                        {card.model}
+                                                    </div>
+                                                    <div className="col-6 col-md-6"><RiPinDistanceFill className="me-2" />
+                                                        {card.kms_driven} kms
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <hr />
+                                            <div className='d-flex gap-2'>
+                                                <Link to="/product-details" className='apara' onClick={() => handleSaveBusAndSellId(card)}>view details </Link>                                        <link></link>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
+
                 <div className='pagination'>
                     <ul className='pagination-list'>
                         {Array.from({ length: totalPages }, (_, index) => (

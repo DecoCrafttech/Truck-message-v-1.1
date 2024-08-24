@@ -11,14 +11,16 @@ function ChatHistory({onConversationClick, receipt}) {
   
   useEffect(()=>{
     const fetchHistory = async () => {
-      const response = (await axios.get(`https://truck.truckmessage.com/get_conversation_history?user_id=${userDetails?.id}`)).data
-      setUserList(response)
-      console.log(response);
+      const response = await axios.get(`https://truck.truckmessage.com/get_conversation_history?user_id=${userDetails?.user_id}`)
+
+      const usrList = response.data.filter(item=>item.person_id !== receipt?.id)
+
+      setUserList(usrList) 
     }
-    if(userDetails.id){
+    if(userDetails.user_id){
       fetchHistory()
     }
-  },[userDetails.id])
+  },[userDetails.user_id])
   
   return (
     <div
@@ -30,7 +32,7 @@ function ChatHistory({onConversationClick, receipt}) {
       className="col-3"
     >
       {receipt && <ChatUser  onClick={onConversationClick} user={receipt} />}
-      {receipt && userList?.filter(item=>item.person_id !== receipt?.id).map((user) => (
+      {receipt && userList.map((user) => (
         <ChatUser key={user.room_id} onClick={onConversationClick} user={user} />
       ))}
     </div>
