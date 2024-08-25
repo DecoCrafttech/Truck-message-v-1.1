@@ -41,6 +41,10 @@ const BlogList = () => {
     const [contactError, setContactError] = useState(''); // State to manage contact number validation error
     const [selectedfile, SetSelectedFile] = useState([]);
     const [multipleImages, setMultipleImages] = useState([]);
+    const [filterLoading, setFilterLoading] = useState(false);
+    const [createVehicleLoading, setCreateVehicleLoading] = useState(false);
+    const [verifyOtpLoading, setverifyOtpLoading] = useState(false);
+    const [verifyAadharLoading,setVerifyAadharLoading]=useState(false)
 
     const [aadharNumber, setAadharNumber] = useState("")
     const [aadharStep, setAadharStep] = useState(1);
@@ -62,6 +66,7 @@ const BlogList = () => {
     };
 
     const handleApplyFilter = async () => {
+        setFilterLoading(true)
         const filterObj = { ...filterModelData }
         filterObj.location = showingFromLocation
         setIsDataFiltered(true)
@@ -81,6 +86,7 @@ const BlogList = () => {
             } else {
                 toast.error(res.data.message)
             }
+            setFilterLoading(false)
         }
         catch (err) {
             console.log(err)
@@ -124,6 +130,7 @@ const BlogList = () => {
     }, []);
 
     const initialRender = async () => {
+        setFilterLoading(true)
         try {
             await axios.get('https://truck.truckmessage.com/all_buy_sell_details')
                 .then(response => {
@@ -133,6 +140,7 @@ const BlogList = () => {
                         console.error('Unexpected response format:', response.data);
                     }
                     setIsDataFiltered(false)
+                    setFilterLoading(false)
                 })
                 .catch(error => {
                     console.error('There was an error fetching the data!', error);
@@ -225,6 +233,7 @@ const BlogList = () => {
     //
 
     const handleBuyAndSellUpdate = async () => {
+        setCreateVehicleLoading(true)
         const userId = window.atob(Cookies.get("usrin"));
 
         const edit = { ...editingData }
@@ -264,6 +273,7 @@ const BlogList = () => {
                 } else {
                     toast.error(res.data.message)
                 }
+                setCreateVehicleLoading(false)
             }
             catch (err) {
                 console.log(err)
@@ -274,6 +284,10 @@ const BlogList = () => {
     }
 
     const handleBuyAndSellModelOpen = async () => {
+        setverifyOtpLoading(false)
+        setCreateVehicleLoading(false)
+        setVerifyAadharLoading(false)
+
         if (Cookies.get("otpId")) {
             setAadharStep(3)
         } else {
@@ -302,7 +316,7 @@ const BlogList = () => {
                     }
                 }
                 else {
-                    toast.error("User ID not found in cookies");
+                    toast.error("User ID not found");
                 }
             } catch (err) {
                 console.log(err)
@@ -319,6 +333,7 @@ const BlogList = () => {
 
     const handleVerifyAadhar = async () => {
         if (aadharNumber !== '' && aadharNumber.length === 12) {
+            setVerifyAadharLoading(true)
             try {
                 const res = await axios.post("https://truck.truckmessage.com/aadhaar_generate_otp", { id_number: aadharNumber })
                 if (res.data.error_code === 0) {
@@ -329,6 +344,7 @@ const BlogList = () => {
                     })
                     setAadharStep(3)
                 }
+                setVerifyAadharLoading(false)
             }
             catch (err) {
                 console.log(err)
@@ -347,6 +363,7 @@ const BlogList = () => {
     }
 
     const handleVerifyOtp = async () => {
+        setverifyOtpLoading(true)
         if (otpNumber !== '' && otpNumber.length === 6) {
             try {
                 const encodedUserId = Cookies.get("usrin");
@@ -361,7 +378,12 @@ const BlogList = () => {
                 if (res.data.error_code === 0) {
                     Cookies.remove("otpId")
                     setAadharStep(4)
+                    toast.success(res.data.message)
+                } else {
+                    console.log(res)
+                    toast.error(res.data.message)
                 }
+                setverifyOtpLoading(false)
             }
             catch (err) {
                 console.log(err)
@@ -392,9 +414,23 @@ const BlogList = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="modal-footer justify-content-between">
-                        <button type="button" className="btn btn-secondary col-12 col-md-5" data-bs-dismiss="modal">Close</button>
-                        <button type="button" className="btn btn-primary col-12 col-md-5" onClick={handleVerifyAadhar}>verify aadhar</button>
+
+                    <div className="modal-footer">
+                        <div className="col-12 col-md-6 m-0">
+                            <button type="button" className="btn btn-secondary w-100" data-bs-dismiss="modal">Close</button>
+                        </div>
+                        <div className="col-12 col-md-6 m-0">
+                            {
+                                verifyAadharLoading ?
+                                    <button type="button" className="btn btn-primary w-100">
+                                        <div class="spinner-border" role="status">
+                                            <span class="visually-hidden">verifying...</span>
+                                        </div>
+                                    </button>
+                                    :
+                                    <button type="button" className="btn btn-primary w-100" onClick={handleVerifyAadhar}>verify aadhar</button>
+                            }
+                        </div>
                     </div>
                 </div>
 
@@ -408,9 +444,23 @@ const BlogList = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="modal-footer justify-content-between">
-                        <button type="button" className="btn btn-secondary col-12 col-md-5" data-bs-dismiss="modal">Close</button>
-                        <button type="button" className="btn btn-primary col-12 col-md-5" onClick={handleVerifyOtp}>verify Otp</button>
+
+                    <div className="modal-footer">
+                        <div className="col-12 col-md-6 m-0">
+                            <button type="button" className="btn btn-secondary w-100" data-bs-dismiss="modal">Close</button>
+                        </div>
+                        <div className="col-12 col-md-6 m-0">
+                            {
+                                verifyOtpLoading ?
+                                    <button type="button" className="btn btn-primary w-100">
+                                        <div class="spinner-border" role="status">
+                                            <span class="visually-hidden">verifying...</span>
+                                        </div>
+                                    </button>
+                                    :
+                                    <button type="button" className="btn btn-primary w-100" onClick={handleVerifyOtp}>verify Otp</button>
+                            }
+                        </div>
                     </div>
                 </div>
 
@@ -538,8 +588,21 @@ const BlogList = () => {
                         </div>
                     </div>
                     <div className="modal-footer">
-                        <button type="button" className="btn btn-secondary col-12 col-md-5" data-bs-dismiss="modal">Close</button>
-                        <button type="button" className="btn btn-primary col-12 col-md-5" onClick={handleBuyAndSellUpdate}>Create</button>
+                        <div className="col-12 col-md-6 m-0">
+                            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                        <div className="col-12 col-md-6 m-0">
+                            {
+                                createVehicleLoading ?
+                                    <button type="button" className="btn btn-primary w-100">
+                                        <div class="spinner-border" role="status">
+                                            <span class="visually-hidden">Saving...</span>
+                                        </div>
+                                    </button>
+                                    :
+                                    <button type="button" className="btn btn-primary w-100" onClick={handleBuyAndSellUpdate}>Create</button>
+                            }
+                        </div>
                     </div>
                 </div>
 
@@ -577,7 +640,7 @@ const BlogList = () => {
 
                         <div className="col-lg-12">
                             <div className='row'>
-                                <div className="col-8 col-lg-12">
+                                <div className="col-12 col-lg-12">
                                     {/* Search Widget */}
                                     <div className="ltn__search-widget mb-0">
                                         <form action="">
@@ -668,7 +731,17 @@ const BlogList = () => {
                             </div>
                         </div>
                         <div className="modal-footer">
-                            <button type="button" className="btn btn-primary" onClick={handleApplyFilter}>Apply Filter</button>
+                            {
+                                filterLoading ?
+                                    <button type="button" className="btn btn-primary">
+                                        <div class="spinner-border" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </button>
+                                    :
+                                    <button type="button" className="btn btn-primary" onClick={handleApplyFilter}>Apply Filter</button>
+                            }
+
                         </div>
                     </div>
                 </div>
@@ -690,123 +763,154 @@ const BlogList = () => {
                 </div>
             </div>
 
-            <div className='container-fluid px-5 blog-list-filter-min-height'>
-                <div className="row">
-                    <div className="col-2">
+            <div className='container-fluid px-lg-5 blog-list-filter-min-height'>
+                <div className="row filter-min-height overflow-hidden">
+                    <div className="col-2 h-100 d-none d-lg-block">
+                        <div>
+                            <h6>Brand</h6>
+                            <div className="input-item input-item-name">
+                                <input type="text" name="material" placeholder="Enter brand" onChange={(e) => SetfilterModelData({ ...filterModelData, brand: e.target.value })} />
+                            </div>
+                        </div>
+                        <div>
+                            <h6>Model</h6>
+                            <div className="input-item input-item-name">
+                                <input type="text" name="tone" placeholder="Enter Model" onChange={(e) => SetfilterModelData({ ...filterModelData, model: e.target.value })} />
+                            </div>
+                        </div>
+                        <div>
+                            <h6>Location</h6>
+                            <div className="input-item input-item-name">
+                                <Autocomplete name="to_location"
+                                    className="google-location location-input bg-transparent py-2"
+                                    apiKey="AIzaSyA09V2FtRwNpWu7Xh8hc7nf-HOqO7rbFqw"
+                                    onPlaceSelected={(place) => {
+                                        if (place) {
+                                            handleLocation(place.address_components);
+                                        }
+                                    }}
+                                    value={showingToLocation}
+                                    onChange={(e) => setShowingToLocation(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <h6>Vehicle Number</h6>
+                            <div className="input-item input-item-email">
+                                <input type="tel" name="contact_no" placeholder="Type your Vehicle Number" value={filterModelData.vehicle_number} onChange={(e) => SetfilterModelData({ ...filterModelData, vehicle_number: e.target.value })} required />
+                            </div>
+                        </div>
+                        <div>
+                            <h6>Kilometers driven</h6>
+                            <div className="tel-item">
+                                <input type="number" name="kms driven" className="w-100 py-4" placeholder="Type Kms driven" value={filterModelData.kms_driven} onChange={(e) => SetfilterModelData({ ...filterModelData, kms_driven: e.target.value })} required />
+                            </div>
+                        </div>
+                        <div className='pt-3'>
+                            <h6>Contact Number</h6>
+                            <div className="input-item input-item-email">
+                                <input type="tel" name="contact_no" placeholder="Type your contact number" value={filterModelData.contact_no} onChange={(e) => SetfilterModelData({ ...filterModelData, contact_no: e.target.value })} required />
+                            </div>
+                        </div>
                         <div className="row">
                             <div className="col-12">
-                                <h6>Brand</h6>
-                                <div className="input-item input-item-name ltn__custom-icon">
-                                    <input type="text" name="material" placeholder="Enter brand" onChange={(e) => SetfilterModelData({ ...filterModelData, brand: e.target.value })} />
-                                </div>
-                            </div>
-                            <div className="col-12">
-                                <h6>Model</h6>
-                                <div className="input-item input-item-name ltn__custom-icon">
-                                    <input type="text" name="tone" placeholder="Enter Model" onChange={(e) => SetfilterModelData({ ...filterModelData, model: e.target.value })} />
-                                </div>
-                            </div>
-                            <div className="col-12">
-                                <h6>Location</h6>
-                                <div className="input-item input-item-name">
-                                    <Autocomplete name="to_location"
-                                        className="google-location location-input bg-transparent py-2"
-                                        apiKey="AIzaSyA09V2FtRwNpWu7Xh8hc7nf-HOqO7rbFqw"
-                                        onPlaceSelected={(place) => {
-                                            if (place) {
-                                                handleLocation(place.address_components);
-                                            }
-                                        }}
-                                        value={showingToLocation}
-                                        onChange={(e) => setShowingToLocation(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-                            <div className="col-12">
-                                <h6>Vehicle Number</h6>
-                                <div className="input-item input-item-email ltn__custom-icon">
-                                    <input type="tel" name="contact_no" placeholder="Type your Vehicle Number" value={filterModelData.vehicle_number} onChange={(e) => SetfilterModelData({ ...filterModelData, vehicle_number: e.target.value })} required />
-                                </div>
-                            </div>
-                            <div className="col-12">
-                                <h6>Kilometers driven</h6>
-                                <div className="tel-item">
-                                    <input type="number" name="kms driven" className="w-100 py-4" placeholder="Type Kms driven" value={filterModelData.kms_driven} onChange={(e) => SetfilterModelData({ ...filterModelData, kms_driven: e.target.value })} required />
-                                </div>
-                            </div>
-                            <div className="col-12">
-                                <h6>Contact Number</h6>
-                                <div className="input-item input-item-email ltn__custom-icon">
-                                    <input type="tel" name="contact_no" placeholder="Type your contact number" value={filterModelData.contact_no} onChange={(e) => SetfilterModelData({ ...filterModelData, contact_no: e.target.value })} required />
-                                </div>
-                            </div>
-                            <div className="row">
-                                <div className="col-12">
-                                    <h6>Descriptions (Optional)</h6>
-                                    <div className="input-item input-item-textarea ltn__custom-icon">
-                                        <textarea name="description" placeholder="Enter a text here" value={filterModelData.description} onChange={(e) => SetfilterModelData({ ...filterModelData, description: e.target.value })} required />
-                                    </div>
+                                <h6>Descriptions (Optional)</h6>
+                                <div className="input-item input-item-textarea ltn__custom-icon">
+                                    <textarea name="description" placeholder="Enter a text here" value={filterModelData.description} onChange={(e) => SetfilterModelData({ ...filterModelData, description: e.target.value })} required />
                                 </div>
                             </div>
                         </div>
+                        <div className='col-12 d-flex flex-wrap justify-content-center pt-3'>
+                            {
+                                filterLoading ?
+                                    <button type="button" className="btn btn-primary">
+                                        <div class="spinner-border" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </button>
+                                    :
+                                    <button type="button" className="btn btn-primary" onClick={handleApplyFilter}>Apply Filter</button>
+                            }
+                        </div>
                     </div>
-                    <div className="col-10">
-                        <div className="row row-cols-1 row-cols-md-3 g-4">
-                            {currentCards.map(card => (
-                                <div className="col" key={card.buy_sell_id}>
-                                    <div className="card card h-100 shadow truckcard">
-                                        <span className='object-fit-fill rounded justify-content-center d-flex'>
-                                            <img
-                                                className="m-3 rounded-3 justify-content-center d-flex"
-                                                src={card.images.length > 0 ? card.images[0] : ''}
-                                                alt="truck message Logo - All in one truck solutions"
-                                                style={{ width: '390px', height: '290px', objectFit: 'cover' }}
-                                            />
-                                        </span>
-                                        <div className="card-body">
-                                            <div className='col-12 col-md-12 mb-2 text-wrap'>
-                                                <div className='row'>
-                                                    <div className='col-8 col-md-8 text-start ps-0'>
-                                                        <h5 className="card-title text-wrap">{card.brand}</h5>
-                                                    </div>
-                                                    <p className='.fs-6 mb-0 reviewtext '>
-                                                        {/* Generate the star ratings based on the response */}
-                                                        {[...Array(5)].map((_, index) => (
-                                                            <span key={index} className="float-right">
-                                                                <i className={`text-warning fa fa-star ${index < card.rating ? '' : 'text-muted'}`}></i>
-                                                            </span>
-                                                        ))}
-                                                        <span>({card.review_count})</span>
-                                                    </p>
-                                                </div>
+
+
+                    <div className="col-12 col-lg-10 h-100 overflow-auto webkitScroll-buy-sell">
+                        <div className="d-flex flex-wrap pt-3 pb-5 w-100 h-100">
+                            {
+                                filterLoading ?
+                                    <div className="row w-100 h-100 justify-content-center align-items-center">
+                                        <div className='col-3 text-center'>
+                                            <div class="spinner-border text-info" role="status">
+                                                <span class="visually-hidden">Loading...</span>
                                             </div>
-                                            <div>
-                                                <label><FaLocationDot className="me-2 text-danger" />{card.location}</label>
-                                            </div>
-                                            <div>
-                                                <div className="row">
-                                                    <div className="col-6 col-md-6"><FaUserAlt className="me-2" />
-                                                        {card.owner_name}
-                                                    </div>
-                                                    <div className="col-6 col-md-6"><FaTruckFast className="me-2" />
-                                                        {card.vehicle_number}
-                                                    </div>
-                                                    <div className="col-6 col-md-6"><BsFillCalendar2DateFill className="me-2" />
-                                                        {card.model}
-                                                    </div>
-                                                    <div className="col-6 col-md-6"><RiPinDistanceFill className="me-2" />
-                                                        {card.kms_driven} kms
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <hr />
-                                            <div className='d-flex gap-2'>
-                                                <Link to="/product-details" className='apara' onClick={() => handleSaveBusAndSellId(card)}>view details </Link>                                        <link></link>
-                                            </div>
+                                            <p className='mt-2 text-info'>Loading...</p>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                    :
+                                    currentCards.length ?
+                                        currentCards.map(card => (
+                                            <div className="col-12 col-sm-6 col-xxl-4 p-2" key={card.buy_sell_id}>
+                                                <div className="card card h-100 shadow truckcard">
+                                                    <span className='object-fit-fill rounded justify-content-center d-flex'>
+                                                        <img
+                                                            className="m-3 rounded-3 justify-content-center d-flex"
+                                                            src={card.images.length > 0 ? card.images[0] : ''}
+                                                            alt="truck message Logo - All in one truck solutions"
+                                                            style={{ width: '390px', height: '290px', objectFit: 'cover' }}
+                                                        />
+                                                    </span>
+                                                    <div className="card-body">
+                                                        <div className='col-12 col-md-12 mb-2 text-wrap'>
+                                                            <div className='row'>
+                                                                <div className='col-8 col-md-8 text-start ps-0'>
+                                                                    <h5 className="card-title text-wrap">{card.brand}</h5>
+                                                                </div>
+                                                                <p className='.fs-6 mb-0 reviewtext '>
+                                                                    {/* Generate the star ratings based on the response */}
+                                                                    {[...Array(5)].map((_, index) => (
+                                                                        <span key={index} className="float-right">
+                                                                            <i className={`text-warning fa fa-star ${index < card.rating ? '' : 'text-muted'}`}></i>
+                                                                        </span>
+                                                                    ))}
+                                                                    <span>({card.review_count})</span>
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <label><FaLocationDot className="me-2 text-danger" />{card.location}</label>
+                                                        </div>
+                                                        <div>
+                                                            <div className="row">
+                                                                <div className="col-6 col-md-6"><FaUserAlt className="me-2" />
+                                                                    {card.owner_name}
+                                                                </div>
+                                                                <div className="col-6 col-md-6"><FaTruckFast className="me-2" />
+                                                                    {card.vehicle_number}
+                                                                </div>
+                                                                <div className="col-6 col-md-6"><BsFillCalendar2DateFill className="me-2" />
+                                                                    {card.model}
+                                                                </div>
+                                                                <div className="col-6 col-md-6"><RiPinDistanceFill className="me-2" />
+                                                                    {card.kms_driven} kms
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <hr />
+                                                        <div className='d-flex gap-2'>
+                                                            <Link to="/product-details" className='apara' onClick={() => handleSaveBusAndSellId(card)}>view details </Link>                                        <link></link>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))
+                                        :
+                                        <div className="row w-100 h-100 justify-content-center align-items-center">
+                                            <div className='col-3 text-center'>
+                                                <p>No data found</p>
+                                            </div>
+                                        </div>
+                            }
                         </div>
                     </div>
                 </div>

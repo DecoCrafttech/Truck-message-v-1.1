@@ -24,6 +24,7 @@ function ChatView() {
       })
 
       if (response.data.error_code === 0) {
+        console.log(response.data.data,"receipt")
         if (response.data.data) {
           setReceipt({
             name: response.data.data[1].name,

@@ -12,9 +12,9 @@ const ChatSlice = createSlice({
         (message) => message.id === newMessage.id
       );
 
-      if (!messageExists) {
+      // if (!messageExists) {
         state.push(newMessage);
-      }
+      // }
     },
     updateCurrentUserMessage: (state, action) => {
       const newMessage = action.payload;
@@ -22,10 +22,9 @@ const ChatSlice = createSlice({
         (message) => message.id === newMessage.id
       );
 
-      if (!messageExists) {
-        console.log(newMessage);
+      // if (!messageExists) {
         state.push(newMessage);
-      }
+      // }
     },
   },
 });

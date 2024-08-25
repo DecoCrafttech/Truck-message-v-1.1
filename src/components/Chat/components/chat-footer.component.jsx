@@ -1,4 +1,4 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import ChatInput from "./chat-input.componnet";
 import { updateCurrentUserMessage } from "../../../Storage/Slices/chat-slice";
 import { useRef } from "react";
@@ -6,7 +6,6 @@ import { getSocket } from "../../../socket";
 import Cookies from 'js-cookie'
 
 function ChatFooter({chatId, receipt}) {
-  // const {userDetails} = useSelector(state=>state?.login)
   const userDetails = Cookies.get('usrin') ? window.atob(Cookies.get('usrin')) : '';
 
   const inputRef = useRef();
@@ -20,7 +19,12 @@ function ChatFooter({chatId, receipt}) {
     const socket = getSocket();
 
     if(socket){
-      console.log(socket)
+      console.log(socket,{
+        user_id: userDetails,
+        person_id : receipt?.id,
+        room_id: chatId ,
+        message: inputRef.current.value
+      })
       socket.emit('send_message',{
         user_id: userDetails,
         person_id : receipt?.id,

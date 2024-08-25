@@ -2,6 +2,7 @@ import React from "react";
 
 function ChatBubble(props) {
   const { role, message } = props;
+  console.log(role)
   return (
     <div
       style={{
