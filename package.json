@@ -1,5 +1,5 @@
 {
-  "homepage":"https://DecoCrafttech.github.io/Truck-message-v-1.1",
+  "homepage": "https://DecoCrafttech.github.io/Truck-message-v-1.1",
   "name": "truck",
   "version": "0.1.0",
   "private": true,
@@ -8,6 +8,7 @@
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "@react-google-maps/api": "^2.19.3",
     "@reduxjs/toolkit": "^2.2.5",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -16,7 +17,6 @@
     "axios": "^1.7.4",
     "bootstrap": "^5.3.3",
     "gh-pages": "^6.1.1",
-    "google-maps-react": "^2.0.6",
     "html-react-parser": "^5.1.12",
     "js-cookie": "^3.0.5",
     "owl.carousel": "^2.3.4",
