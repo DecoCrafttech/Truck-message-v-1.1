@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { BsExclamationCircle } from 'react-icons/bs';
+import { FaLocationDot } from 'react-icons/fa6';
 
 export const ExpenseCalculator = () => {
     const [loadTrips, setLoadTrips] = useState([]);
@@ -144,13 +145,13 @@ export const ExpenseCalculator = () => {
                             <div className="col-12 col-md-6 col-lg-4" key={index}>
                                 <div className="card w-100 shadow-sm">
                                     <div className="card-body">
-                                        <h5 className="card-title">{trip.load_name}</h5>
+                                    <h5 className="card-title cardmodify">{trip.load_name}</h5>
                                         <div className="py-2">
                                             <p className="card-text mb-1">
-                                                <b>From:</b> <span>{trip.from_location}</span>
+                                            <label><FaLocationDot className="me-2 text-danger" />{trip.from_location}</label>
                                             </p>
                                             <p className="card-text mb-1">
-                                                <b>To:</b> <span>{trip.to_location}</span>
+                                            <label><FaLocationDot className="me-2 text-success" />{trip.to_location}</label>
                                             </p>
                                             <p className="card-text mb-1">
                                                 <b>Created on:</b> <span>{new Date(trip.updt).toLocaleString()}</span>

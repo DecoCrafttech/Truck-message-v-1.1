@@ -312,6 +312,12 @@ const Navbar = () => {
                                             <button type="button" className="btn btn-primary btn-block" onClick={handleVerifyMobileNumbre}>Verify</button>
                                         </div>
                                     </div>
+                                    <div className='mt-1 ps-4'>
+                                                    <p>
+                                                    Remember your password? 
+                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal" onClick={() => { document.getElementById("closeForgotPasswordModel").click() }}> Sign in</a>
+                                                    </p>
+                                                </div>
                                 </div>
                             </div>
                         </section>
@@ -643,7 +649,7 @@ const Navbar = () => {
                                                 <div className="input-item">
                                                     <label>Category</label>
                                                     <select className="form-select" onChange={(e) => setCategory(e.target.value)}>
-                                                        <option value="">Category</option>
+                                                        <option value="">Select Category</option>
                                                         <option value="Lorry Owner">Lorry Owner</option>
                                                         <option value="Logistics">Logistics</option>
                                                         <option value="Lorry Contractors">Lorry Contractors</option>

@@ -469,17 +469,38 @@ const BlogList = () => {
                     <div>
                         <div className="row">
                             <div className="col-12 col-md-6">
-                                <h6>Brand</h6>
-                                <div className="input-item input-item-name ltn__custom-icon">
-                                    <input type="text" name="company_name" placeholder="Name of the Brand" value={editingData.brand} onChange={(e) => setEditingData({ ...editingData, brand: e.target.value })} required />
+                                <h6>Model Year</h6>
+                                <div className="tel-item ">
+                                    <input type="number" name="company_name" className="w-100 py-4" placeholder="Name of the Brand" value={editingData.brand} onChange={(e) => setEditingData({ ...editingData, brand: e.target.value })} required />
                                 </div>
                             </div>
                             <div className="col-12 col-md-6">
-                                <h6>Model</h6>
+                                <h6>Brand</h6>
+                                <div className="input-item">
+                                    <select className="nice-select" name="truck_body_type" required>
+                                        <option value="open_body">Ashok Leyland</option>
+                                        <option value="container">Tata </option>
+                                        <option value="trailer">Mahindra </option>
+                                        <option value="tanker">Eicher </option>
+                                        <option value="tanker">Daimler India  </option>
+                                        <option value="tanker">Bharat Benz </option>
+                                        <option value="tanker">Maruthi Suzuki  </option>
+                                        <option value="tanker">SML Lsuzu </option>
+                                        <option value="tanker">Force  </option>
+                                        <option value="tanker">AMW   </option>
+                                        <option value="tanker">Man   </option>
+                                        <option value="tanker">Scania    </option>
+                                        <option value="tanker">Volvo     </option>
+                                        <option value="tanker">Others   </option>
+                                    </select>
+                                </div>
+                            </div>
+                            {/* <div className="col-12 col-md-6">
+                                <h6>Brand </h6>
                                 <div className="input-item input-item-name ltn__custom-icon">
                                     <input type="text" name="company_name" placeholder="Name of the Model" value={editingData.model} onChange={(e) => setEditingData({ ...editingData, model: e.target.value })} required />
                                 </div>
-                            </div>
+                            </div> */}
                             <div className="col-12 col-md-6">
                                 <h6>Owner Name</h6>
                                 <div className="input-item input-item-name ltn__custom-icon">
@@ -496,6 +517,12 @@ const BlogList = () => {
                                 <h6>Kilometers driven</h6>
                                 <div className="tel-item">
                                     <input type="number" name="kms driven" className="w-100 py-4" placeholder="Type Kms driven" value={editingData.kms_driven} onChange={(e) => setEditingData({ ...editingData, kms_driven: e.target.value })} required />
+                                </div>
+                            </div>
+                            <div className="col-12 col-md-6">
+                                <h6>Price</h6>
+                                <div className="tel-item">
+                                    <input type="number" name="kms driven" className="w-100 py-4" placeholder="Enter your Price here..." value={editingData.kms_driven} onChange={(e) => setEditingData({ ...editingData, kms_driven: e.target.value })} required />
                                 </div>
                             </div>
                             <div className="col-12 col-md-6">
@@ -667,7 +694,7 @@ const BlogList = () => {
                 <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h1 className="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                            <h1 className="modal-title fs-5" id="exampleModalLabel">Add Post</h1>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeFilterBox"></button>
                         </div>
                         <div className="modal-body ps-4 pe-4 p-">

@@ -24,6 +24,7 @@ const ExpenseDetails = () => {
         if (userId && params.id) {
             try {
                 const res = await axios.post('https://truck.truckmessage.com/initial_cash_in_out', { load_trip_id: params.id })
+                console.log(res)
                 if (res.data.error_code === 0) {
                     setLoadCashDetails(res.data.data.length > 0 ? res.data.data : [])
                 }
