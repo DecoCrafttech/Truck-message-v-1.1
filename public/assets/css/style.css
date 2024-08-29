@@ -20184,3 +20184,54 @@ button {
   border-radius: 20px;
   cursor: pointer;
 }
+
+
+.conversation-list {
+  background-color: #f8f9fa;
+  padding: 0;
+}
+
+.chat-window {
+  overflow: auto !important;
+  background-color: #fff;
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.message.text-end {
+  align-items: flex-end;
+}
+
+.message-content {
+  max-width: 70%;
+  word-wrap: break-word;
+}
+
+.bg-primary {
+  background-color: #0d6efd !important;
+}
+
+.bg-light {
+  background-color: #f8f9fa !important;
+}
+
+
+
+
+
+.bg-primary {
+  background-color: #007bff !important;
+}
+
+.bg-light {
+  background-color: #f8f9fa !important;
+}
+
+.chat-messgae-min-height{
+  height: 30rem;
+  overflow-y: scroll;
+}
