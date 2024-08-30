@@ -5,11 +5,10 @@ import { FaWeightHanging, FaTruck, FaLocationDot, FaTruckFast } from "react-icon
 import { SiMaterialformkdocs } from "react-icons/si";
 import { GiCarWheel } from "react-icons/gi";
 import { IoCall } from "react-icons/io5";
-import { Link } from 'react-router-dom'; // Assuming you are using react-router for navigation
 import { useSelector } from 'react-redux';
 import Cookies from 'js-cookie';
 import Autocomplete from "react-google-autocomplete";
-import { MdConfirmationNumber } from 'react-icons/md';
+import { HiOutlineOfficeBuilding } from 'react-icons/hi';
 
 
 const BlogGrid = () => {
@@ -651,7 +650,7 @@ const BlogGrid = () => {
                         <div className="col" key={card.id}>
                             <div className="card h-100 shadow truckcard">
                                 <div className='card-header mt-2 border-0 mb-2'>
-                                    <h5 className="card-title cardmodify">{card.company_name}</h5>
+                                    <h5 className="card-title cardmodify">{card.profile_name}</h5>
                                     <p className='.fs-6 mb-0 reviewtext '>
                                         {/* Generate the star ratings based on the response */}
                                         {[...Array(5)].map((_, index) => (
@@ -659,8 +658,8 @@ const BlogGrid = () => {
                                                 <i className={`text-warning fa fa-star ${index < card.rating  ? '' : 'text-muted'}`}></i>
                                             </span>
                                         ))}
-                                        <span>({card.review_count})</span>
-                                        <p className="float-end mb-0 text-b"> <strong>Posts </strong> : 12</p>
+                                        <span>({card.review_count} 4)</span>
+                                        <p className="float-end mb-0 text-b"> <strong>Posts </strong> {card.user_post}</p>
 
                                     </p>
                                 </div>
@@ -691,6 +690,9 @@ const BlogGrid = () => {
                                         </div>
                                         <div className="col-lg-6 cardicon">
                                             <label><FaTruckFast className='me-2' />{card.vehicle_number}</label>
+                                        </div>
+                                        <div className="col-lg-12 cardicon">
+                                            <label><HiOutlineOfficeBuilding className='me-2' />{card.company_name}</label>
                                         </div>
                                     </div>
                                     <div className='m-2'>

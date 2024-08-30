@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import Cookies from 'js-cookie';
 import Autocomplete from "react-google-autocomplete";
 import { IoCall } from 'react-icons/io5';
+import { HiOutlineOfficeBuilding } from 'react-icons/hi';
 
 
 const TruckAvailability = () => {
@@ -685,7 +686,7 @@ const TruckAvailability = () => {
                         <div className="col" key={card.id}>
                             <div className="card h-100 shadow truckcard">
                                 <div className='card-header mt-2 border-0 mb-2'>
-                                    <h5 className="card-title cardmodify">{card.company_name}</h5>
+                                    <h5 className="card-title cardmodify">{card.profile_name}</h5>
                                     <p className='.fs-6 mb-0 reviewtext '>
                                         {/* Generate the star ratings based on the response */}
                                         {[...Array(5)].map((_, index) => (
@@ -693,8 +694,8 @@ const TruckAvailability = () => {
                                                 <i className={`text-warning fa fa-star ${index < card.rating  ? '' : 'text-muted'}`}></i>
                                             </span>
                                         ))}
-                                        <span>({card.review_count})</span>
-                                        <p className="float-end mb-0 text-b"> <strong>Posts </strong> : 12</p>
+                                        <span>({card.review_count} 4)</span>
+                                        <p className="float-end mb-0 text-b"> <strong>Posts </strong> {card.user_post}</p>
 
                                     </p>
                                 </div>
@@ -730,6 +731,9 @@ const TruckAvailability = () => {
                                         </div>
                                         <div className="col-lg-6 cardicon">
                                             <label><FaTruckFast className='me-2' />{card.vehicle_number}</label>
+                                        </div>
+                                        <div className="col-lg-6 cardicon">
+                                            <label><HiOutlineOfficeBuilding className='me-2' />{card.company_name}</label>
                                         </div>
                                     </div>
                                     <div className='m-2'>
