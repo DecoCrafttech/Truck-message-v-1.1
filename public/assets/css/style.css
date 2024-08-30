@@ -20185,11 +20185,78 @@ button {
   cursor: pointer;
 }
 
+.chatlistheadcon {
+  /* margin-bottom: 20px;
+  margin-right: 10px; */
+  /* margin: 20px; */
+  font-size: 16px;
+  font-weight: 800;
+  background-color: rgb(240, 246, 255);
+  padding: 20px 0px 20px 20px;
+  border-bottom: #000;
+  
+  border-radius: 5px;
+  text-align: left; 
+  }
 
-.conversation-list {
-  background-color: #f8f9fa;
-  padding: 0;
-}
+
+.chatlisthead {
+  /* margin-bottom: 20px;
+  margin-right: 10px; */
+  /* margin: 20px; */
+  font-size: 16px;
+  font-weight: 800;
+  background-color: rgb(240, 246, 255);
+  padding: 20px 0px 20px 20px;
+  
+  border-radius: 5px;
+  text-align: left; 
+  }
+
+  .conversation-list .list-group-item {
+    border: solid;
+    border-color: #999;
+    border-radius: 10px;
+    transition: background-color 0.3s, box-shadow 0.3s;
+  }
+  
+  .conversation-list .list-group-item:hover {
+    background-color: #f8f9fa;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .conversation-list .list-group-item.active {
+    background-color: #e9ecef;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+  }
+  
+  .conversation-list .list-group-item img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+  }
+  
+  .form-control {
+    border-radius: 8px;
+  }
+  
+  .btn-outline-secondary {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .btn-outline-secondary i {
+    font-size: 1.2rem;
+  }
+  
+  
+
+
+
 
 .chat-window {
   overflow: auto !important;
@@ -20200,6 +20267,28 @@ button {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+}
+
+.listmsg{
+  background-color: #ff0000 !important;
+  
+}
+
+.msg {
+  background-color: #fff;
+  font-size: 11px;
+  padding: 5px;
+  border-radius: 5px;
+  font-weight: 500;
+  border: solid;
+  color: #3e3c3c
+}
+
+.img1 {
+  border-radius: 50%;
+  border: solid;
+  border-width: .15px;
+  background-color: #ffefef
 }
 
 .message.text-end {
@@ -20235,3 +20324,28 @@ button {
   height: 30rem;
   overflow-y: scroll;
 }
+
+
+.chat-person-card{
+  background-color: #e7e7e709;
+  transition: all .1s linear;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.106);
+  color : black !important;
+  }
+  
+  .chat-person-card:hover,.chat-person-card.active{
+  background-color: #eff7ff;
+  color: rgb(56, 94, 201) !important;
+  
+  }
+
+  .send-message-btn{
+    position: absolute;
+    top: .2rem;
+    right: .5rem;
+  }
+
+  .send-message-btn button{
+    padding: 1rem 2rem;
+  }

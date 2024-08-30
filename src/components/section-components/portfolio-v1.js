@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { FaWeightHanging, FaTruck, FaLocationDot } from "react-icons/fa6";
+import { HiOutlineOfficeBuilding } from "react-icons/hi";
 import { SiMaterialformkdocs } from "react-icons/si";
 import { GiCarWheel } from "react-icons/gi";
 import { useSelector } from 'react-redux';
@@ -14,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 const PortfolioV1 = () => {
     const LoginDetails = useSelector((state) => state.login);
     const navigate =useNavigate();
+    
 
     const [cards, setCards] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -485,6 +487,10 @@ const PortfolioV1 = () => {
         }
     }
 
+    const handleGetDistance = (from,to) =>{
+
+    }
+
     const handleMessageClick = (card) => {
         navigate(`/chat?person_id=${card.user_id}`);
     };
@@ -662,7 +668,7 @@ const PortfolioV1 = () => {
                         <div className="col" key={card.id}>
                             <div className="card h-100 shadow truckcard">
                                 <div className='card-header mt-2 border-0 mb-0 '>
-                                    <h5 className="card-title cardmodify">{card.company_name}</h5>
+                                    <h5 className="card-title cardmodify">{card.profile_name}</h5>
                                     <p className='.fs-6 mb-0 reviewtext '>
                                         {/* Generate the star ratings based on the response */}
                                         {[...Array(5)].map((_, index) => (
@@ -671,7 +677,7 @@ const PortfolioV1 = () => {
                                             </span>
                                         ))}
                                         <span>({card.review_count})</span>
-                                        <p className="float-end mb-0 text-b"> <strong>Posts </strong> : 12</p>
+                                        <p className="float-end mb-0 text-b"> <strong>Posts </strong> : {card.user_post}</p>
 
                                     </p>
 
@@ -687,6 +693,8 @@ const PortfolioV1 = () => {
                                         <div className="col-lg-12 cardicon">
                                             <div><label><FaLocationDot className='me-2 text-success' />{card.to_location}</label></div>
                                         </div>
+
+                                        {handleGetDistance(card.from_location,card.to_location)}
                                     </div>
                                     <hr className="hr m-2" />
                                     <div className='row mt-3'>
@@ -703,6 +711,9 @@ const PortfolioV1 = () => {
                                         </div>
                                         <div className="col-lg-6 cardicon">
                                             <label><FaTruck className='me-2' />{card.truck_body_type}</label>
+                                        </div>
+                                        <div className="col-lg-12 cardicon">
+                                            <label><HiOutlineOfficeBuilding className='me-2' />{card.company_name}</label>
                                         </div>
                                     </div>
                                     <div className='m-2'>
