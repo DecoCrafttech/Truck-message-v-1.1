@@ -15,6 +15,7 @@ import shortid from "https://cdn.skypack.dev/shortid@2.2.16";
 const BlogList = () => {
   const LoginDetails = useSelector((state) => state.login);
 
+
   const [cards, setCards] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [cardsPerPage] = useState(21);
@@ -37,6 +38,8 @@ const BlogList = () => {
   const [showingBuyAndSellLocation, setShowingBuyAndSellLocation] =
     useState("");
 
+  const [kilometers, setkilometers] = useState('');
+  const [price,setPrice]=useState('')
   const [contactError, setContactError] = useState(""); // State to manage contact number validation error
   const [selectedfile, SetSelectedFile] = useState([]);
   const [multipleImages, setMultipleImages] = useState([]);
@@ -74,6 +77,9 @@ const BlogList = () => {
     setFilterLoading(true);
     const filterObj = { ...filterModelData };
     filterObj.location = showingFromLocation;
+    filterObj.kms_driven = `${kilometers} kms`;
+    filterObj.price = `${price} lakhs`;
+
     setIsDataFiltered(true);
 
     try {
@@ -934,9 +940,8 @@ const BlogList = () => {
                   <div className="col-4">
                     <button
                       type="button"
-                      className={`col-12 ${
-                        isDataFiltered ? "filterbtn" : " btn-secondary pe-none"
-                      }`}
+                      className={`col-12 ${isDataFiltered ? "filterbtn" : " btn-secondary pe-none"
+                        }`}
                       onClick={initialRender}
                     >
                       Clear
@@ -1042,23 +1047,48 @@ const BlogList = () => {
                   </div>
                   <div className="col-12 col-md-6">
                     <h6>Kilometers driven</h6>
-                    <div className="tel-item">
-                      <input
-                        type="number"
-                        name="kms driven"
-                        className="w-100 py-4"
-                        placeholder="Type Kms driven"
-                        value={filterModelData.kms_driven}
-                        onChange={(e) =>
-                          SetfilterModelData({
-                            ...filterModelData,
-                            kms_driven: e.target.value,
-                          })
-                        }
-                        required
-                      />
-                    </div>
+                    <button type="button" class="btn btn-transparent dropdown-toggle col-12 py-2 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                      {kilometers === '' ? 'select kilometers' : `${kilometers} kms`}
+                    </button>
+                    <ul class="dropdown-menu col-11 dropdown-ul">
+                      <li onClick={() => setkilometers('(0 - 10,000)')}><a class="dropdown-item">(0 - 10,000) kms</a></li>
+                      <li onClick={() => setkilometers('(10,001 - 30,000)')}><a class="dropdown-item">(10,001 - 30,000) kms</a></li>
+                      <li onClick={() => setkilometers('(30,001 - 50,000)')}><a class="dropdown-item">(30,001 - 50,000) kms</a></li>
+                      <li onClick={() => setkilometers('(50,001 - 70,000)')}><a class="dropdown-item">(50,001 - 70,000) kms</a></li>
+                      <li onClick={() => setkilometers('(70,001 - 100,000)')}><a class="dropdown-item">(70,001 - 100,000) kms</a></li>
+                      <li onClick={() => setkilometers('(100,001 - 150,000)')}><a class="dropdown-item">(100,001 - 150,000) kms</a></li>
+                      <li onClick={() => setkilometers('(150,001 - 200,000)')}><a class="dropdown-item">(150,001 - 200,000) kms</a></li>
+                      <li onClick={() => setkilometers('(200,001 - 300,000)')}><a class="dropdown-item">(200,001 - 300,000) kms</a></li >
+                      <li onClick={() => setkilometers('(300,001 - 500,000)')}><a class="dropdown-item">(300,001 - 500,000) kms</a></li >
+                      <li onClick={() => setkilometers('(500,001 - 700,000)')}><a class="dropdown-item">(500,001 - 700,000) kms</a></li >
+                      <li onClick={() => setkilometers('(700,001 - 1,000,000)')}><a class="dropdown-item">(700,001 - 1,000,000) kms</a></li >
+                      <li onClick={() => setkilometers('(1,000,001 - 1,500,000)')}><a class="dropdown-item">(1,000,001 - 1,500,000) kms</a></li >
+                      <li onClick={() => setkilometers('(1,500,001 - 2,000,000)')}> <a class="dropdown-item">(1,500,001 - 2,000,000) kms</a></li >
+                      <li onClick={() => setkilometers('(2,000,001+)')}><a class="dropdown-item">(2,000,001+ kms)</a></li >
+                    </ul >
                   </div>
+
+
+                  <div className="col-12 my-3">
+                    <h6>Price</h6>
+                    <button type="button" class="btn btn-transparent dropdown-toggle col-12 py-2 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                      {price === '' ? 'select price' : `${price} lakhs`}
+                    </button>
+                    <ul class="dropdown-menu col-11 dropdown-ul">
+                      <li onClick={() => setPrice('(0 - 5,00,000) lakhs')}><a class="dropdown-item">(0 - 5,00,000) lakhs</a></li>
+                      <li onClick={() => setPrice('(5,00,001 - 10,00,000)')}><a class="dropdown-item">(5,00,001 - 10,00,000) lakhs</a></li>
+                      <li onClick={() => setPrice('(10,00,001 - 20,00,000)')}><a class="dropdown-item">(10,00,001 - 20,00,000) lakhs</a></li>
+                      <li onClick={() => setPrice('(20,00,001 - 30,00,000)')}><a class="dropdown-item">(20,00,001 - 30,00,000) lakhs</a></li>
+                      <li onClick={() => setPrice('(30,00,001 - 40,00,000)')}><a class="dropdown-item">(30,00,001 - 40,00,000) lakhs</a></li>
+                      <li onClick={() => setPrice('(40,00,001 - 50,00,000)')}><a class="dropdown-item">(40,00,001 - 50,00,000) lakhs</a></li>
+                      <li onClick={() => setPrice('(50,00,001 - 60,00,000)')}><a class="dropdown-item">(50,00,001 - 60,00,000) lakhs</a></li>
+                      <li onClick={() => setPrice('(60,00,001 - 70,00,000)')}><a class="dropdown-item">(60,00,001 - 70,00,000) lakhs</a></li >
+                      <li onClick={() => setPrice('(70,00,001 - 80,00,000)')}><a class="dropdown-item">(70,00,001 - 80,00,000) lakhs</a></li >
+                      <li onClick={() => setPrice('(80,00,001 - 90,00,000)')}><a class="dropdown-item">(80,00,001 - 90,00,000) lakhs</a></li >
+                      <li onClick={() => setPrice('(90,00,001)')}><a class="dropdown-item">(90,00,001 and above) lakhs</a></li >
+                    </ul >
+                  </div>
+
                   <div className="col-12 col-md-6">
                     <h6>Contact Number</h6>
                     <div className="input-item input-item-email ltn__custom-icon">
@@ -1131,9 +1161,8 @@ const BlogList = () => {
         aria-hidden="true"
       >
         <div
-          className={`modal-dialog modal-dialog-centered modal-dialog-scrollable ${
-            aadharStep === 4 ? "modal-lg" : "modal-md"
-          }`}
+          className={`modal-dialog modal-dialog-centered modal-dialog-scrollable ${aadharStep === 4 ? "modal-lg" : "modal-md"
+            }`}
         >
           <div className="modal-content">
             <div className="modal-header">
@@ -1224,14 +1253,15 @@ const BlogList = () => {
               </div>
             </div>
             <div>
-              <h6>Kilometers driven</h6>
-              <div className="tel-item">
+
+              {/* <div className="tel-item">
                 <input
                   type="number"
                   name="kms driven"
                   className="w-100 py-4"
                   placeholder="Type Kms driven"
                   value={filterModelData.kms_driven}
+                  min="0"
                   onChange={(e) =>
                     SetfilterModelData({
                       ...filterModelData,
@@ -1239,9 +1269,54 @@ const BlogList = () => {
                     })
                   }
                   required
-                />
+                /> */}
+              {/* <div className="col-12 "> */}
+              <h6>Kilometers driven</h6>
+
+              <button type="button" class="btn btn-transparent dropdown-toggle col-12 py-2 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                {kilometers === '' ? 'select kilometers' : `${kilometers} kms`}
+              </button>
+              <ul class="dropdown-menu col-11 dropdown-ul">
+                <li onClick={() => setkilometers('(0 - 10,000)')}><a class="dropdown-item">(0 - 10,000) kms</a></li>
+                <li onClick={() => setkilometers('(10,001 - 30,000)')}><a class="dropdown-item">(10,001 - 30,000) kms</a></li>
+                <li onClick={() => setkilometers('(30,001 - 50,000)')}><a class="dropdown-item">(30,001 - 50,000) kms</a></li>
+                <li onClick={() => setkilometers('(50,001 - 70,000)')}><a class="dropdown-item">(50,001 - 70,000) kms</a></li>
+                <li onClick={() => setkilometers('(70,001 - 100,000)')}><a class="dropdown-item">(70,001 - 100,000) kms</a></li>
+                <li onClick={() => setkilometers('(100,001 - 150,000)')}><a class="dropdown-item">(100,001 - 150,000) kms</a></li>
+                <li onClick={() => setkilometers('(150,001 - 200,000)')}><a class="dropdown-item">(150,001 - 200,000) kms</a></li>
+                <li onClick={() => setkilometers('(200,001 - 300,000)')}><a class="dropdown-item">(200,001 - 300,000) kms</a></li >
+                <li onClick={() => setkilometers('(300,001 - 500,000)')}><a class="dropdown-item">(300,001 - 500,000) kms</a></li >
+                <li onClick={() => setkilometers('(500,001 - 700,000)')}><a class="dropdown-item">(500,001 - 700,000) kms</a></li >
+                <li onClick={() => setkilometers('(700,001 - 1,000,000)')}><a class="dropdown-item">(700,001 - 1,000,000) kms</a></li >
+                <li onClick={() => setkilometers('(1,000,001 - 1,500,000)')}><a class="dropdown-item">(1,000,001 - 1,500,000) kms</a></li >
+                <li onClick={() => setkilometers('(1,500,001 - 2,000,000)')}> <a class="dropdown-item">(1,500,001 - 2,000,000) kms</a></li >
+                <li onClick={() => setkilometers('(2,000,001+ kms)')}><a class="dropdown-item">(2,000,001+ kms)</a></li >
+              </ul >
+
+
+              <div className="col-12 mt-3 p-0">
+                <h6>Price</h6>
+                <button type="button" class="btn btn-transparent dropdown-toggle col-12 py-2 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                  {price === '' ? 'select price' : `${price} lakhs`}
+                </button>
+                <ul class="dropdown-menu col-11 dropdown-ul">
+                  <li onClick={() => setPrice('(0 - 5,00,000)')}><a class="dropdown-item">(0 - 5,00,000) lakhs</a></li>
+                  <li onClick={() => setPrice('(5,00,001 - 10,00,000)')}><a class="dropdown-item">(5,00,001 - 10,00,000) lakhs</a></li>
+                  <li onClick={() => setPrice('(10,00,001 - 20,00,000)')}><a class="dropdown-item">(10,00,001 - 20,00,000) lakhs</a></li>
+                  <li onClick={() => setPrice('(20,00,001 - 30,00,000)')}><a class="dropdown-item">(20,00,001 - 30,00,000) lakhs</a></li>
+                  <li onClick={() => setPrice('(30,00,001 - 40,00,000)')}><a class="dropdown-item">(30,00,001 - 40,00,000) lakhs</a></li>
+                  <li onClick={() => setPrice('(40,00,001 - 50,00,000)')}><a class="dropdown-item">(40,00,001 - 50,00,000) lakhs</a></li>
+                  <li onClick={() => setPrice('(50,00,001 - 60,00,000)')}><a class="dropdown-item">(50,00,001 - 60,00,000) lakhs</a></li>
+                  <li onClick={() => setPrice('(60,00,001 - 70,00,000)')}><a class="dropdown-item">(60,00,001 - 70,00,000) lakhs</a></li >
+                  <li onClick={() => setPrice('(70,00,001 - 80,00,000)')}><a class="dropdown-item">(70,00,001 - 80,00,000) lakhs</a></li >
+                  <li onClick={() => setPrice('(80,00,001 - 90,00,000)')}><a class="dropdown-item">(80,00,001 - 90,00,000) lakhs</a></li >
+                  <li onClick={() => setPrice('(90,00,001 and above)')}><a class="dropdown-item">(90,00,001 and above) lakhs</a></li >
+                </ul >
               </div>
-            </div>
+
+
+              {/* </div> */}
+            </div >
             <div className="pt-3">
               <h6>Contact Number</h6>
               <div className="input-item input-item-email">
@@ -1296,7 +1371,7 @@ const BlogList = () => {
                 </button>
               )}
             </div>
-          </div>
+          </div >
 
           <div className="col-12 col-lg-10 h-100 overflow-auto webkitScroll-buy-sell">
             <div className="d-flex flex-wrap pt-3 pb-5 w-100 h-100">
@@ -1337,9 +1412,8 @@ const BlogList = () => {
                                 {[...Array(5)].map((_, index) => (
                                   <span key={index} className="float-right">
                                     <i
-                                      className={`text-warning fa fa-star ${
-                                        index < card.rating ? "" : "text-muted"
-                                      }`}
+                                      className={`text-warning fa fa-star ${index < card.rating ? "" : "text-muted"
+                                        }`}
                                     ></i>
                                   </span>
                                 ))}
@@ -1405,7 +1479,7 @@ const BlogList = () => {
               )}
             </div>
           </div>
-        </div>
+        </div >
 
         <div className="pagination">
           <ul className="pagination-list">
@@ -1425,8 +1499,8 @@ const BlogList = () => {
             ))}
           </ul>
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 };
 

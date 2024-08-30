@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
 import { LuRefreshCcw } from "react-icons/lu";
@@ -16,6 +16,7 @@ const ChatView = () => {
   const [userId, setUserId] = useState(Cookies.get("usrin")); // Set your user_id
   const [personId, setPersonId] = useState(query?.get("person_id")); // Will be set based on selected conversation
   const [userList, setUserList] = useState([]);
+  const chatWindowRef = useRef(null); // To reference the chat window
 
   const getUserList = async () => {
     try {
@@ -33,8 +34,8 @@ const ChatView = () => {
           return findUSer.person_id == personId;
         });
 
-        setPersonId(findUser.length > 0 ? findUser[0].person_id : 0);
-        fetchChatMessages(findUser.length > 0 ? findUser[0].person_id : 0);
+        setPersonId(findUser.length > 0 ? findUser[0].person_id : personId);
+        fetchChatMessages(findUser.length > 0 ? findUser[0].person_id : personId);
       }
     } catch (err) {
       console.error("Error getting user list:", err);
@@ -51,11 +52,9 @@ const ChatView = () => {
         }
       );
 
-      console.log(response, "response");
       if (response.data.error_code === 0) {
         // Reverse the messages to display the most recent at the bottom
         setMessages(response.data.data.reverse());
-        handleSendMessage(personId);
       } else {
         console.error("Error fetching messages:", response.data.message);
       }
@@ -82,7 +81,7 @@ const ChatView = () => {
           setMessages((prevMessages) => [
             ...prevMessages,
             {
-              chat_id: userId,
+              chat_id: window.atob(userId),
               message: newMessage,
               updt: new Date().toUTCString(),
             },
@@ -105,59 +104,26 @@ const ChatView = () => {
   };
 
   const handleRefresh = () => {
-    // Implement your logic to refresh the contact list
-    console.log("Refresh button clicked");
+    getUserList(); // Refresh the contact list
   };
 
   useEffect(() => {
     getUserList();
   }, []);
 
+  useEffect(() => {
+    // Scroll to the bottom of the chat window when messages are updated
+    if (chatWindowRef.current) {
+      chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight;
+    }
+  }, [messages]);
+
   return (
     <div className="container-fluid d-flex flex-column py-3">
       <div className="row flex-grow-1">
         {/* Conversation List */}
-        {/* <div className="col-md-4 border-end conversation-list">
-          <h5 className="card-title chatlisthead mt-3">Chat List</h5>
-          <div className="list-group pt-3">
-            {userList.map((users, userIndex) => {
-              return (
-                <button
-                  className={`list-group-item list-group-item-action mb-2    ${
-                    users.person_id === personId ? "active" : ""
-                  }`}
-                  onClick={() => {
-                    handleSelectConversation("Conversation 1", users.person_id);
-                    handleSendMessage(users.person_id);
-                  }}
-                >
-                  <img
-                    src="https://img.icons8.com/color/40/000000/guest-female.png"
-                    width="30"
-                    class="img1 "
-                  />
-                  <span className="ps-3">{users.profile_name}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div> */}
-
         <div className="col-md-4 border-end border-top conversation-list">
           <h5 className="card-title chatlisthead mt-3">Chat List</h5>
-          {/* <div className="d-flex align-items-center mt-3 px-3">
-            <input
-              type="text"
-              className="form-control "
-              placeholder="Search "
-            />
-            <button
-              className="btn btn-outline-secondary"
-              onClick={handleRefresh}
-            >
-              <i className="bi bi-arrow-clockwise"></i>
-            </button>
-          </div> */}
           <div className="list-group pt-3">
             {userList.map((users, userIndex) => {
               return (
@@ -168,7 +134,6 @@ const ChatView = () => {
                   }`}
                   onClick={() => {
                     handleSelectConversation("Conversation 1", users.person_id);
-                    handleSendMessage(users.person_id);
                   }}
                   style={{ cursor: "pointer" }}
                 >
@@ -196,18 +161,20 @@ const ChatView = () => {
         {/* Chat Window */}
         <div className="col-md-8 border-top d-flex flex-column">
           <div className="col-md-12 row d-flex align-items-center gap-2">
-            <h5 className=" col-md-9 card-title chatlistheadcon mt-3 pe-2">
+            <h5 className="col-md-9 card-title chatlistheadcon mt-3 pe-2">
               Chat List
             </h5>
             <button
-              className="ps-2  p-4 btn col-md-2 btn-outline-secondary"
+              className="ps-2 p-4 btn col-md-2 btn-outline-secondary"
               onClick={handleRefresh}
             >
               <LuRefreshCcw />
             </button>
           </div>
-          <div className="flex-grow-1 p-3 chat-window d-flex flex-column chat-messgae-min-height">
-            {/* {selectedConversation ? ( */}
+          <div
+            className="flex-grow-1 p-3 chat-window d-flex flex-column chat-messgae-min-height"
+            ref={chatWindowRef}
+          >
             {messages.map((msg, index) => {
               return (
                 <div
@@ -257,10 +224,6 @@ const ChatView = () => {
                 </div>
               );
             })}
-
-            {/* ) : (
-              <p>Select a conversation to start chatting.</p>
-            )} */}
           </div>
           <div className="p-3 border-top">
             <div className="input-group position-relative">

@@ -4,10 +4,8 @@ import HomeV1 from './components/home-v1';
 import About from './components/about';
 import Service from './components/service';
 import ServiceDetails from './components/service-details';
-import loadavailability from './components/loadavailability';
 import PortfolioV2 from './components/portfolio-v2';
-import truck_availability from './components/truckavailability';
-// import truckavailability from './components/truckavailability';
+import truck_availability from './components/truckavailability'; 
 import Team from './components/team';
 import TeamDetails from './components/team-details';
 import Faq from './components/faq';
@@ -86,14 +84,12 @@ function App() {
 
           {/* <Route path="/load-availabilitypage" element={ <Loadavailablity/> } /> */}
 
-
           <Route path="/product-details" element={<ProdductDetails />} />
           {/* blog */}
           <Route path="/blog-grid" element={<BlogGrid />} />
           <Route path="/blog-left-sidebar" element={<BlogLeftSidebar />} />
           <Route path="/blog-right-sidebar" element={<BlogRightSidebar />} />
           <Route path="/blog" element={<Blog />} />
-
 
           <Route path="/blog-details" element={<BlogDetails />} />
           <Route path="/contact" element={<Contact />} />
@@ -105,7 +101,6 @@ function App() {
           <Route path="/add-listing" element={<AddListing />} />
           <Route path="/toll-calculator" element={<TollCalculator />} />
 
-
           <Route path="/wishlist" element={<Wishlist />}>
             <Route path="load" />
             <Route path="truck" />
@@ -113,11 +108,9 @@ function App() {
             <Route path="buy_sell" />
           </Route>
 
-
           <Route path="/expense-calculator" element={<ExpenseCalculator />} />
           <Route path="/expense-details/:id" element={<ExpenseDetails />} />
           <Route path="/fuelprice" element={<FuelPrice />} />
-
 
           <Route path="/order-tracking" element={<OrderTracking />} />
           <Route path="/history" element={<History />} />

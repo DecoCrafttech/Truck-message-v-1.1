@@ -20349,3 +20349,26 @@ button {
   .send-message-btn button{
     padding: 1rem 2rem;
   }
+
+
+  .signin-password-eye{
+    position: absolute;
+    top: 1.95rem;
+    right: .36rem;
+    background-color: transparent;
+  }
+
+  .signin-password-eye button:focus{
+    box-shadow: none !important;
+    border: 0 !important;
+  }
+
+  .dropdown-arrow::after{
+    top: 1.4rem !important;
+    right: .5rem!important;
+  }
+
+  .dropdown-ul{
+    height: 25rem;
+    overflow-y: scroll;
+  }

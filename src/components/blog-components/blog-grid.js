@@ -9,10 +9,12 @@ import { useSelector } from 'react-redux';
 import Cookies from 'js-cookie';
 import Autocomplete from "react-google-autocomplete";
 import { HiOutlineOfficeBuilding } from 'react-icons/hi';
+import { useNavigate } from 'react-router-dom';
 
 
 const BlogGrid = () => {
     const LoginDetails = useSelector((state) => state.login);
+    const navigate = useNavigate();
 
     const [cards, setCards] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -43,19 +45,20 @@ const BlogGrid = () => {
 
     const formRef = useRef(null);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get('https://truck.truckmessage.com/all_driver_details');
-                if (response.data.success && Array.isArray(response.data.data)) {
-                    setCards(response.data.data);
-                } else {
-                    console.error('Unexpected response format:', response.data);
-                }
-            } catch (error) {
-                console.error('There was an error fetching the data!', error);
+    const fetchData = async () => {
+        try {
+            const response = await axios.get('https://truck.truckmessage.com/all_driver_details');
+            if (response.data.success && Array.isArray(response.data.data)) {
+                setCards(response.data.data);
+            } else {
+                console.error('Unexpected response format:', response.data);
             }
-        };
+        } catch (error) {
+            console.error('There was an error fetching the data!', error);
+        }
+    };
+
+    useEffect(() => {
         fetchData();
     }, []);
 
@@ -95,48 +98,50 @@ const BlogGrid = () => {
         return contactNumberPattern.test(contact);
     };
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const contactNumber = formData.get('contact_no');
+    const handleSubmit = async (event) => {
+        try {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const contactNumber = formData.get('contact_no');
 
-        if (!validateContactNumber(contactNumber)) {
-            setContactError('Please enter a valid 10-digit contact number.');
-            return;
-        }
-
-        const userId = window.atob(Cookies.get("usrin"));
-        const data = {
-            vehicle_number: formData.get('vehicle_number'),
-            company_name: formData.get('company_name'),
-            driver_name: formData.get('driver_name'),
-            contact_no: contactNumber,
-            from: formData.get('from_location'),
-            to: formData.get('to_location'),
-            truck_name: formData.get('truck_name'),
-            truck_body_type: formData.get('truck_body_type'),
-            no_of_tyres: formData.get('tyre_count'),
-            description: formData.get('description'),
-            user_id: userId
-        };
-
-        axios.post('https://truck.truckmessage.com/driver_entry', data, {
-            headers: {
-                'Content-Type': 'application/json'
+            if (!validateContactNumber(contactNumber)) {
+                setContactError('Please enter a valid 10-digit contact number.');
+                return;
             }
-        })
-            .then(response => {
-                toast.success('Form submitted successfully!');
-                formRef.current.reset();
-                setContactError('');
-                setTimeout(() => {
-                    window.location.reload();
-                }, 100);
+
+            const userId = window.atob(Cookies.get("usrin"));
+            const data = {
+                vehicle_number: formData.get('vehicle_number'),
+                company_name: formData.get('company_name'),
+                driver_name: formData.get('driver_name'),
+                contact_no: contactNumber,
+                from: formData.get('from_location'),
+                to: formData.get('to_location'),
+                truck_name: formData.get('truck_name'),
+                truck_body_type: formData.get('truck_body_type'),
+                no_of_tyres: formData.get('tyre_count'),
+                description: formData.get('description'),
+                user_id: userId
+            };
+
+            axios.post('https://truck.truckmessage.com/driver_entry', data, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             })
-            .catch(error => {
-                console.error('There was an error submitting the form:', error);
-                toast.error('Failed to submit the form.');
-            });
+                .then(response => {
+                    toast.success('Form submitted successfully!');
+                    formRef.current.reset();
+                    setContactError('');
+                    fetchData()
+                })
+                .catch(error => {
+                    console.error('There was an error submitting the form:', error);
+                    toast.error('Failed to submit the form.');
+                });
+        } catch (err) {
+            console.log(err)
+        }
     };
 
     const filteredCards = filterCards(cards);
@@ -432,7 +437,7 @@ const BlogGrid = () => {
                                 </div>
                             </div>
                         </div>
-                    
+
                         <div className="row">
 
                             <div className="col-12 col-md-6">
@@ -478,6 +483,10 @@ const BlogGrid = () => {
                 break;
         }
     }
+
+    const handleMessageClick = (card) => {
+        navigate(`/chat?person_id=${card.user_id}`);
+    };
 
     return (
         <div>
@@ -655,7 +664,7 @@ const BlogGrid = () => {
                                         {/* Generate the star ratings based on the response */}
                                         {[...Array(5)].map((_, index) => (
                                             <span key={index} className="float-right">
-                                                <i className={`text-warning fa fa-star ${index < card.rating  ? '' : 'text-muted'}`}></i>
+                                                <i className={`text-warning fa fa-star ${index < card.rating ? '' : 'text-muted'}`}></i>
                                             </span>
                                         ))}
                                         <span>({card.review_count} 4)</span>
@@ -716,7 +725,7 @@ const BlogGrid = () => {
                                                     </button>
                                                 </div>
                                                 <div className='col-6'>
-                                                    <button className="btn cardbutton w-100" type="button">Message</button>
+                                                    <button className="btn cardbutton w-100" type="button" onClick={() => handleMessageClick(card)}>Message</button>
                                                 </div>
                                             </div>
                                         ) :

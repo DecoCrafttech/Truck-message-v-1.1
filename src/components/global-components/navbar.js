@@ -8,6 +8,8 @@ import Cookie from 'js-cookie';
 import axios from 'axios';
 import { MdDelete } from "react-icons/md";
 import Autocomplete from "react-google-autocomplete";
+import { AiOutlineEye } from "react-icons/ai";
+import { AiOutlineEyeInvisible } from "react-icons/ai";
 
 const Navbar = () => {
     const Login = useSelector((state) => state.login);
@@ -17,8 +19,16 @@ const Navbar = () => {
     const publicUrl = process.env.PUBLIC_URL + '/';
 
     const [phoneNumber, setPhoneNumber] = useState('');
+    const [email, setEmail] = useState('');
+    const [pincode, setPincode] = useState('');
     const [password, setPassword] = useState('');
     const [termsChecked, setTermsChecked] = useState(false);
+    const [passwordEye, setPasswordEye] = useState(false);
+    const [signinLoading, setSignInLoading] = useState(false);
+    const [forgotPassMobNumVerification, setforgotPassMobNumVerification] = useState(false);
+    const [verifyOtpLoading, setVerifyOtpLoading] = useState(false);
+    const [updatePasswordLoading, setUpdatePasswordLoading] = useState(false);
+    const [resendCountDown, setResendCountDown] = useState(null);
 
     const [otpInput, setOtpInput] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -35,7 +45,14 @@ const Navbar = () => {
 
     const [forgotPassMobNum, setForgotPassMobNum] = useState('');
     const [forgotPasswordStep, setForgotPasswordStep] = useState(Number);
-    const [forgotPassUSerId,setforgotPassUSerId] = useState('')
+    const [forgotPassUSerId, setforgotPassUSerId] = useState('')
+
+    const handleReset = () => {
+        setPasswordEye(false)
+        setResendCountDown(null)
+        setUpdatePasswordLoading(false)
+        setVerifyOtpLoading(false)
+    }
 
     const [updatePass, setUpdatePass] = useState({
         password: '',
@@ -63,6 +80,7 @@ const Navbar = () => {
         } else if (!termsChecked) {
             toast.error('Please agree to the terms and conditions.');
         } else {
+            setSignInLoading(true)
             try {
                 const loginData = {
                     username: phoneNumber,
@@ -84,7 +102,8 @@ const Navbar = () => {
 
                     dispatch(updateIsLoggedIn(true));
                     document.getElementById("closeSignInModel").click();
-                }   
+                }
+                setSignInLoading(false)
             } catch (err) {
                 toast.error(err.code)
             }
@@ -93,7 +112,7 @@ const Navbar = () => {
 
     const register = async () => {
         try {
-            if (firstName === '' || dob === '' || phoneNumber === '' || password === '' || confirmPassword === '' || operatingStates.length === 0) {
+            if (firstName === '' || dob === '' || phoneNumber === '' || category==='' || password === '' || confirmPassword === '' || operatingStates.length === 0 || pincode.length === 0) {
                 toast.error('Please fill in all fields.');
                 return;
             } else if (password !== confirmPassword) {
@@ -101,6 +120,11 @@ const Navbar = () => {
                 return;
             } else if (!termsChecked) {
                 toast.error('You must agree to the terms and conditions.');
+                return;
+            }
+
+            else if (pincode.length !== 6) {
+                toast.error('Pin code should be 6 digit');
                 return;
             }
 
@@ -112,16 +136,15 @@ const Navbar = () => {
                 phone_number: phoneNumber,
                 password: password,
                 operating_city: operatingStates,
-                email:"test@gmail.com",
-                pincode:627415
+                email: email,
+                pincode: pincode
             };
-
-            console.log(registrationData)
 
             const res = await axios.post('https://truck.truckmessage.com/registration', registrationData)
             if (res.data.error_code === 0) {
                 if (res.data.success) {
                     toast.success(res.data.message)
+
                     sendOTP(phoneNumber); // Send OTP after successful registration
                     setStep(2); // Move to step 2 after registration
                 } else {
@@ -134,8 +157,25 @@ const Navbar = () => {
         }
     };
 
+    useEffect(() => {
+        if (resendCountDown === 0) {
+            setResendCountDown(null);
+        }
+
+        if (!resendCountDown) return;
+
+        const intervalId = setInterval(() => {
+            setResendCountDown(resendCountDown - 1);
+        }, 1000);
+
+        return () => clearInterval(intervalId);
+    }, [resendCountDown]);
+
+
+
     const sendOTP = async (phone) => {
         try {
+
             await axiosInstance.post('/send_signup_otp', { phone_number: phone })
         } catch (err) {
             toast.error(err.code)
@@ -149,6 +189,7 @@ const Navbar = () => {
                 return;
             }
 
+            setVerifyOtpLoading(true)
             const otpData = {
                 phone_number: phoneNumber,
                 otp: otpInput
@@ -159,7 +200,7 @@ const Navbar = () => {
 
                 document.getElementById("registrationModalClose").click();
             }
-
+            setVerifyOtpLoading(false)
         } catch (err) {
             console.log(err)
         }
@@ -213,23 +254,32 @@ const Navbar = () => {
     }
 
     const handleVerifyMobileNumbre = async () => {
-        if (forgotPassMobNum !== '' ) {
-            try {
-                const data = {
-                    phone_number:forgotPassMobNum
-                }
-                const res = await axios.post('https://truck.truckmessage.com/send_forgot_pwd_otp', data)
+        if (forgotPassMobNum !== '') {
+            if (forgotPassMobNum.length === 10) {
+                setforgotPassMobNumVerification(true);
 
-                if(res.data.error_code === 0){
-                    setForgotPasswordStep(2)
-                    setforgotPassUSerId(res.data.data.user_id)
-                    toast.success(res.data.message)
-                }else{
-                    toast.error(res.data.message)
+                try {
+                    const data = {
+                        phone_number: forgotPassMobNum
+                    }
+                    const res = await axios.post('https://truck.truckmessage.com/send_forgot_pwd_otp', data)
+
+                    if (res.data.error_code === 0) {
+                        setResendCountDown(60)
+
+                        setForgotPasswordStep(2)
+                        setforgotPassUSerId(res.data.data.user_id)
+                        toast.success(res.data.message)
+                    } else {
+                        toast.error(res.data.message)
+                    }
+                    setforgotPassMobNumVerification(false);
                 }
-            }
-            catch (err) {
-                console.log(err)
+                catch (err) {
+                    console.log(err)
+                }
+            } else {
+                toast.error("phone number should must be 10 characters")
             }
         } else {
             toast.error("Invalid mobile number")
@@ -240,17 +290,16 @@ const Navbar = () => {
         if (otp !== '' && otp.length === 6) {
             try {
                 const data = {
-                    phone_number:forgotPassMobNum,
-                    otp:otp,
-                    user_id:JSON.stringify(forgotPassUSerId)
+                    phone_number: forgotPassMobNum,
+                    otp: otp,
+                    user_id: JSON.stringify(forgotPassUSerId)
                 }
                 const res = await axios.post('https://truck.truckmessage.com/validate_forgot_otp', data)
 
-                if(res.data.error_code === 0){
-                    console.log(res.data)
+                if (res.data.error_code === 0) {
                     setForgotPasswordStep(3)
                     toast.success(res.data.message)
-                }else{
+                } else {
                     toast.error(res.data.message)
                 }
             }
@@ -265,20 +314,22 @@ const Navbar = () => {
     const handleVerifyPasswords = async () => {
         if (updatePass.password !== '' || updatePass.confirm_password !== '') {
             if (updatePass.password === updatePass.confirm_password) {
+                setUpdatePasswordLoading(true)
                 try {
                     const data = {
-                        user_id:JSON.stringify(forgotPassUSerId),
-                        pwd_type:"forgot_pwd",
-                        new_pwd:updatePass.password
+                        user_id: JSON.stringify(forgotPassUSerId),
+                        pwd_type: "forgot_pwd",
+                        new_pwd: updatePass.password
                     }
                     const res = await axios.post('https://truck.truckmessage.com/update_user_password', data)
 
-                    if(res.data.error_code === 0){
+                    if (res.data.error_code === 0) {
                         document.getElementById('closeForgotPasswordModel').click()
                         toast.success(res.data.message)
-                    }else{
+                    } else {
                         toast.error(res.data.message)
                     }
+                    setUpdatePasswordLoading(false)
                 }
                 catch (err) {
                     console.log(err)
@@ -309,15 +360,28 @@ const Navbar = () => {
                                                 <label>Phone Number</label>
                                                 <input type="number" max={10} className="form-control py-3" placeholder="Phone number" value={forgotPassMobNum} onChange={(e) => setForgotPassMobNum(e.target.value)} />
                                             </div>
-                                            <button type="button" className="btn btn-primary btn-block" onClick={handleVerifyMobileNumbre}>Verify</button>
+                                            {
+                                                forgotPassMobNumVerification ?
+                                                    <button type="button" className="btn btn-primary btn-block pe-none" >
+                                                        <div class="spinner-border text-light" role="status">
+                                                            <span class="visually-hidden">Loading...</span>
+                                                        </div>
+                                                    </button>
+                                                    :
+                                                    <button type="button" className="btn btn-primary btn-block" onClick={handleVerifyMobileNumbre}>Verify</button>
+                                            }
+
                                         </div>
                                     </div>
                                     <div className='mt-1 ps-4'>
-                                                    <p>
-                                                    Remember your password? 
-                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal" onClick={() => { document.getElementById("closeForgotPasswordModel").click() }}> Sign in</a>
-                                                    </p>
-                                                </div>
+                                        <p>
+                                            Remember your password?
+                                            <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal" onClick={() => {
+                                                document.getElementById("closeForgotPasswordModel").click()
+                                                setPasswordEye(false)
+                                            }}> Sign in</a>
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </section>
@@ -340,6 +404,18 @@ const Navbar = () => {
                                                 <label>OTP</label>
                                                 <input type="number" max={6} className="form-control py-3" placeholder="Enter otp" value={otp} onChange={(e) => setOtp(e.target.value)} />
                                             </div>
+
+                                            <div className='text-end mb-3'>
+                                                <span className='pe-2'>{resendCountDown ? `00:${resendCountDown}` : '00:00'} </span>
+                                                <a className={`text-decoration-underline ${resendCountDown !== null ? 'pe-none' : 'cursor-pointer'}`} onClick={resendCountDown !== null ?
+                                                    null : () => {
+                                                        setResendCountDown(60)
+                                                        sendOTP(phoneNumber)
+                                                    }}>
+                                                    resend otp
+                                                </a>
+                                            </div>
+
                                             <button type="button" className="btn btn-primary btn-block" onClick={handleVerifyOtp}>Verify otp</button>
                                         </div>
                                     </div>
@@ -369,7 +445,17 @@ const Navbar = () => {
                                                 <label>Confirm password</label>
                                                 <input type="password" className="form-control" placeholder="Confirm Password" value={updatePass.confirm_password} onChange={(e) => setUpdatePass({ ...updatePass, confirm_password: e.target.value })} />
                                             </div>
-                                            <button type="button" className="btn btn-primary btn-block" onClick={handleVerifyPasswords}>Update password</button>
+                                            {
+                                                updatePasswordLoading ?
+                                                    <button type="button" className="btn btn-primary btn-block pe-none" >
+                                                        <div class="spinner-border text-light" role="status">
+                                                            <span class="visually-hidden">Loading...</span>
+                                                        </div>
+                                                    </button>
+                                                    :
+                                                    <button type="button" className="btn btn-primary btn-block" onClick={handleVerifyPasswords}>Update password</button>
+                                            }
+
                                         </div>
                                     </div>
                                 </div>
@@ -573,9 +659,17 @@ const Navbar = () => {
                                                     <label>Phone Number</label>
                                                     <input type="text" className="form-control" placeholder="Phone number" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
                                                 </div>
-                                                <div className="form-group">
+                                                <div className="form-group position-relative">
                                                     <label>Password</label>
-                                                    <input type="password" className="form-control" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                                                    <input type={passwordEye ? "text" : "password"} className="form-control" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                                                    <div className='signin-password-eye'>
+                                                        {
+                                                            passwordEye ?
+                                                                <button type="button" className='btn py-3' onClick={() => setPasswordEye(!passwordEye)}><AiOutlineEye className='fs-4' /></button>
+                                                                :
+                                                                <button type="button" className='btn py-3' onClick={() => setPasswordEye(!passwordEye)}><AiOutlineEyeInvisible className='fs-4' /></button>
+                                                        }
+                                                    </div>
 
                                                     <div className='text-end w-100'>
                                                         <a href="#" data-bs-toggle="modal" data-bs-target="#forgotpasswordModel" onClick={() => {
@@ -588,7 +682,17 @@ const Navbar = () => {
                                                     <input type="checkbox" className="form-check-input" id="termsCheck" checked={termsChecked} onChange={() => setTermsChecked(!termsChecked)} />
                                                     <label className="form-check-label ps-2" htmlFor="termsCheck">I agree to the terms and conditions</label>
                                                 </div>
-                                                <button type="button" className="btn btn-primary btn-block" onClick={signIn}>Sign In</button>
+                                                {
+                                                    signinLoading ?
+                                                        <button type="button" className="btn btn-primary btn-block pe-none" >
+                                                            <div class="spinner-border text-light" role="status">
+                                                                <span class="visually-hidden">Loading...</span>
+                                                            </div>
+                                                        </button>
+                                                        :
+                                                        <button type="button" className="btn btn-primary btn-block" onClick={signIn}>Sign In</button>
+                                                }
+
                                                 <div className='mt-4'>
                                                     <p>
                                                         Dont have an account ?
@@ -615,7 +719,7 @@ const Navbar = () => {
 
             {/* register modal  */}
             <div className="modal fade" id="registerModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
                     <div className="modal-content">
                         <div className="modal-header border-0">
                             <h1 className="modal-title fs-5  " id="staticBackdropLabel">Registration</h1>
@@ -624,20 +728,34 @@ const Navbar = () => {
                         <div className="modal-body">
                             <div className="row">
                                 <div className="col-lg-12 p-2 border-0">
-                                    <div className="card mx-auto  border-0" style={{ maxWidth: '520px' }}>
-                                        <div className="card-body">
+                                    <div className="col-12 border-0">
+                                        <form className="card-body">
                                             {/* <h4 className="card-title mb-4">Registration</h4> */}
-                                            <div id="step1" style={{ display: step === 1 ? 'block' : 'none' }}>
-                                                <div className="form-group ">
+                                            <div id="step1" className={`col-12 ${step === 1 ? 'd-flex flex-wrap' : 'd-none'}`}>
+                                                <div className="form-group col-12 col-md-6 mb-3">
                                                     <label className='mb-1'>Name</label>
-                                                    <input type="text" className="form-control" placeholder="Enter Your Name" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+                                                    <input type="text" className="form-control mb-0" placeholder="Enter Your Name" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
                                                 </div>
 
-                                                <div className="form-group ">
+                                                <div className="form-group col-12 col-md-6 mb-3">
                                                     <label>Date of Birth</label>
-                                                    <input type="date" className="form-control py-3" placeholder="Date of Birth" value={dob} onChange={(e) => setDob(e.target.value)} />
+                                                    <input type="date" className="form-control py-3 mb-0" placeholder="Date of Birth" value={dob} onChange={(e) => setDob(e.target.value)} />
                                                 </div>
-                                                <div className="input-item mb-3">
+                                                <div className="form-group mb-3 col-12 col-md-6">
+                                                    <label>Email</label>
+                                                    <div className="input-group ">
+                                                        <input type="email" className="form-control py-3 mb-0" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                                                    </div>
+                                                </div>
+
+                                                <div className="form-group mb-3 col-12 col-md-6">
+                                                    <label>Pincode</label>
+                                                    <div className="input-group ">
+                                                        <input type="text" className="form-control py-3 mb-0" placeholder="Pincode" value={pincode} onChange={(e) => setPincode(e.target.value)} maxLength="6" />
+                                                    </div>
+                                                </div>
+
+                                                <div className="form-group mb-3 col-12 col-md-6">
                                                     <label>Phone Number</label>
                                                     <div className="input-group ">
                                                         <div className="input-group-prepend d-flex">
@@ -646,19 +764,23 @@ const Navbar = () => {
                                                         <input type="tel" className="form-control py-3 mb-0" placeholder="Phone number" value={phoneNumber} onInput={handlePhoneNumberInput} maxLength="10" />
                                                     </div>
                                                 </div>
-                                                <div className="input-item">
-                                                    <label>Category</label>
-                                                    <select className="form-select" onChange={(e) => setCategory(e.target.value)}>
-                                                        <option value="">Select Category</option>
-                                                        <option value="Lorry Owner">Lorry Owner</option>
-                                                        <option value="Logistics">Logistics</option>
-                                                        <option value="Lorry Contractors">Lorry Contractors</option>
-                                                        <option value="Load Booking Agent">Load Booking Agent</option>
-                                                        <option value="Driver">Driver</option>
-                                                        <option value="Lorry Buy & Sell Dealer/Owner">Lorry Buy & Sell Dealer/Owner</option>
-                                                    </select>
+
+                                                <div className="col">
+                                                    <h6>Category</h6>
+                                                    <button type="button" class="btn btn-transparent dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        {category === '' ? 'select Category' : category}
+                                                    </button>
+                                                    <ul class="dropdown-menu col-11">
+                                                        <li onClick={() => setCategory('Lorry Owner')}><a class="dropdown-item">Lorry Owner</a></li>
+                                                        <li onClick={() => setCategory('Logistics')}><a class="dropdown-item">Logistics</a></li>
+                                                        <li onClick={() => setCategory('Lorry Contractors')}><a class="dropdown-item">Lorry Contractors</a></li>
+                                                        <li onClick={() => setCategory('Load Booking Agent')}><a class="dropdown-item">Load Booking Agent</a></li>
+                                                        <li onClick={() => setCategory('Driver')}><a class="dropdown-item">Driver</a></li>
+                                                        <li onClick={() => setCategory('Lorry Buy & Sell Dealer/Owner')}><a class="dropdown-item">Lorry Buy & Sell Dealer/Owner</a></li>
+                                                    </ul >
                                                 </div>
-                                                <div className="form-group mb-3">
+
+                                                <div className="form-group mb-3 col-12 col-md-6 mt-3 mt-md-0">
                                                     <label>Operating State and City</label>
                                                     <Autocomplete name="from_location"
                                                         className="google-location location-input bg-transparent mb-1"
@@ -676,10 +798,17 @@ const Navbar = () => {
                                                         onChange={(e) => setoperatingStateString(e.target.value)}
                                                         disabled={checked}
                                                     />
-                                                    <div className='row g-2 mb-3 h-100'>
+
+                                                    <div className="form-check mb-0 col-12">
+                                                        <input className="form-check-input" type="checkbox" value="" id="allStatesandCities" onChange={handleCheckbox} />
+                                                        <label className="form-check-label ps-2 mb-0" for="allStatesandCities">
+                                                            All states and cities
+                                                        </label>
+                                                    </div>
+                                                    <div className='row g-2 mb-3 h-100 col-12'>
                                                         {!checked ?
                                                             operatingStates.map((v, i) => {
-                                                                return <div className='col-6 h-100'>
+                                                                return <div className='col-12 col-md-6 h-100'>
                                                                     <div className='p-2 border rounded-2 col-12 d-flex flex-wrap'>
                                                                         <div className="col-10 p-0">
                                                                             <p className='m-0 text-break'>{v}</p>
@@ -694,21 +823,16 @@ const Navbar = () => {
                                                             null}
                                                     </div>
                                                 </div>
-                                                <div className="form-check mb-3">
-                                                    <input className="form-check-input" type="checkbox" value="" id="allStatesandCities" onChange={handleCheckbox} />
-                                                    <label className="form-check-label ps-2" for="allStatesandCities">
-                                                        All states and cities
-                                                    </label>
-                                                </div>
-                                                <div className="form-group mb-3">
+
+                                                <div className="form-group mb-3 col-12 col-md-6">
                                                     <label>Password</label>
-                                                    <input type="password" className="form-control" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                                                    <input type="password" className="form-control mb-0" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
                                                 </div>
-                                                <div className="form-group mb-3">
+                                                <div className="form-group mb-3 col-12 col-md-6">
                                                     <label>Confirm Password</label>
-                                                    <input type="password" className="form-control" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                                                    <input type="password" className="form-control mb-0" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
                                                 </div>
-                                                <div className="form-group form-check">
+                                                <div className="form-group form-check col-12">
                                                     <input type="checkbox" className="form-check-input" id="termsCheck" checked={termsChecked} onChange={() => setTermsChecked(!termsChecked)} />
                                                     <label className="form-check-label" htmlFor="termsCheck">I agree to the terms and conditions</label>
                                                 </div>
@@ -717,7 +841,10 @@ const Navbar = () => {
                                                 <div className='mt-4'>
                                                     <p>
                                                         Already have an account ?
-                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal" onClick={() => { document.getElementById("registrationModalClose").click() }}> Sign in</a>
+                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal" onClick={() => {
+                                                            document.getElementById("registrationModalClose").click()
+                                                            handleReset()
+                                                        }}> Sign in</a>
                                                     </p>
                                                 </div>
                                             </div>
@@ -728,9 +855,19 @@ const Navbar = () => {
                                                     <label>Enter OTP</label>
                                                     <input type="text" className="form-control" placeholder="Enter OTP" value={otpInput} onChange={(e) => setOtpInput(e.target.value)} />
                                                 </div>
-                                                <button type="button" className="btn btn-primary btn-block" onClick={validateOTP} aria-label="Send OTP">Verify OTP</button>
+                                                {
+                                                    verifyOtpLoading ?
+                                                        <button type="button" className="btn btn-primary btn-block pe-none" >
+                                                            <div class="spinner-border text-light" role="status">
+                                                                <span class="visually-hidden">Loading...</span>
+                                                            </div>
+                                                        </button>
+                                                        :
+                                                        <button type="button" className="btn btn-primary btn-block" onClick={validateOTP} aria-label="Send OTP">Verify OTP</button>
+                                                }
+
                                             </div>
-                                        </div>
+                                        </form>
                                     </div>
                                 </div>
                             </div>

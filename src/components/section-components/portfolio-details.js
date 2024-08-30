@@ -3,9 +3,10 @@ import axios from 'axios';
 import { FaWeightHanging, FaTruck, FaLocationDot } from "react-icons/fa6";
 import { SiMaterialformkdocs } from "react-icons/si";
 import { GiCarWheel } from "react-icons/gi";
-import { Link } from 'react-router-dom'; // Assuming you are using react-router for navigation
+import { Link, useNavigate } from 'react-router-dom'; // Assuming you are using react-router for navigation
 
 function Truck_availability() {
+    const navigate =useNavigate();
     const [cards, setCards] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [cardsPerPage] = useState(9); // Adjust the number of cards per page as needed
@@ -74,10 +75,9 @@ function Truck_availability() {
         // }
     };
 
-    // Handle login (dummy implementation for demonstration)
-    const handleLogin = () => {
-        setIsSignedIn(true);
-        setShowLoginPopup(false);
+
+    const handleMessageClick = (card) => {
+        navigate(`/chat?person_id=${card.user_id}`);
     };
 
     return (
@@ -158,7 +158,7 @@ function Truck_availability() {
                                         {isSignedIn ? (
                                             <div className="d-flex gap-2 justify-content-between mt-3">
                                                 <button className="btn cardbutton" type="button">Call</button>
-                                                <button className="btn cardbutton" type="button">Message</button>
+                                                <button className="btn cardbutton" type="button" onClick={() => handleMessageClick(card)}>Message</button>
                                             </div>
                                         ) :
                                         <div className="d-grid gap-2">

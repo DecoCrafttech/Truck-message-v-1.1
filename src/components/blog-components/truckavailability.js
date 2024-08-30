@@ -4,7 +4,7 @@ import axios from 'axios';
 import { FaWeightHanging, FaTruck, FaLocationDot, FaTruckFast } from "react-icons/fa6";
 import { SiMaterialformkdocs } from "react-icons/si";
 import { GiCarWheel } from "react-icons/gi";
-import { Link } from 'react-router-dom'; // Assuming you are using react-router for navigation
+import { Link, useNavigate } from 'react-router-dom'; // Assuming you are using react-router for navigation
 import { useSelector } from 'react-redux';
 import Cookies from 'js-cookie';
 import Autocomplete from "react-google-autocomplete";
@@ -14,6 +14,7 @@ import { HiOutlineOfficeBuilding } from 'react-icons/hi';
 
 const TruckAvailability = () => {
     const LoginDetails = useSelector((state) => state.login);
+    const navigate = useNavigate();
 
     const [cards, setCards] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -55,18 +56,27 @@ const TruckAvailability = () => {
     const formRef = useRef(null);
     const modalRef = useRef(null);
 
+
+    const fetchData = async () => {
+        try {
+            await axios.get('https://truck.truckmessage.com/all_truck_details')
+                .then(response => {
+                    if (response.data.success && Array.isArray(response.data.data)) {
+                        setCards(response.data.data);
+                    } else {
+                        console.error('Unexpected response format:', response.data);
+                    }
+                })
+                .catch(error => {
+                    console.error('There was an error fetching the data!', error);
+                });
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
     useEffect(() => {
-        axios.get('https://truck.truckmessage.com/all_truck_details')
-            .then(response => {
-                if (response.data.success && Array.isArray(response.data.data)) {
-                    setCards(response.data.data);
-                } else {
-                    console.error('Unexpected response format:', response.data);
-                }
-            })
-            .catch(error => {
-                console.error('There was an error fetching the data!', error);
-            });
+        fetchData()
     }, []);
 
     const handleCopy = (contactNo) => {
@@ -106,47 +116,52 @@ const TruckAvailability = () => {
     };
 
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const contactNumber = formData.get('contact_no');
+    const handleSubmit = async (event) => {
+        try {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const contactNumber = formData.get('contact_no');
 
-        if (!validateContactNumber(contactNumber)) {
-            setContactError('Please enter a valid 10-digit contact number.');
-            return;
-        }
-        const userId = window.atob(Cookies.get("usrin"));
-        const data = {
-            vehicle_number: formData.get('vehicle_number'),
-            company_name: formData.get('company_name'),
-            contact_no: formData.get('contact_no'),
-            from: formData.get('from_location'),
-            to: formData.get('to_location'),
-            truck_name: formData.get('truck_name'),
-            tone: formData.get('tone'),
-            truck_body_type: formData.get('truck_body_type'),
-            no_of_tyres: formData.get('tyre_count'),
-            description: formData.get('description'),
-            user_id: userId
-        };
-
-        axios.post('https://truck.truckmessage.com/truck_entry', data, {
-            headers: {
-                'Content-Type': 'application/json'
+            if (!validateContactNumber(contactNumber)) {
+                setContactError('Please enter a valid 10-digit contact number.');
+                return;
             }
-        })
-            .then(response => {
-                toast.success('Form submitted successfully!');
-                formRef.current.reset();
-                setContactError('');
-                setTimeout(() => {
-                    window.location.reload();
-                }, 100);
+            const userId = window.atob(Cookies.get("usrin"));
+            const data = {
+                vehicle_number: formData.get('vehicle_number'),
+                company_name: formData.get('company_name'),
+                contact_no: formData.get('contact_no'),
+                from: formData.get('from_location'),
+                to: formData.get('to_location'),
+                truck_name: formData.get('truck_name'),
+                tone: formData.get('tone'),
+                truck_body_type: formData.get('truck_body_type'),
+                no_of_tyres: formData.get('tyre_count'),
+                description: formData.get('description'),
+                user_id: userId
+            };
+
+            console.log(data, 'data')
+
+            await axios.post('https://truck.truckmessage.com/truck_entry', data, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             })
-            .catch(error => {
-                toast.error('Failed to submit the form.');
-                console.error('There was an error!', error);
-            });
+                .then(response => {
+                    toast.success('Form submitted successfully!');
+                    formRef.current.reset();
+                    setContactError('');
+                    fetchData()
+                })
+                .catch(error => {
+                    toast.error('Failed to submit the form.');
+                    console.error('There was an error!', error);
+                });
+        }
+        catch (err) {
+            console.log(err)
+        }
     };
 
     const filteredCards = filterCards(cards);
@@ -513,6 +528,10 @@ const TruckAvailability = () => {
         }
     }
 
+    const handleMessageClick = (card) => {
+        navigate(`/chat?person_id=${card.user_id}`);
+    };
+
 
     return (
         <div>
@@ -629,7 +648,7 @@ const TruckAvailability = () => {
                                         <div className="col-12 col-md-6">
                                             <h6>Truck Body Type</h6>
                                             <div className="input-item">
-                                            <select className="nice-select" name="truck_body_type" required>
+                                                <select className="nice-select" name="truck_body_type" required>
                                                     <option value="open_body">LCV</option>
                                                     <option value="container">Bus</option>
                                                     <option value="trailer">Open body vehicle</option>
@@ -691,7 +710,7 @@ const TruckAvailability = () => {
                                         {/* Generate the star ratings based on the response */}
                                         {[...Array(5)].map((_, index) => (
                                             <span key={index} className="float-right">
-                                                <i className={`text-warning fa fa-star ${index < card.rating  ? '' : 'text-muted'}`}></i>
+                                                <i className={`text-warning fa fa-star ${index < card.rating ? '' : 'text-muted'}`}></i>
                                             </span>
                                         ))}
                                         <span>({card.review_count} 4)</span>
@@ -748,7 +767,7 @@ const TruckAvailability = () => {
                                                 {/* <div className='col-6'>
                                                     <a href={`tel:${card.contact_no}`} className="btn btn-success  w-100" type="button"> <IoCall className='me-3' />Call</a>
                                                 </div> */}
-                                                 <div className='col-6'>
+                                                <div className='col-6'>
                                                     {/* <button className="btn btn-success w-100" type="button"> <IoCall  className='me-3' />{card.contact_no}</button> */}
                                                     <button
                                                         className="btn btn-success w-100"
@@ -759,7 +778,7 @@ const TruckAvailability = () => {
                                                     </button>
                                                 </div>
                                                 <div className='col-6'>
-                                                    <button className="btn cardbutton w-100" type="button">Message</button>
+                                                    <button className="btn cardbutton w-100" type="button" onClick={() => handleMessageClick(card)}>Message</button>
                                                 </div>
                                             </div>
                                         ) :

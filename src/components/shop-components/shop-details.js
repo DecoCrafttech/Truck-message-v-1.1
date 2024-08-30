@@ -9,6 +9,7 @@ import Slider from 'react-slick';
 const ShopDetails = () => {
 	let publicUrl = process.env.PUBLIC_URL + '/';
 	let sliderRef = useRef(null);
+	const navigate =useNavigate();
 
 	const [Images, setImages] = useState([]);
 	const [currentImage, setCurrentImage] = useState("")
@@ -110,6 +111,11 @@ const ShopDetails = () => {
 		setIsOpen(true)
 	}
 
+	const handleMessageClick = (card) => {
+		console.log(card,"card")
+        navigate(`/chat?person_id=${card.user_id}`);
+    };
+
 	return <div className="ltn__shop-details-area pb-10">
 		<div className="container">
 			<div className="row">
@@ -185,7 +191,7 @@ const ShopDetails = () => {
 											{/* <button type="button" className="btn btn-success p-2">call</button> */}
 											< a href={`tel:${data.contact_no}`} className='btn btn-success p-2 w-100'>Call</a>
 										</div>
-										<button type="button" className="btn btn-danger p-2 ">Message</button>
+										<button type="button" className="btn btn-danger p-2 " onClick={() => handleMessageClick(data)}>Message</button>
 									</div>
 								</div>
 							</div>
