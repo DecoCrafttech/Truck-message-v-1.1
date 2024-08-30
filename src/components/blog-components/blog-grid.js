@@ -117,7 +117,7 @@ const BlogGrid = () => {
                 contact_no: contactNumber,
                 from: formData.get('from_location'),
                 to: formData.get('to_location'),
-                truck_name: formData.get('truck_name'),
+                truck_name: '',
                 truck_body_type: formData.get('truck_body_type'),
                 no_of_tyres: formData.get('tyre_count'),
                 description: formData.get('description'),
@@ -130,6 +130,8 @@ const BlogGrid = () => {
                 }
             })
                 .then(response => {
+                    document.getElementById('closeAddModel').click()
+
                     toast.success('Form submitted successfully!');
                     formRef.current.reset();
                     setContactError('');
@@ -545,7 +547,7 @@ const BlogGrid = () => {
                     <div className="modal-content">
                         <div className="modal-header">
                             <h1 className="modal-title fs-5" id="staticBackdropLabel">Add Driver</h1>
-                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeAddModel"></button>
                         </div>
                         <div className="modal-body">
                             {handleAddarVerifiactionStatus()}

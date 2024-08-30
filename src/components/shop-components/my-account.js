@@ -15,6 +15,7 @@ import Autocomplete from "react-google-autocomplete";
 
 const MyAccount = () => {
   const [profileData, setProfileData] = useState(null);
+  const [category, setCategory] = useState('')
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [vehicleData, setVehicleData] = useState([]);
@@ -95,6 +96,7 @@ const MyAccount = () => {
           setProfileData(response.data.data);
           setVehicleData(response.data.data[0].vehicle_data)
           setEditProfile(response.data.data[1])
+          setCategory(response.data.data[1].category)
           if (response.data.data[1].operating_city[0] === "All state and cities") {
             setOperatingStates(["All state and cities"])
             setChecked(true)
@@ -240,7 +242,7 @@ const MyAccount = () => {
           user_id: userId,
           first_name: editProfile.name,
           date_of_birth: editProfile.date_of_birth,
-          category: editProfile.category,
+          category: category,
           phone_number: editProfile.phone_number,
           operating_city: operatingStates,
           state: operatingStates
@@ -436,9 +438,9 @@ const MyAccount = () => {
                           </div>
                         </div>
                         <div className="modal-footer">
-                        <button type="button" className="btn btn-primary" onClick={handleAddVehicle}>Add Vehicle</button>
+                          <button type="button" className="btn btn-primary" onClick={handleAddVehicle}>Add Vehicle</button>
                           <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" id="closeModalButton">Close</button>
-                          
+
                         </div>
                       </div>
                     </div>
@@ -536,9 +538,22 @@ const MyAccount = () => {
                               <label htmlFor="editPhoneNumber" className="form-label">Phone Number</label>
                               <input type="tel" className="form-control" id="editPhoneNumber" value={editProfile.phone_number} onChange={(e) => setEditProfile({ ...editProfile, phone_number: e.target.value })} />
                             </div>
-                            <div className=" col-12 col-md-6">
-                              <label htmlFor="editCategory" className="form-label">Category</label>
-                              <input type="text" className="form-control" id="editCategory" value={editProfile.category} onChange={(e) => setEditProfile({ ...editProfile, category: e.target.value })} />
+                            <div className=" col-12 col-md-6 mt-2">
+                              <h6>Category</h6>
+                              <button type="button" class="btn btn-transparent dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                                {category === '' ? 'select Category' : category}
+                              </button>
+                              <ul class="dropdown-menu col-11">
+                                <li onClick={() => setCategory('Lorry Owner')}><a class="dropdown-item">Lorry Owner</a></li>
+                                <li onClick={() => setCategory('Logistics')}><a class="dropdown-item">Logistics</a></li>
+                                <li onClick={() => setCategory('Lorry Contractors')}><a class="dropdown-item">Lorry Contractors</a></li>
+                                <li onClick={() => setCategory('Load Booking Agent')}><a class="dropdown-item">Load Booking Agent</a></li>
+                                <li onClick={() => setCategory('Driver')}><a class="dropdown-item">Driver</a></li>
+                                <li onClick={() => setCategory('Lorry Buy & Sell Dealer/Owner')}><a class="dropdown-item">Lorry Buy & Sell Dealer/Owner</a></li>
+                              </ul >
+
+                              {/* <label htmlFor="editCategory" className="form-label">Category</label>
+                              <input type="text" className="form-control" id="editCategory" value={editProfile.category} onChange={(e) => setEditProfile({ ...editProfile, category: e.target.value })} /> */}
                             </div>
                             <div className="form-group mb-3">
                               <label>Operating State and City</label>

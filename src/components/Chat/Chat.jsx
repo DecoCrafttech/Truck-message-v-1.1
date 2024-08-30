@@ -28,14 +28,20 @@ const ChatView = () => {
       );
 
       if (response.data.error_code === 0) {
-        setUserList(response.data.data);
+        
 
-        const findUser = response.data.data.filter((findUSer) => {
+        const sortByData = response.data.data.sort(function(a,b){
+          return new Date(b.last_time) - new Date(a.last_time);
+        })
+
+        setUserList(sortByData);
+
+        const findUser = sortByData.filter((findUSer) => {
           return findUSer.person_id == personId;
         });
 
-        setPersonId(findUser.length > 0 ? findUser[0].person_id : personId);
-        fetchChatMessages(findUser.length > 0 ? findUser[0].person_id : personId);
+        setPersonId(findUser.length > 0 ? findUser[0].person_id : 0);
+        fetchChatMessages(findUser.length > 0 ? findUser[0].person_id : 0);
       }
     } catch (err) {
       console.error("Error getting user list:", err);
@@ -138,7 +144,7 @@ const ChatView = () => {
                   style={{ cursor: "pointer" }}
                 >
                   <img
-                    src="https://img.icons8.com/color/40/000000/guest-female.png"
+                    src={users.profile_image_name}
                     width="40"
                     height="40"
                     className="rounded-circle img1"
@@ -149,7 +155,7 @@ const ChatView = () => {
                       {users.profile_name}
                     </div>
                     <div className="text-muted">
-                      {users.last_message}Users Last Message Here...
+                      {users.last_msg}
                     </div>
                   </div>
                 </button>
@@ -161,15 +167,15 @@ const ChatView = () => {
         {/* Chat Window */}
         <div className="col-md-8 border-top d-flex flex-column">
           <div className="col-md-12 row d-flex align-items-center gap-2">
-            <h5 className="col-md-9 card-title chatlistheadcon mt-3 pe-2">
-              Chat List
+            <h5 className="col-md-12 card-title chatlistheadcon mt-3 pe-2">
+              Conversations
             </h5>
-            <button
+            {/* <button
               className="ps-2 p-4 btn col-md-2 btn-outline-secondary"
               onClick={handleRefresh}
             >
               <LuRefreshCcw />
-            </button>
+            </button> */}
           </div>
           <div
             className="flex-grow-1 p-3 chat-window d-flex flex-column chat-messgae-min-height"
@@ -200,7 +206,7 @@ const ChatView = () => {
                     <div
                       className={`message-content col-6 p-2 rounded ${
                         msg.chat_id == window.atob(userId)
-                          ? "bg-primary text-white text-start"
+                          ? "bg-danger text-white text-start"
                           : "bg-light text-dark"
                       }`}
                     >

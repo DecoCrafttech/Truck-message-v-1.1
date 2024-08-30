@@ -20335,7 +20335,7 @@ button {
   }
   
   .chat-person-card:hover,.chat-person-card.active{
-  background-color: #eff7ff;
+  background-color: #d9ecff;
   color: rgb(56, 94, 201) !important;
   
   }

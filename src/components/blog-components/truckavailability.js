@@ -26,25 +26,16 @@ const TruckAvailability = () => {
     const [aadharNumber, setAadharNumber] = useState("")
     const [aadharStep, setAadharStep] = useState(1);
     const [otpNumber, setOtpNumber] = useState("")
+    const [truckBrandName,setTruckBrandName]=useState('')
 
     const [filterModelData, SetfilterModelData] = useState({
-        // company_name: "",
-        // user_id: "",
-        // from_location: "",
-        // to_location: "",
-        // truck_body_type: "",
-        // no_of_tyres: "",
-        // material: "",
-        // tone: ""
-
-
         user_id: "",
         vehicle_number: "",
         company_name: "",
         contact_no: "",
         from_location: "",
         to_location: "",
-        truck_name: "",
+        truck_brand_name: "",
         truck_body_type: "",
         no_of_tyres: "",
         tone: ""
@@ -130,18 +121,18 @@ const TruckAvailability = () => {
             const data = {
                 vehicle_number: formData.get('vehicle_number'),
                 company_name: formData.get('company_name'),
+                name_of_the_transport: formData.get('name_of_the_transport'),
                 contact_no: formData.get('contact_no'),
                 from: formData.get('from_location'),
                 to: formData.get('to_location'),
-                truck_name: formData.get('truck_name'),
+                truck_name: truckBrandName,
+                truck_brand_name: truckBrandName,
                 tone: formData.get('tone'),
                 truck_body_type: formData.get('truck_body_type'),
                 no_of_tyres: formData.get('tyre_count'),
                 description: formData.get('description'),
                 user_id: userId
-            };
-
-            console.log(data, 'data')
+            }; 
 
             await axios.post('https://truck.truckmessage.com/truck_entry', data, {
                 headers: {
@@ -149,6 +140,8 @@ const TruckAvailability = () => {
                 }
             })
                 .then(response => {
+                    document.getElementById('closeAddModel').click();
+
                     toast.success('Form submitted successfully!');
                     formRef.current.reset();
                     setContactError('');
@@ -414,11 +407,43 @@ const TruckAvailability = () => {
                                     {contactError && <p style={{ color: 'red' }}>{contactError}</p>}
                                 </div>
                             </div>
+
+                            <div className="col-12 col-md-6">
+                                <h6>Name of the transport</h6>
+                                <div className="input-item input-item-name ltn__custom-icon">
+                                    <input type="text" name="name_of_the_transport" placeholder="Enter name of the transport" required />
+                                </div>
+                            </div>
+
+                            <div className="col-12 col-md-6">
+                                <h6>Ton</h6>
+                                <div className="input-item input-item-name ltn__custom-icon">
+                                    <input type="text" name="tone" placeholder="Example: 2 tones" required />
+                                </div>
+                            </div>
+
                             <div className="col-12 col-md-6">
                                 <h6>Truck Name</h6>
-                                <div className="input-item input-item-name ltn__custom-icon">
-                                    <input type="text" name="truck_name" placeholder="What type of material" required />
-                                </div>
+
+                                <button type="button" class="btn btn-transparent dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {truckBrandName === '' ? 'select truck' : `${truckBrandName} lakhs`}
+                                </button>
+                                <ul class="dropdown-menu col-11 dropdown-ul">
+                                    <li onClick={() => setTruckBrandName('ashok_leyland')}><a class="dropdown-item">ashok_leyland</a></li>
+                                    <li onClick={() => setTruckBrandName('tata')}><a class="dropdown-item">tata</a></li>
+                                    <li onClick={() => setTruckBrandName('mahindra')}><a class="dropdown-item">mahindra</a></li>
+                                    <li onClick={() => setTruckBrandName('eicher')}><a class="dropdown-item">eicher</a></li>
+                                    <li onClick={() => setTruckBrandName('daimler_india')}><a class="dropdown-item">daimler_india</a></li>
+                                    <li onClick={() => setTruckBrandName('bharat_benz')}><a class="dropdown-item">bharat_benz</a></li>
+                                    <li onClick={() => setTruckBrandName('maruthi_suzuki')}><a class="dropdown-item">maruthi_suzuki</a></li>
+                                    <li onClick={() => setTruckBrandName('sml_isuzu')}><a class="dropdown-item">sml_isuzu</a></li >
+                                    <li onClick={() => setTruckBrandName('force')}><a class="dropdown-item">force</a></li >
+                                    <li onClick={() => setTruckBrandName('amw')}><a class="dropdown-item">amw</a></li >
+                                    <li onClick={() => setTruckBrandName('man')}><a class="dropdown-item">man</a></li >
+                                    <li onClick={() => setTruckBrandName('scania')}><a class="dropdown-item">scania</a></li >
+                                    <li onClick={() => setTruckBrandName('volvo')}><a class="dropdown-item">volvo</a></li >
+                                    <li onClick={() => setTruckBrandName('others')}><a class="dropdown-item">others</a></li >
+                                </ul >
                             </div>
 
                         </div>
@@ -474,12 +499,7 @@ const TruckAvailability = () => {
                             </div>
                         </div> */}
 
-                            <div>
-                                <h6>Ton</h6>
-                                <div className="input-item input-item-name ltn__custom-icon">
-                                    <input type="text" name="tone" placeholder="Example: 2 tones" required />
-                                </div>
-                            </div>
+                            
                         </div>
                         <div className="row">
                             <div className="col-12 col-md-6">
@@ -513,7 +533,7 @@ const TruckAvailability = () => {
                             <div>
                                 <h6>Descriptions (Optional)</h6>
                                 <div className="input-item input-item-textarea ltn__custom-icon">
-                                    <textarea name="description" placeholder="Enter a text here" />
+                                    <textarea name="description" placeholder="Enter a text here" required/>
                                 </div>
                             </div>
                         </div>
@@ -589,7 +609,7 @@ const TruckAvailability = () => {
                     <div className="modal-content">
                         <div className="modal-header">
                             <h1 className="modal-title fs-5" id="staticBackdropLabel">Add Truck</h1>
-                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeAddModel"></button>
                         </div>
                         <div className="modal-body">
                             {handleAddarVerifiactionStatus()}
