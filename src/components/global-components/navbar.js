@@ -780,7 +780,7 @@ const Navbar = () => {
                                                     </ul >
                                                 </div>
 
-                                                <div className="form-group mb-3 col-12 col-md-6 mt-3 mt-md-0">
+                                                <div className="form-group mb-3 col-12 col-md-12 mt-3 mt-md-0">
                                                     <label>Operating State and City</label>
                                                     <Autocomplete name="from_location"
                                                         className="google-location location-input bg-transparent mb-1"

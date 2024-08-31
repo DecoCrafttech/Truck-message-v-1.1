@@ -459,10 +459,15 @@ const BlogGrid = () => {
                                 <h6>No. of Tyres</h6>
                                 <div className="input-item">
                                     <select className="nice-select" name="tyre_count" required>
+                                    <option value="4">4</option>
                                         <option value="6">6</option>
                                         <option value="10">10</option>
                                         <option value="12">12</option>
                                         <option value="14">14</option>
+                                        <option value="16">16</option>
+                                        <option value="18">18</option>
+                                        <option value="20">20</option>
+                                        <option value="22">22</option>
                                     </select>
                                 </div>
                             </div>

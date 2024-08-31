@@ -80,12 +80,11 @@ class ContactForm extends Component {
 							<div className="input-item" >
 								<select className="nice-select" name="service">
 								<option>Select Service Type</option>
-								<option>Service </option>
-								<option> Service </option>
-								<option> Service</option>
-								<option> Service</option>
-								<option> Service</option>
-								<option> Service</option>
+								<option>Logistics </option>
+								<option> Lorry Contractors </option>
+								<option> Load Booking Agent</option>
+								<option> Driver</option>
+								<option> Lorry Buy & Sell Dealer/Owner</option>
 								</select>
 							</div>
 							</div>

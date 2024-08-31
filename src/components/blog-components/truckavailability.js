@@ -426,7 +426,7 @@ const TruckAvailability = () => {
                                 <h6>Truck Name</h6>
 
                                 <button type="button" class="btn btn-transparent dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
-                                    {truckBrandName === '' ? 'select truck' : `${truckBrandName} lakhs`}
+                                    {truckBrandName === '' ? 'select truck' : `${truckBrandName} `}
                                 </button>
                                 <ul class="dropdown-menu col-11 dropdown-ul">
                                     <li onClick={() => setTruckBrandName('ashok_leyland')}><a class="dropdown-item">ashok_leyland</a></li>
@@ -517,6 +517,7 @@ const TruckAvailability = () => {
                                 <h6>No. of Tyres</h6>
                                 <div className="input-item">
                                     <select className="nice-select" name="tyre_count" required>
+                                        <option value="4">4</option>
                                         <option value="6">6</option>
                                         <option value="10">10</option>
                                         <option value="12">12</option>

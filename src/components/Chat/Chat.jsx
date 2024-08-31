@@ -206,7 +206,7 @@ const ChatView = () => {
                     <div
                       className={`message-content col-6 p-2 rounded ${
                         msg.chat_id == window.atob(userId)
-                          ? "bg-danger text-white text-start"
+                          ? "bg-primary text-white text-start"
                           : "bg-light text-dark"
                       }`}
                     >
