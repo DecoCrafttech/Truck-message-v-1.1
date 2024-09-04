@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { FaUserAlt } from "react-icons/fa";
-import { FaTruckFast } from "react-icons/fa6";
+import { FaIndianRupeeSign, FaTruckFast } from "react-icons/fa6";
 import { BsFillCalendar2DateFill } from "react-icons/bs";
 import { RiPinDistanceFill } from "react-icons/ri";
 import { FaLocationDot } from "react-icons/fa6";
@@ -15,17 +15,72 @@ import shortid from "https://cdn.skypack.dev/shortid@2.2.16";
 const BlogList = () => {
   const LoginDetails = useSelector((state) => state.login);
 
-  const [yearData,setYearData]=useState([]);
-  const truckBodyType=["LCV","Bus","Open body vehicle","Tanker","Trailer","Tipper"]
+  const [yearData, setYearData] = useState([]);
+  const truckBodyType = ["LCV", "Bus", "Open body vehicle", "Tanker", "Trailer", "Tipper"];
+  const truckBrand = [
+    "Ashok Leyland",
+    "Tata",
+    "Mahindra",
+    "Eicher",
+    "Daimler India",
+    "Bharat Benz",
+    "Maruthi Suzuki",
+    "SML Lsuzu",
+    "Force",
+    "AMW",
+    "Man",
+    "Scania",
+    "Volvo",
+    "Others",
+  ]
+  const numOfTyres = [4,
+    6,
+    10,
+    12,
+    14,
+    16,
+    18,
+    20,
+    22
+  ]
+  const filterKilometers = [
+    '(0 - 10,000)',
+    '(10,001 - 30,000)',
+    '(30,001 - 50,000)',
+    '(50,001 - 70,000)',
+    '(70,001 - 100,000)',
+    '(100,001 - 150,000)',
+    '(150,001 - 200,000)',
+    '(200,001 - 300,000)',
+    '(300,001 - 500,000)',
+    '(500,001 - 700,000)',
+    '(700,001 - 1,000,000)',
+    '(1,000,001 - 1,500,000)',
+    '(1,500,001 - 2,000,000)',
+    '(2,000,001+ kms)'
+  ]
+  const filterPrice = [
+    '(0 - 5,00,000)',
+    '(5,00,001 - 10,00,000)',
+    '(10,00,001 - 20,00,000)',
+    '(20,00,001 - 30,00,000)',
+    '(30,00,001 - 40,00,000)',
+    '(40,00,001 - 50,00,000)',
+    '(50,00,001 - 60,00,000)',
+    '(60,00,001 - 70,00,000)',
+    '(70,00,001 - 80,00,000)',
+    '(80,00,001 - 90,00,000)',
+    '(90,00,001 and above)'
+  ]
 
-  useEffect(()=>{
+  useEffect(() => {
     const getYear = new Date().getFullYear()
-    var l=[]
-    for(var i=1980;i<=getYear;i++){
-      l[l.length]=i
+    var l = []
+    for (var i = 1980; i <= getYear; i++) {
+      l[l.length] = i
     }
     setYearData(l)
-  },[])
+  }, [])
 
 
   const [cards, setCards] = useState([]);
@@ -39,19 +94,21 @@ const BlogList = () => {
     user_id: "",
     brand: "",
     contact_no: "",
-    description: "",
     kms_driven: "",
     model: "",
     owner_name: "",
     vehicle_number: "",
     location: "",
+    truck_body_type: '',
+    no_of_tyres: '',
+    price: ''
   });
 
   const [showingBuyAndSellLocation, setShowingBuyAndSellLocation] =
     useState("");
 
   const [kilometers, setkilometers] = useState('');
-  const [price,setPrice]=useState('')
+  const [price, setPrice] = useState('')
   const [contactError, setContactError] = useState(""); // State to manage contact number validation error
   const [selectedfile, SetSelectedFile] = useState([]);
   const [multipleImages, setMultipleImages] = useState([]);
@@ -59,6 +116,7 @@ const BlogList = () => {
   const [createVehicleLoading, setCreateVehicleLoading] = useState(false);
   const [verifyOtpLoading, setverifyOtpLoading] = useState(false);
   const [verifyAadharLoading, setVerifyAadharLoading] = useState(false);
+  const [clearFilterLoading, setclearFilterLoading] = useState(false);
 
   const [aadharNumber, setAadharNumber] = useState("");
   const [aadharStep, setAadharStep] = useState(1);
@@ -89,8 +147,8 @@ const BlogList = () => {
     setFilterLoading(true);
     const filterObj = { ...filterModelData };
     filterObj.location = showingFromLocation;
-    filterObj.kms_driven = `${kilometers} kms`;
-    filterObj.price = `${price} lakhs`;
+    filterObj.kms_driven = `${filterObj.kms_driven} kms`;
+    filterObj.price = `${filterObj.price} lakhs`;
 
     setIsDataFiltered(true);
 
@@ -117,6 +175,11 @@ const BlogList = () => {
       console.log(err);
     }
   };
+
+  const handleClearFilter = () => {
+    setclearFilterLoading(true)
+    initialRender();
+  }
 
   const filterCards = (cards) => {
     return cards.filter((card) => {
@@ -148,6 +211,8 @@ const BlogList = () => {
     no_of_tyres: "",
     tone: "",
     truck_body_type: "",
+    model: "",
+    brand: ''
   });
 
   useEffect(() => {
@@ -155,7 +220,6 @@ const BlogList = () => {
   }, []);
 
   const initialRender = async () => {
-    setFilterLoading(true);
     try {
       await axios
         .get("https://truck.truckmessage.com/all_buy_sell_details")
@@ -167,6 +231,20 @@ const BlogList = () => {
           }
           setIsDataFiltered(false);
           setFilterLoading(false);
+          setclearFilterLoading(false);
+          SetfilterModelData({
+            user_id: "",
+            brand: "",
+            contact_no: "",
+            kms_driven: "",
+            model: "",
+            owner_name: "",
+            vehicle_number: "",
+            location: "",
+            truck_body_type: '',
+            no_of_tyres: '',
+            price: ''
+          })
         })
         .catch((error) => {
           console.error("There was an error fetching the data!", error);
@@ -200,15 +278,7 @@ const BlogList = () => {
   };
 
   const handleSaveBusAndSellId = (buyAndSellDetails) => {
-    Cookies.set(
-      "buyAndSellViewDetailsId",
-      window.btoa(buyAndSellDetails.buy_sell_id),
-      {
-        secure: true,
-        sameSite: "strict",
-        path: "/",
-      }
-    );
+    Cookies.set("buyAndSellViewDetailsId", window.btoa(buyAndSellDetails.buy_sell_id));
   };
 
   //Image upload and delete functions
@@ -269,7 +339,7 @@ const BlogList = () => {
   //
 
   const handleBuyAndSellUpdate = async () => {
-    setCreateVehicleLoading(true);
+
     const userId = window.atob(Cookies.get("usrin"));
 
     const edit = { ...editingData };
@@ -287,38 +357,46 @@ const BlogList = () => {
     formData.append("model", edit.model);
     formData.append("owner_name", edit.owner_name);
     formData.append("vehicle_number", edit.vehicle_number);
+    formData.append("truck_body_type", editingData.truck_body_type)
+    formData.append("no_of_tyres", editingData.no_of_tyres)
 
-    if (multipleImages.length > 0) {
-      if (edit.images.length > 0) {
-        for (let i = 0; i < edit.images.length; i++) {
-          formData.append(`truck_image${i + 1}`, edit.images[i]);
-        }
-      }
+    if (editingData.no_of_tyres || editingData.truck_body_type || edit.vehicle_number || edit.owner_name || edit.brand || edit.contact_no || edit.description || edit.price || edit.kms_driven || showingBuyAndSellLocation || edit.model) {
+      if (multipleImages.length > 0) {
+        setCreateVehicleLoading(true);
 
-      try {
-        const res = await axios.post(
-          "https://truck.truckmessage.com/truck_buy_sell",
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
+        if (edit.images.length > 0) {
+          for (let i = 0; i < edit.images.length; i++) {
+            formData.append(`truck_image${i + 1}`, edit.images[i]);
           }
-        );
-
-        if (res.data.error_code === 0) {
-          document.getElementById("clodeBuySellModel").click();
-          toast.success(res.data.message);
-          initialRender();
-        } else {
-          toast.error(res.data.message);
         }
-        setCreateVehicleLoading(false);
-      } catch (err) {
-        console.log(err);
+
+        try {
+          const res = await axios.post(
+            "https://truck.truckmessage.com/truck_buy_sell",
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+
+          if (res.data.error_code === 0) {
+            document.getElementById("clodeBuySellModel").click();
+            toast.success(res.data.message);
+            initialRender();
+          } else {
+            toast.error(res.data.message);
+          }
+          setCreateVehicleLoading(false);
+        } catch (err) {
+          console.log(err);
+        }
+      } else {
+        toast.error("Image required");
       }
     } else {
-      toast.error("Image required");
+      toast.error("Some fields are empty");
     }
   };
 
@@ -442,10 +520,12 @@ const BlogList = () => {
       case 1:
         return (
           <div className="py-5 row align-items-center justify-content-center text-center">
+            <div className="col">
             <div className="spinner-border text-success" role="status">
               <span className="sr-only">Loading...</span>
             </div>
             <p className="text-success mt-3">Verifying Aadhar</p>
+            </div>
           </div>
         );
 
@@ -551,62 +631,46 @@ const BlogList = () => {
         return (
           <div className="ltn__appointment-inner">
             <div>
-              <div className="row">
+              <div className="row gy-4">
 
                 <div className="col-12 col-md-6">
                   <h6>Model Year</h6>
-                  <div className="input-item">
-                    <select
-                      className="nice-select"
-                      name="modal_year"
-                      required
-                    >
-                      {
-                        yearData.map((yearVal)=>{
-                          return  <option value={yearVal}>{yearVal}</option>
-                        })
-                      }
-
-                    </select>
-                  </div>
+                  <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                    {editingData.model === '' ? 'select model' : `${editingData.model}`}
+                  </button>
+                  <ul class="dropdown-menu col-11 dropdown-ul">
+                    {
+                      yearData.map((yearVal) => {
+                        return <li onClick={() => setEditingData({
+                          ...editingData, model: yearVal,
+                        })}><a class="dropdown-item">{yearVal}</a></li>
+                      })
+                    }
+                  </ul >
                 </div>
 
                 <div className="col-12 col-md-6">
                   <h6>Brand</h6>
-                  <div className="input-item">
-                    <select
-                      className="nice-select"
-                      name="truck_body_type"
-                      required
-                    >
-                      <option value="open_body">Ashok Leyland</option>
-                      <option value="container">Tata </option>
-                      <option value="trailer">Mahindra </option>
-                      <option value="tanker">Eicher </option>
-                      <option value="tanker">Daimler India </option>
-                      <option value="tanker">Bharat Benz </option>
-                      <option value="tanker">Maruthi Suzuki </option>
-                      <option value="tanker">SML Lsuzu </option>
-                      <option value="tanker">Force </option>
-                      <option value="tanker">AMW </option>
-                      <option value="tanker">Man </option>
-                      <option value="tanker">Scania </option>
-                      <option value="tanker">Volvo </option>
-                      <option value="tanker">Others </option>
-                    </select>
-                  </div>
+                  <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                    {editingData.brand === '' ? 'select model' : `${editingData.brand}`}
+                  </button>
+                  <ul class="dropdown-menu col-11 dropdown-ul">
+                    {
+                      truckBrand.map((brandVal) => {
+                        return <li onClick={() => setEditingData({
+                          ...editingData, brand: brandVal,
+                        })}><a class="dropdown-item">{brandVal}</a></li>
+                      })
+                    }
+                  </ul >
                 </div>
-                {/* <div className="col-12 col-md-6">
-                                <h6>Brand </h6>
-                                <div className="input-item input-item-name ltn__custom-icon">
-                                    <input type="text" name="company_name" placeholder="Name of the Model" value={editingData.model} onChange={(e) => setEditingData({ ...editingData, model: e.target.value })} required />
-                                </div>
-                            </div> */}
+
                 <div className="col-12 col-md-6">
                   <h6>Owner Name</h6>
-                  <div className="input-item input-item-name ltn__custom-icon">
+                  <div className="input-item input-item-name">
                     <input
                       type="text"
+                      className="mb-0"
                       name="owner_name"
                       placeholder="Name of the Owner"
                       value={editingData.owner_name}
@@ -620,12 +684,14 @@ const BlogList = () => {
                     />
                   </div>
                 </div>
+
                 <div className="col-12 col-md-6">
                   <h6>Vehicle Number</h6>
-                  <div className="input-item input-item-email ltn__custom-icon">
+                  <div className="input-item input-item-email">
                     <input
                       type="tel"
                       name="contact_no"
+                      className="mb-0"
                       placeholder="Type your Vehicle Number"
                       value={editingData.vehicle_number}
                       onChange={(e) =>
@@ -638,13 +704,14 @@ const BlogList = () => {
                     />
                   </div>
                 </div>
+
                 <div className="col-12 col-md-6">
                   <h6>Kilometers driven</h6>
                   <div className="tel-item">
                     <input
                       type="number"
                       name="kms driven"
-                      className="w-100 py-4"
+                      className="w-100 py-3"
                       placeholder="Type Kms driven"
                       value={editingData.kms_driven}
                       onChange={(e) =>
@@ -657,13 +724,14 @@ const BlogList = () => {
                     />
                   </div>
                 </div>
+
                 <div className="col-12 col-md-6">
                   <h6>Price</h6>
                   <div className="tel-item">
                     <input
                       type="number"
                       name="kms driven"
-                      className="w-100 py-4"
+                      className="w-100 py-3"
                       placeholder="Enter your Price here..."
                       value={editingData.price}
                       onChange={(e) =>
@@ -676,12 +744,14 @@ const BlogList = () => {
                     />
                   </div>
                 </div>
+
                 <div className="col-12 col-md-6">
                   <h6>Contact Number</h6>
-                  <div className="input-item input-item-email ltn__custom-icon">
+                  <div className="input-item input-item-email">
                     <input
                       type="tel"
                       name="contact_no"
+                      className="mb-0"
                       placeholder="Type your contact number"
                       value={editingData.contact_no}
                       onChange={(e) =>
@@ -697,6 +767,7 @@ const BlogList = () => {
                     )}
                   </div>
                 </div>
+
                 <div className="col-12 col-md-6">
                   <h6>Location</h6>
                   <div className="input-item input-item-name">
@@ -717,54 +788,41 @@ const BlogList = () => {
                     />
                   </div>
                 </div>
-                <div className="col-12 col-md-6">
+
+                <div className="col-12 col-md-6 m-0">
                   <h6>Truck Body Type</h6>
-                  <div className="input-item">
-                    <select
-                      className="nice-select"
-                      name="truck_body_type"
-                      required
-                    >
-                      <option value="open_body">LCV</option>
-                      <option value="container">Bus</option>
-                      <option value="trailer">Open body vehicle</option>
-                      <option value="tanker">Tanker</option>
-                      <option value="tanker">Trailer</option>
-                      <option value="tanker">Tipper</option>
-                    </select>
-                  </div>
+                  <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                    {editingData.truck_body_type === '' ? 'select body type' : `${editingData.truck_body_type}`}
+                  </button>
+                  <ul class="dropdown-menu col-11 dropdown-ul">
+                    {
+                      truckBodyType.map((bodyType) => {
+                        return <li onClick={() => setEditingData({
+                          ...editingData, truck_body_type: bodyType,
+                        })}><a class="dropdown-item">{bodyType}</a></li>
+                      })
+                    }
+                  </ul >
                 </div>
 
-                <div className="col-12 col-md-6">
+                <div className="col-12 col-md-6 m-0">
                   <h6>No. of Tyres</h6>
-                  <div className="input-item">
-                    <select
-                      className="nice-select"
-                      name="tyre_count"
-                      value={editingData.no_of_tyres}
-                      onChange={(e) =>
-                        setEditingData({
-                          ...editingData,
-                          no_of_tyres: e.target.value,
-                        })
-                      }
-                      required
-                    >
-                      <option value="4">4</option>
-                      <option value="6">6</option>
-                      <option value="10">10</option>
-                      <option value="12">12</option>
-                      <option value="14">14</option>
-                      <option value="12">16</option>
-                      <option value="18">18</option>
-                      <option value="20">20</option>
-                      <option value="22">22</option>
-                    </select>
-                  </div>
+                  <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                    {editingData.no_of_tyres === '' ? 'select number of tyres' : `${editingData.no_of_tyres}`}
+                  </button>
+                  <ul class="dropdown-menu col-11 dropdown-ul">
+                    {
+                      numOfTyres.map((numOfTyres) => {
+                        return <li onClick={() => setEditingData({
+                          ...editingData, no_of_tyres: numOfTyres,
+                        })}><a class="dropdown-item">{numOfTyres}</a></li>
+                      })
+                    }
+                  </ul >
                 </div>
               </div>
 
-              <div className="mb-3">
+              <div className="mt-4">
                 <label for="formFileMultiple" className="form-label">
                   Multiple files input example
                 </label>
@@ -777,7 +835,8 @@ const BlogList = () => {
                   required
                 />
               </div>
-              <div className="my-3">
+
+              <div className="mt-4">
                 {selectedfile.map((data, index) => {
                   const {
                     id,
@@ -828,7 +887,7 @@ const BlogList = () => {
             <div className="row">
               <div className="col-12">
                 <h6>Descriptions (Optional)</h6>
-                <div className="input-item input-item-textarea ltn__custom-icon">
+                <div className="input-item input-item-textarea">
                   <textarea
                     name="description"
                     placeholder="Enter a text here"
@@ -844,6 +903,7 @@ const BlogList = () => {
                 </div>
               </div>
             </div>
+
             <div className="modal-footer">
               <div className="col-12 col-md-6 m-0">
                 <button
@@ -882,9 +942,9 @@ const BlogList = () => {
 
   return (
     <div>
-      <div className="ltn__product-area ltn__product-gutter mb-50 mt-60">
-        <div className="container">
-          <div className="row">
+      <div className="ltn__product-area ltn__product-gutter mt-60 ">
+        <div className="container-fluid px-lg-5">
+          <div className="row border-bottom">
             <div className="col-lg-12 mb-2">
               <div className="ltn__shop-options">
                 <ul>
@@ -924,49 +984,6 @@ const BlogList = () => {
                 </ul>
               </div>
             </div>
-
-            <hr></hr>
-
-            <div className="col-lg-12">
-              <div className="row">
-                <div className="col-12 col-lg-12">
-                  {/* Search Widget */}
-                  <div className="ltn__search-widget mb-0">
-                    <form action="">
-                      <input
-                        type="text"
-                        name="search"
-                        placeholder="Search by ..."
-                        onChange={handleFilterChange}
-                      />
-                    </form>
-                  </div>
-                </div>
-                <div className="col-lg-4 row d-lg-none">
-                  <div className="col-8">
-                    {/* Filter */}
-                    <button
-                      type="button"
-                      className="filterbtn col-12"
-                      data-bs-toggle="modal"
-                      data-bs-target="#buySellfilter"
-                    >
-                      Filter
-                    </button>
-                  </div>
-                  <div className="col-4">
-                    <button
-                      type="button"
-                      className={`col-12 ${isDataFiltered ? "filterbtn" : " btn-secondary pe-none"
-                        }`}
-                      onClick={initialRender}
-                    >
-                      Clear
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -994,45 +1011,45 @@ const BlogList = () => {
             </div>
             <div className="modal-body ps-4 pe-4 p-">
               <div className="ltn__appointment-inner ">
-                <div className="row">
-                  <div className="col-12 col-md-6">
+                <div className="d-flex flex-wrap flex-column gap-4">
+                  <div className="col-12 p-0">
+                    <h6>Model Year</h6>
+                    <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-2 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                      {filterModelData.model === '' ? 'select model' : `${filterModelData.model}`}
+                    </button>
+                    <ul class="dropdown-menu col-12 dropdown-ul">
+                      {
+                        yearData.map((yearVal) => {
+                          return <li onClick={() => SetfilterModelData({
+                            ...filterModelData, model: yearVal,
+                          })}><a class="dropdown-item">{yearVal}</a></li>
+                        })
+                      }
+                    </ul >
+                  </div>
+
+                  <div className="col-12 p-0">
                     <h6>Brand</h6>
-                    <div className="input-item input-item-name ltn__custom-icon">
-                      <input
-                        type="text"
-                        name="material"
-                        placeholder="Enter brand"
-                        onChange={(e) =>
-                          SetfilterModelData({
-                            ...filterModelData,
-                            brand: e.target.value,
-                          })
-                        }
-                      />
-                    </div>
+                    <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-2 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                      {filterModelData.brand === '' ? 'select model' : `${filterModelData.brand}`}
+                    </button>
+                    <ul class="dropdown-menu col-12 dropdown-ul">
+                      {
+                        truckBrand.map((brandVal) => {
+                          return <li onClick={() => SetfilterModelData({
+                            ...filterModelData, brand: brandVal,
+                          })}><a class="dropdown-item">{brandVal}</a></li>
+                        })
+                      }
+                    </ul >
                   </div>
-                  <div className="col-12 col-md-6">
-                    <h6>Model</h6>
-                    <div className="input-item input-item-name ltn__custom-icon">
-                      <input
-                        type="text"
-                        name="tone"
-                        placeholder="Enter Model"
-                        onChange={(e) =>
-                          SetfilterModelData({
-                            ...filterModelData,
-                            model: e.target.value,
-                          })
-                        }
-                      />
-                    </div>
-                  </div>
-                  <div className="col-12 col-md-6">
+
+                  <div className="col-12 p-0">
                     <h6>Location</h6>
                     <div className="input-item input-item-name">
                       <Autocomplete
                         name="to_location"
-                        className="google-location location-input bg-transparent py-2"
+                        className="w-100 bg-transparent mb-0 "
                         apiKey="AIzaSyA09V2FtRwNpWu7Xh8hc7nf-HOqO7rbFqw"
                         onPlaceSelected={(place) => {
                           if (place) {
@@ -1044,75 +1061,102 @@ const BlogList = () => {
                       />
                     </div>
                   </div>
-                  <div className="col-12 col-md-6">
+
+                  <div className="col-12 p-0">
                     <h6>Vehicle Number</h6>
-                    <div className="input-item input-item-email ltn__custom-icon">
-                      <input
-                        type="tel"
-                        name="contact_no"
-                        placeholder="Type your Vehicle Number"
-                        value={filterModelData.vehicle_number}
-                        onChange={(e) =>
-                          SetfilterModelData({
-                            ...filterModelData,
-                            vehicle_number: e.target.value,
+                    <input
+                      type="tel"
+                      name="contact_no"
+                      className="tel-input-height mb-0"
+                      placeholder="Vehicle Number"
+                      value={filterModelData.vehicle_number}
+                      onChange={(e) =>
+                        SetfilterModelData({
+                          ...filterModelData,
+                          vehicle_number: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                  </div>
+
+                  <div className="col-12 px-0">
+                    <h6>Kilometers driven</h6>
+
+                    <button type="button" class="btn btn-transparent dropdown-toggle col-12 py-2 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                      {filterModelData.kms_driven === '' ? 'select kilometers' : `${filterModelData.kms_driven} kms`}
+                    </button>
+                    <ul class="dropdown-menu col-12 dropdown-ul">
+                      {
+                        filterKilometers.map((kms, ind) => {
+                          return <li onClick={() => SetfilterModelData({
+                            ...filterModelData, kms_driven: kms
+                          })}><a class="dropdown-item">{kms} kms</a></li>
+                        })
+                      }
+                    </ul >
+
+
+                    <div className="col-12 mt-3 p-0">
+                      <h6>Price</h6>
+                      <button type="button" class="btn btn-transparent dropdown-toggle col-12 py-2 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                        {filterModelData.price === '' ? 'select price' : `${filterModelData.price} lakhs`}
+                      </button>
+                      <ul class="dropdown-menu col-12 dropdown-ul">
+                        {
+                          filterPrice.map((fltrPrice, ind) => {
+                            return <li onClick={() => SetfilterModelData({
+                              ...filterModelData, price: fltrPrice
+                            })}><a class="dropdown-item">{fltrPrice} lakhs</a></li>
                           })
                         }
-                        required
-                      />
+                      </ul >
                     </div>
-                  </div>
-                  <div className="col-12 col-md-6">
-                    <h6>Kilometers driven</h6>
-                    <button type="button" class="btn btn-transparent dropdown-toggle col-12 py-2 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
-                      {kilometers === '' ? 'select kilometers' : `${kilometers} kms`}
+
+
+                    {/* </div> */}
+                  </div >
+
+                  <div className="col-12 px-0">
+                    <h6>Truck Body Type</h6>
+                    <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                      {filterModelData.truck_body_type === '' ? 'select body type' : `${filterModelData.truck_body_type}`}
                     </button>
-                    <ul class="dropdown-menu col-11 dropdown-ul">
-                      <li onClick={() => setkilometers('(0 - 10,000)')}><a class="dropdown-item">(0 - 10,000) kms</a></li>
-                      <li onClick={() => setkilometers('(10,001 - 30,000)')}><a class="dropdown-item">(10,001 - 30,000) kms</a></li>
-                      <li onClick={() => setkilometers('(30,001 - 50,000)')}><a class="dropdown-item">(30,001 - 50,000) kms</a></li>
-                      <li onClick={() => setkilometers('(50,001 - 70,000)')}><a class="dropdown-item">(50,001 - 70,000) kms</a></li>
-                      <li onClick={() => setkilometers('(70,001 - 100,000)')}><a class="dropdown-item">(70,001 - 100,000) kms</a></li>
-                      <li onClick={() => setkilometers('(100,001 - 150,000)')}><a class="dropdown-item">(100,001 - 150,000) kms</a></li>
-                      <li onClick={() => setkilometers('(150,001 - 200,000)')}><a class="dropdown-item">(150,001 - 200,000) kms</a></li>
-                      <li onClick={() => setkilometers('(200,001 - 300,000)')}><a class="dropdown-item">(200,001 - 300,000) kms</a></li >
-                      <li onClick={() => setkilometers('(300,001 - 500,000)')}><a class="dropdown-item">(300,001 - 500,000) kms</a></li >
-                      <li onClick={() => setkilometers('(500,001 - 700,000)')}><a class="dropdown-item">(500,001 - 700,000) kms</a></li >
-                      <li onClick={() => setkilometers('(700,001 - 1,000,000)')}><a class="dropdown-item">(700,001 - 1,000,000) kms</a></li >
-                      <li onClick={() => setkilometers('(1,000,001 - 1,500,000)')}><a class="dropdown-item">(1,000,001 - 1,500,000) kms</a></li >
-                      <li onClick={() => setkilometers('(1,500,001 - 2,000,000)')}> <a class="dropdown-item">(1,500,001 - 2,000,000) kms</a></li >
-                      <li onClick={() => setkilometers('(2,000,001+)')}><a class="dropdown-item">(2,000,001+ kms)</a></li >
+                    <ul class="dropdown-menu col-12 dropdown-ul">
+                      {
+                        truckBodyType.map((bodyType) => {
+                          return <li onClick={() => SetfilterModelData({
+                            ...filterModelData, truck_body_type: bodyType,
+                          })}><a class="dropdown-item">{bodyType}</a></li>
+                        })
+                      }
                     </ul >
                   </div>
 
-
-                  <div className="col-12 my-3">
-                    <h6>Price</h6>
-                    <button type="button" class="btn btn-transparent dropdown-toggle col-12 py-2 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
-                      {price === '' ? 'select price' : `${price} lakhs`}
+                  <div className="col-12 px-0">
+                    <h6>No. of Tyres</h6>
+                    <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                      {filterModelData.no_of_tyres === '' ? 'select number of tyres' : `${filterModelData.no_of_tyres}`}
                     </button>
-                    <ul class="dropdown-menu col-11 dropdown-ul">
-                      <li onClick={() => setPrice('(0 - 5,00,000) lakhs')}><a class="dropdown-item">(0 - 5,00,000) lakhs</a></li>
-                      <li onClick={() => setPrice('(5,00,001 - 10,00,000)')}><a class="dropdown-item">(5,00,001 - 10,00,000) lakhs</a></li>
-                      <li onClick={() => setPrice('(10,00,001 - 20,00,000)')}><a class="dropdown-item">(10,00,001 - 20,00,000) lakhs</a></li>
-                      <li onClick={() => setPrice('(20,00,001 - 30,00,000)')}><a class="dropdown-item">(20,00,001 - 30,00,000) lakhs</a></li>
-                      <li onClick={() => setPrice('(30,00,001 - 40,00,000)')}><a class="dropdown-item">(30,00,001 - 40,00,000) lakhs</a></li>
-                      <li onClick={() => setPrice('(40,00,001 - 50,00,000)')}><a class="dropdown-item">(40,00,001 - 50,00,000) lakhs</a></li>
-                      <li onClick={() => setPrice('(50,00,001 - 60,00,000)')}><a class="dropdown-item">(50,00,001 - 60,00,000) lakhs</a></li>
-                      <li onClick={() => setPrice('(60,00,001 - 70,00,000)')}><a class="dropdown-item">(60,00,001 - 70,00,000) lakhs</a></li >
-                      <li onClick={() => setPrice('(70,00,001 - 80,00,000)')}><a class="dropdown-item">(70,00,001 - 80,00,000) lakhs</a></li >
-                      <li onClick={() => setPrice('(80,00,001 - 90,00,000)')}><a class="dropdown-item">(80,00,001 - 90,00,000) lakhs</a></li >
-                      <li onClick={() => setPrice('(90,00,001)')}><a class="dropdown-item">(90,00,001 and above) lakhs</a></li >
+                    <ul class="dropdown-menu col-12 dropdown-ul">
+                      {
+                        numOfTyres.map((numOfTyres) => {
+                          return <li onClick={() => SetfilterModelData({
+                            ...filterModelData, no_of_tyres: numOfTyres,
+                          })}><a class="dropdown-item">{numOfTyres}</a></li>
+                        })
+                      }
                     </ul >
                   </div>
 
-                  <div className="col-12 col-md-6">
+                  <div className="col-12 px-0">
                     <h6>Contact Number</h6>
-                    <div className="input-item input-item-email ltn__custom-icon">
+                    <div className="input-item input-item-email">
                       <input
                         type="tel"
                         name="contact_no"
-                        placeholder="Type your contact number"
+                        placeholder="contact number"
+                        className="mb-0"
                         value={filterModelData.contact_no}
                         onChange={(e) =>
                           SetfilterModelData({
@@ -1124,44 +1168,26 @@ const BlogList = () => {
                       />
                     </div>
                   </div>
-                  <div className="row">
-                    <div className="col-12">
-                      <h6>Descriptions (Optional)</h6>
-                      <div className="input-item input-item-textarea ltn__custom-icon">
-                        <textarea
-                          name="description"
-                          placeholder="Enter a text here"
-                          value={filterModelData.description}
-                          onChange={(e) =>
-                            SetfilterModelData({
-                              ...filterModelData,
-                              description: e.target.value,
-                            })
-                          }
-                          required
-                        />
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
             <div className="modal-footer">
-              {filterLoading ? (
-                <button type="button" className="btn btn-primary">
-                  <div class="spinner-border" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                  </div>
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={handleApplyFilter}
-                >
-                  Apply Filter
-                </button>
-              )}
+              
+                {filterLoading ? (
+                  <button type="button" className="btn btn-primary w-100">
+                    <div class="spinner-border" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="btn btn-primary w-100"
+                    onClick={handleApplyFilter}
+                  >
+                    Apply Filter
+                  </button>
+                )} 
             </div>
           </div>
         </div>
@@ -1200,46 +1226,85 @@ const BlogList = () => {
       </div>
 
       <div className="container-fluid px-lg-5 blog-list-filter-min-height">
-        <div className="row filter-min-height overflow-hidden">
-          <div className="col-2 h-100 d-none d-lg-block">
-            <div>
+        <div className="row filter-min-height pb-5">
+          <div className="filter-column-width h-100 d-none d-lg-flex flex-wrap flex-column gap-4 pt-4">
+
+            <div className="col-12 d-flex flex-wrap p-0">
+              <div className="col-6 p-0">
+                {clearFilterLoading ? (
+                  <button type="button" className="btn btn-primary w-100">
+                    <div class="spinner-border" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="btn btn-primary w-100"
+                    onClick={handleClearFilter}
+                  >
+                    Clear Filter
+                  </button>
+                )}
+              </div>
+
+              <div className="col-6 p-0 ps-1">
+                {filterLoading ? (
+                  <button type="button" className="btn btn-primary w-100">
+                    <div class="spinner-border" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="btn btn-primary w-100"
+                    onClick={handleApplyFilter}
+                  >
+                    Apply Filter
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="col-12 p-0">
+              <h6>Model Year</h6>
+              <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-2 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                {filterModelData.model === '' ? 'select model' : `${filterModelData.model}`}
+              </button>
+              <ul class="dropdown-menu col-12 dropdown-ul">
+                {
+                  yearData.map((yearVal) => {
+                    return <li onClick={() => SetfilterModelData({
+                      ...filterModelData, model: yearVal,
+                    })}><a class="dropdown-item">{yearVal}</a></li>
+                  })
+                }
+              </ul >
+            </div>
+
+            <div className="col-12 p-0">
               <h6>Brand</h6>
-              <div className="input-item input-item-name">
-                <input
-                  type="text"
-                  name="material"
-                  placeholder="Enter brand"
-                  onChange={(e) =>
-                    SetfilterModelData({
-                      ...filterModelData,
-                      brand: e.target.value,
-                    })
-                  }
-                />
-              </div>
+              <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-2 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                {filterModelData.brand === '' ? 'select model' : `${filterModelData.brand}`}
+              </button>
+              <ul class="dropdown-menu col-12 dropdown-ul">
+                {
+                  truckBrand.map((brandVal) => {
+                    return <li onClick={() => SetfilterModelData({
+                      ...filterModelData, brand: brandVal,
+                    })}><a class="dropdown-item">{brandVal}</a></li>
+                  })
+                }
+              </ul >
             </div>
-            <div>
-              <h6>Model</h6>
-              <div className="input-item input-item-name">
-                <input
-                  type="text"
-                  name="tone"
-                  placeholder="Enter Model"
-                  onChange={(e) =>
-                    SetfilterModelData({
-                      ...filterModelData,
-                      model: e.target.value,
-                    })
-                  }
-                />
-              </div>
-            </div>
-            <div>
+
+            <div className="col-12 p-0">
               <h6>Location</h6>
               <div className="input-item input-item-name">
                 <Autocomplete
                   name="to_location"
-                  className="google-location location-input bg-transparent py-2"
+                  className="w-100 bg-transparent mb-0 "
                   apiKey="AIzaSyA09V2FtRwNpWu7Xh8hc7nf-HOqO7rbFqw"
                   onPlaceSelected={(place) => {
                     if (place) {
@@ -1251,96 +1316,102 @@ const BlogList = () => {
                 />
               </div>
             </div>
-            <div>
-              <h6>Vehicle Number</h6>
-              <div className="input-item input-item-email">
-                <input
-                  type="tel"
-                  name="contact_no"
-                  placeholder="Type your Vehicle Number"
-                  value={filterModelData.vehicle_number}
-                  onChange={(e) =>
-                    SetfilterModelData({
-                      ...filterModelData,
-                      vehicle_number: e.target.value,
-                    })
-                  }
-                  required
-                />
-              </div>
-            </div>
-            <div>
 
-              {/* <div className="tel-item">
-                <input
-                  type="number"
-                  name="kms driven"
-                  className="w-100 py-4"
-                  placeholder="Type Kms driven"
-                  value={filterModelData.kms_driven}
-                  min="0"
-                  onChange={(e) =>
-                    SetfilterModelData({
-                      ...filterModelData,
-                      kms_driven: e.target.value,
-                    })
-                  }
-                  required
-                /> */}
-              {/* <div className="col-12 "> */}
+            <div className="col-12 p-0">
+              <h6>Vehicle Number</h6>
+              <input
+                type="tel"
+                name="contact_no"
+                className="tel-input-height mb-0"
+                placeholder="Vehicle Number"
+                value={filterModelData.vehicle_number}
+                onChange={(e) =>
+                  SetfilterModelData({
+                    ...filterModelData,
+                    vehicle_number: e.target.value,
+                  })
+                }
+                required
+              />
+            </div>
+
+            <div className="col-12 px-0">
               <h6>Kilometers driven</h6>
 
               <button type="button" class="btn btn-transparent dropdown-toggle col-12 py-2 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
-                {kilometers === '' ? 'select kilometers' : `${kilometers} kms`}
+                {filterModelData.kms_driven === '' ? 'select kilometers' : `${filterModelData.kms_driven} kms`}
               </button>
-              <ul class="dropdown-menu col-11 dropdown-ul">
-                <li onClick={() => setkilometers('(0 - 10,000)')}><a class="dropdown-item">(0 - 10,000) kms</a></li>
-                <li onClick={() => setkilometers('(10,001 - 30,000)')}><a class="dropdown-item">(10,001 - 30,000) kms</a></li>
-                <li onClick={() => setkilometers('(30,001 - 50,000)')}><a class="dropdown-item">(30,001 - 50,000) kms</a></li>
-                <li onClick={() => setkilometers('(50,001 - 70,000)')}><a class="dropdown-item">(50,001 - 70,000) kms</a></li>
-                <li onClick={() => setkilometers('(70,001 - 100,000)')}><a class="dropdown-item">(70,001 - 100,000) kms</a></li>
-                <li onClick={() => setkilometers('(100,001 - 150,000)')}><a class="dropdown-item">(100,001 - 150,000) kms</a></li>
-                <li onClick={() => setkilometers('(150,001 - 200,000)')}><a class="dropdown-item">(150,001 - 200,000) kms</a></li>
-                <li onClick={() => setkilometers('(200,001 - 300,000)')}><a class="dropdown-item">(200,001 - 300,000) kms</a></li >
-                <li onClick={() => setkilometers('(300,001 - 500,000)')}><a class="dropdown-item">(300,001 - 500,000) kms</a></li >
-                <li onClick={() => setkilometers('(500,001 - 700,000)')}><a class="dropdown-item">(500,001 - 700,000) kms</a></li >
-                <li onClick={() => setkilometers('(700,001 - 1,000,000)')}><a class="dropdown-item">(700,001 - 1,000,000) kms</a></li >
-                <li onClick={() => setkilometers('(1,000,001 - 1,500,000)')}><a class="dropdown-item">(1,000,001 - 1,500,000) kms</a></li >
-                <li onClick={() => setkilometers('(1,500,001 - 2,000,000)')}> <a class="dropdown-item">(1,500,001 - 2,000,000) kms</a></li >
-                <li onClick={() => setkilometers('(2,000,001+ kms)')}><a class="dropdown-item">(2,000,001+ kms)</a></li >
+              <ul class="dropdown-menu col-12 dropdown-ul">
+                {
+                  filterKilometers.map((kms, ind) => {
+                    return <li onClick={() => SetfilterModelData({
+                      ...filterModelData, kms_driven: kms
+                    })}><a class="dropdown-item">{kms} kms</a></li>
+                  })
+                }
               </ul >
 
 
               <div className="col-12 mt-3 p-0">
                 <h6>Price</h6>
                 <button type="button" class="btn btn-transparent dropdown-toggle col-12 py-2 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
-                  {price === '' ? 'select price' : `${price} lakhs`}
+                  {filterModelData.price === '' ? 'select price' : `${filterModelData.price} lakhs`}
                 </button>
-                <ul class="dropdown-menu col-11 dropdown-ul">
-                  <li onClick={() => setPrice('(0 - 5,00,000)')}><a class="dropdown-item">(0 - 5,00,000) lakhs</a></li>
-                  <li onClick={() => setPrice('(5,00,001 - 10,00,000)')}><a class="dropdown-item">(5,00,001 - 10,00,000) lakhs</a></li>
-                  <li onClick={() => setPrice('(10,00,001 - 20,00,000)')}><a class="dropdown-item">(10,00,001 - 20,00,000) lakhs</a></li>
-                  <li onClick={() => setPrice('(20,00,001 - 30,00,000)')}><a class="dropdown-item">(20,00,001 - 30,00,000) lakhs</a></li>
-                  <li onClick={() => setPrice('(30,00,001 - 40,00,000)')}><a class="dropdown-item">(30,00,001 - 40,00,000) lakhs</a></li>
-                  <li onClick={() => setPrice('(40,00,001 - 50,00,000)')}><a class="dropdown-item">(40,00,001 - 50,00,000) lakhs</a></li>
-                  <li onClick={() => setPrice('(50,00,001 - 60,00,000)')}><a class="dropdown-item">(50,00,001 - 60,00,000) lakhs</a></li>
-                  <li onClick={() => setPrice('(60,00,001 - 70,00,000)')}><a class="dropdown-item">(60,00,001 - 70,00,000) lakhs</a></li >
-                  <li onClick={() => setPrice('(70,00,001 - 80,00,000)')}><a class="dropdown-item">(70,00,001 - 80,00,000) lakhs</a></li >
-                  <li onClick={() => setPrice('(80,00,001 - 90,00,000)')}><a class="dropdown-item">(80,00,001 - 90,00,000) lakhs</a></li >
-                  <li onClick={() => setPrice('(90,00,001 and above)')}><a class="dropdown-item">(90,00,001 and above) lakhs</a></li >
+                <ul class="dropdown-menu col-12 dropdown-ul">
+                  {
+                    filterPrice.map((fltrPrice, ind) => {
+                      return <li onClick={() => SetfilterModelData({
+                        ...filterModelData, price: fltrPrice
+                      })}><a class="dropdown-item">{fltrPrice} lakhs</a></li>
+                    })
+                  }
                 </ul >
               </div>
 
 
               {/* </div> */}
             </div >
-            <div className="pt-3">
+
+            <div className="col-12 px-0">
+              <h6>Truck Body Type</h6>
+              <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                {filterModelData.truck_body_type === '' ? 'select body type' : `${filterModelData.truck_body_type}`}
+              </button>
+              <ul class="dropdown-menu col-12 dropdown-ul">
+                {
+                  truckBodyType.map((bodyType) => {
+                    return <li onClick={() => SetfilterModelData({
+                      ...filterModelData, truck_body_type: bodyType,
+                    })}><a class="dropdown-item">{bodyType}</a></li>
+                  })
+                }
+              </ul >
+            </div>
+
+            <div className="col-12 px-0">
+              <h6>No. of Tyres</h6>
+              <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                {filterModelData.no_of_tyres === '' ? 'select number of tyres' : `${filterModelData.no_of_tyres}`}
+              </button>
+              <ul class="dropdown-menu col-12 dropdown-ul">
+                {
+                  numOfTyres.map((numOfTyres) => {
+                    return <li onClick={() => SetfilterModelData({
+                      ...filterModelData, no_of_tyres: numOfTyres,
+                    })}><a class="dropdown-item">{numOfTyres}</a></li>
+                  })
+                }
+              </ul >
+            </div>
+
+            <div className="col-12 px-0">
               <h6>Contact Number</h6>
               <div className="input-item input-item-email">
                 <input
                   type="tel"
                   name="contact_no"
-                  placeholder="Type your contact number"
+                  placeholder="contact number"
+                  className="mb-0"
                   value={filterModelData.contact_no}
                   onChange={(e) =>
                     SetfilterModelData({
@@ -1352,45 +1423,55 @@ const BlogList = () => {
                 />
               </div>
             </div>
+          </div >
+
+          <div className="col h-100 overflow-auto webkitScroll-buy-sell pt-3">
             <div className="row">
-              <div className="col-12">
-                <h6>Descriptions (Optional)</h6>
-                <div className="input-item input-item-textarea ltn__custom-icon">
-                  <textarea
-                    name="description"
-                    placeholder="Enter a text here"
-                    value={filterModelData.description}
-                    onChange={(e) =>
-                      SetfilterModelData({
-                        ...filterModelData,
-                        description: e.target.value,
-                      })
-                    }
-                    required
-                  />
+              <div className="col-12 col-lg-12">
+                {/* Search Widget */}
+                <div className="ltn__search-widget mb-0">
+                  <form action="">
+                    <input
+                      type="text"
+                      name="search"
+                      placeholder="Search by ..."
+                      onChange={handleFilterChange}
+                    />
+                  </form>
+                </div>
+              </div>
+              <div className="col-lg-4 row d-lg-none">
+                <div className="col-8">
+                  {/* Filter */}
+                  <button
+                    type="button"
+                    className="filterbtn col-12"
+                    data-bs-toggle="modal"
+                    data-bs-target="#buySellfilter"
+                  >
+                    Filter
+                  </button>
+                </div>
+                <div className="col-4">
+                  {clearFilterLoading ? (
+                  <button type="button" className="btn-primary w-100">
+                    <div class="spinner-border" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className={`w-100 col-12 ${isDataFiltered ? "filterbtn" : " btn-secondary pe-none"}`}
+                    onClick={handleClearFilter}
+                  >
+                    Clear Filter
+                  </button>
+                )}
                 </div>
               </div>
             </div>
-            <div className="col-12 d-flex flex-wrap justify-content-center pt-3">
-              {filterLoading ? (
-                <button type="button" className="btn btn-primary">
-                  <div class="spinner-border" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                  </div>
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={handleApplyFilter}
-                >
-                  Apply Filter
-                </button>
-              )}
-            </div>
-          </div >
 
-          <div className="col-12 col-lg-10 h-100 overflow-auto webkitScroll-buy-sell">
             <div className="d-flex flex-wrap pt-3 pb-5 w-100 h-100">
               {filterLoading ? (
                 <div className="row w-100 h-100 justify-content-center align-items-center">
@@ -1469,6 +1550,10 @@ const BlogList = () => {
                             <div className="col-6 col-md-6">
                               <RiPinDistanceFill className="me-2" />
                               {card.kms_driven} kms
+                            </div>
+                            <div className="col-6 col-md-6">
+                              <FaIndianRupeeSign className="me-2" />
+                              {card.price}
                             </div>
                           </div>
                         </div>

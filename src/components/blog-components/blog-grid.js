@@ -332,10 +332,12 @@ const BlogGrid = () => {
         switch (aadharStep) {
             case 1:
                 return <div className="py-5 row align-items-center justify-content-center text-center">
-                    <div className="spinner-border text-success" role="status">
-                        <span className="sr-only">Loading...</span>
+                    <div className="col">
+                        <div className="spinner-border text-success" role="status">
+                            <span className="sr-only">Loading...</span>
+                        </div>
+                        <p className="text-success mt-3">Verifying Aadhar</p>
                     </div>
-                    <p className='text-success mt-3'>Verifying Aadhar</p>
                 </div>
 
             case 2:
@@ -459,7 +461,7 @@ const BlogGrid = () => {
                                 <h6>No. of Tyres</h6>
                                 <div className="input-item">
                                     <select className="nice-select" name="tyre_count" required>
-                                    <option value="4">4</option>
+                                        <option value="4">4</option>
                                         <option value="6">6</option>
                                         <option value="10">10</option>
                                         <option value="12">12</option>

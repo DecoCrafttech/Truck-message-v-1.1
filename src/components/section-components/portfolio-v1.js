@@ -332,10 +332,12 @@ const PortfolioV1 = () => {
         switch (aadharStep) {
             case 1:
                 return <div className="py-5 row align-items-center justify-content-center text-center">
-                    <div className="spinner-border text-success" role="status">
-                        <span className="sr-only">Loading...</span>
+                    <div className="col">
+                        <div className="spinner-border text-success" role="status">
+                            <span className="sr-only">Loading...</span>
+                        </div>
+                        <p className="text-success mt-3">Verifying Aadhar</p>
                     </div>
-                    <p className='text-success mt-3'>Verifying Aadhar</p>
                 </div>
 
             case 2:

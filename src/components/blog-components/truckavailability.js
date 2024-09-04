@@ -26,7 +26,7 @@ const TruckAvailability = () => {
     const [aadharNumber, setAadharNumber] = useState("")
     const [aadharStep, setAadharStep] = useState(1);
     const [otpNumber, setOtpNumber] = useState("")
-    const [truckBrandName,setTruckBrandName]=useState('')
+    const [truckBrandName, setTruckBrandName] = useState('')
 
     const [filterModelData, SetfilterModelData] = useState({
         user_id: "",
@@ -38,7 +38,8 @@ const TruckAvailability = () => {
         truck_brand_name: "",
         truck_body_type: "",
         no_of_tyres: "",
-        tone: ""
+        tone: "",
+        truck_name:""
     })
 
     const [contactError, setContactError] = useState(''); // State to manage contact number validation error
@@ -132,7 +133,7 @@ const TruckAvailability = () => {
                 no_of_tyres: formData.get('tyre_count'),
                 description: formData.get('description'),
                 user_id: userId
-            }; 
+            };
 
             await axios.post('https://truck.truckmessage.com/truck_entry', data, {
                 headers: {
@@ -344,10 +345,12 @@ const TruckAvailability = () => {
         switch (aadharStep) {
             case 1:
                 return <div className="py-5 row align-items-center justify-content-center text-center">
-                    <div className="spinner-border text-success" role="status">
-                        <span className="sr-only">Loading...</span>
+                    <div className="col">
+                        <div className="spinner-border text-success" role="status">
+                            <span className="sr-only">Loading...</span>
+                        </div>
+                        <p className="text-success mt-3">Verifying Aadhar</p>
                     </div>
-                    <p className='text-success mt-3'>Verifying Aadhar</p>
                 </div>
 
             case 2:
@@ -499,7 +502,7 @@ const TruckAvailability = () => {
                             </div>
                         </div> */}
 
-                            
+
                         </div>
                         <div className="row">
                             <div className="col-12 col-md-6">
@@ -534,7 +537,7 @@ const TruckAvailability = () => {
                             <div>
                                 <h6>Descriptions (Optional)</h6>
                                 <div className="input-item input-item-textarea ltn__custom-icon">
-                                    <textarea name="description" placeholder="Enter a text here" required/>
+                                    <textarea name="description" placeholder="Enter a text here" required />
                                 </div>
                             </div>
                         </div>

@@ -135,7 +135,7 @@ const Navbar = () => {
                 state: operatingStates,
                 phone_number: phoneNumber,
                 password: password,
-                operating_city: operatingStates,
+                operating_city: [],
                 email: email,
                 pincode: pincode
             };
@@ -767,7 +767,7 @@ const Navbar = () => {
 
                                                 <div className="col">
                                                     <h6>Category</h6>
-                                                    <button type="button" class="btn btn-transparent dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <button type="button" class="btn btn-transparent border shadow-none dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
                                                         {category === '' ? 'select Category' : category}
                                                     </button>
                                                     <ul class="dropdown-menu col-11">
@@ -780,7 +780,7 @@ const Navbar = () => {
                                                     </ul >
                                                 </div>
 
-                                                <div className="form-group mb-3 col-12 col-md-12 mt-3 mt-md-0">
+                                                {/* <div className="form-group mb-3 col-12 col-md-12 mt-3 mt-md-0">
                                                     <label>Operating State and City</label>
                                                     <Autocomplete name="from_location"
                                                         className="google-location location-input bg-transparent mb-1"
@@ -822,7 +822,7 @@ const Navbar = () => {
                                                             :
                                                             null}
                                                     </div>
-                                                </div>
+                                                </div> */}
 
                                                 <div className="form-group mb-3 col-12 col-md-6">
                                                     <label>Password</label>

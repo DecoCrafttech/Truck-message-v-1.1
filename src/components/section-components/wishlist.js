@@ -4,11 +4,11 @@ import toast from "react-hot-toast";
 import { FaWeightHanging, FaTruck, FaLocationDot } from "react-icons/fa6";
 import { SiMaterialformkdocs } from "react-icons/si";
 import { GiCarWheel } from "react-icons/gi";
-import { GiTruck } from "react-icons/gi";
+import { CiStar } from "react-icons/ci";
 import Cookies from "js-cookie";
 import { NavLink, useNavigate } from "react-router-dom";
 import Autocomplete from "react-google-autocomplete";
-import { FaUserAlt } from "react-icons/fa";
+import { FaStar, FaUserAlt } from "react-icons/fa";
 import { FaTruckFast } from "react-icons/fa6";
 import { BsFillCalendar2DateFill } from "react-icons/bs";
 import { RiPinDistanceFill } from "react-icons/ri";
@@ -20,6 +20,8 @@ const WishList = () => {
   const [data, setData] = useState([]);
   const [reload, setReload] = useState(false);
   const [gettingDetails, setGettingDetails] = useState(false);
+  const [feedbackRating, setRating] = useState('');
+  const [feedbackHover, setHover] = useState('')
 
   const LoginDetails = useSelector((state) => state.login);
   const pageRender = useNavigate();
@@ -271,33 +273,34 @@ const WishList = () => {
 
   const handleChooseDelete = (deletionId) => {
     const getPath = window.location.pathname;
-      switch (getPath) {
-        case "/wishlist/load":
-          const remove_load_details = {
-            load_id: JSON.stringify(deletionId.load_id),
-          };
-          hanldeDelete("remove_load_details", remove_load_details);
-          break;
-        case "/wishlist/truck":
-          const remove_truck_entry = {
-            truck_id: JSON.stringify(deletionId.truck_id),
-          };
-          hanldeDelete("remove_truck_entry", remove_truck_entry);
-          break;
-        case "/wishlist/driver":
-          const remove_driver_entry = {
-            driver_id: JSON.stringify(deletionId.driver_id),
-          };
-          hanldeDelete("remove_driver_entry", remove_driver_entry);
-          break;
-        case "/wishlist/buy_sell":
-          const remove_truck_buy_sell = {
-            buy_sell_id: JSON.stringify(deletionId.buy_sell_id),
-          };
-          hanldeDelete("remove_truck_buy_sell", remove_truck_buy_sell);
-          break;
-        default:
-          break;
+    switch (getPath) {
+      case "/wishlist/load":
+        const remove_load_details = {
+          load_id: JSON.stringify(deletionId.load_id),
+        };
+
+        hanldeDelete("remove_load_details", remove_load_details);
+        break;
+      case "/wishlist/truck":
+        const remove_truck_entry = {
+          truck_id: JSON.stringify(deletionId.truck_id),
+        };
+        hanldeDelete("remove_truck_entry", remove_truck_entry);
+        break;
+      case "/wishlist/driver":
+        const remove_driver_entry = {
+          driver_id: JSON.stringify(deletionId.driver_id),
+        };
+        hanldeDelete("remove_driver_entry", remove_driver_entry);
+        break;
+      case "/wishlist/buy_sell":
+        const remove_truck_buy_sell = {
+          buy_sell_id: JSON.stringify(deletionId.buy_sell_id),
+        };
+        hanldeDelete("remove_truck_buy_sell", remove_truck_buy_sell);
+        break;
+      default:
+        break;
     }
   };
 
@@ -357,13 +360,12 @@ const WishList = () => {
           via_app: feedbackRadio,
           ref_name: "buy and sell",
         };
-      }      
+      }
 
       if (feedbackRadio === "NO") {
         const object = { ...data };
-        object.feedback = feedback.feedbackCnt;
 
-        console.log(feedback.feedbackCnt);
+        object.feedback = feedback.feedbackCnt;
 
         if (feedback.feedbackCnt !== "") {
           const res = await axios.post(
@@ -380,17 +382,22 @@ const WishList = () => {
         }
       } else {
         const object = { ...data };
-        object.feedback = feedback.mobNum;
+        object.mobile_no = feedback.mobNum;
+        object.ratings = feedbackRating;
 
         if (feedback.mobNum !== "" && feedback.mobNum.length === 10) {
-          const res = await axios.post(
-            "https://truck.truckmessage.com/user_feedback",
-            object
-          );
-          if (res.data.error_code === 0) {
-            handleChooseDelete(deletingData);
-          } else {
-            toast.error(res.data.message);
+          if (feedbackRating) {
+            const res = await axios.post(
+              "https://truck.truckmessage.com/user_feedback",
+              object
+            );
+            if (res.data.error_code === 0) {
+              handleChooseDelete(deletingData);
+            } else {
+              toast.error(res.data.message);
+            }
+          }else{
+            toast.error("ratings required");
           }
         } else if (feedback.mobNum === "") {
           toast.error("Mobile number required");
@@ -617,6 +624,8 @@ const WishList = () => {
                       data-bs-target="#handleDeleteModel"
                       onClick={() => {
                         setDeletingData(item);
+                        setRating(0);
+                        setHover(0);
                         setfeedback({
                           feedbackCnt: "",
                           mobNum: "",
@@ -753,6 +762,8 @@ const WishList = () => {
                           feedbackCnt: "",
                           mobNum: "",
                         });
+                        setRating(0)
+                        setHover(0)
                       }}
                     >
                       Delete
@@ -872,6 +883,8 @@ const WishList = () => {
                           feedbackCnt: "",
                           mobNum: "",
                         });
+                        setRating(0)
+                        setHover(0)
                       }}
                     >
                       Delete
@@ -1007,6 +1020,8 @@ const WishList = () => {
                               feedbackCnt: "",
                               mobNum: "",
                             });
+                            setRating(0)
+                            setHover(0)
                           }}
                         >
                           Delete
@@ -1031,17 +1046,17 @@ const WishList = () => {
 
   const renderTabContent = () => {
     const getPath = window.location.pathname;
-      switch (getPath) {
-        case "/wishlist/load":
-          return <div className="row">{renderLoadCard()}</div>;
-        case "/wishlist/truck":
-          return <div className="row">{renderTruckCard()}</div>;
-        case "/wishlist/driver":
-          return <div className="row">{renderDriverCard()}</div>;
-        case "/wishlist/buy_sell":
-          return <div className="row">{renderBuyandSell()}</div>;
-        default:
-          return null;
+    switch (getPath) {
+      case "/wishlist/load":
+        return <div className="row">{renderLoadCard()}</div>;
+      case "/wishlist/truck":
+        return <div className="row">{renderTruckCard()}</div>;
+      case "/wishlist/driver":
+        return <div className="row">{renderDriverCard()}</div>;
+      case "/wishlist/buy_sell":
+        return <div className="row">{renderBuyandSell()}</div>;
+      default:
+        return null;
     }
   }
 
@@ -2283,26 +2298,55 @@ const WishList = () => {
                     </div>
                   </div>
                 ) : (
-                  <div className="mb-3">
-                    <label
-                      htmlFor="feedbackModelMobilenumber"
-                      className="form-label"
-                    >
-                      Phone number
-                    </label>
-                    <input
-                      type="number"
-                      className="form-control"
-                      id="feedbackModelMobilenumber"
-                      placeholder="Enter your mobile number"
-                      value={feedback.mobNum}
-                      onChange={(e) =>
-                        setfeedback({ ...feedback, mobNum: e.target.value })
-                      }
-                    />
-                  </div>
+                  <>
+                    <div className="mb-3">
+                      <label
+                        htmlFor="feedbackModelMobilenumber"
+                        className="form-label"
+                      >
+                        Phone number
+                      </label>
+                      <input
+                        type="number"
+                        className="form-control"
+                        id="feedbackModelMobilenumber"
+                        placeholder="Enter your mobile number"
+                        value={feedback.mobNum}
+                        onChange={(e) =>
+                          setfeedback({ ...feedback, mobNum: e.target.value })
+                        }
+                      />
+                    </div>
+
+                    <div className="mb-3 row align-items-center">
+                      <div className="col-2">
+                        <h6 className="mb-0">Ratings</h6>
+                      </div>
+                      <div className="col-10 row p-0">
+                        {[...Array(5)].map((star, i) => {
+                          const ratingsValue = i + 1;
+                          return (
+                            <label className="ratingLabel">
+                              <input type="radio" name="rating" className="ratingInput" value={ratingsValue} onClick={() => setRating(ratingsValue)} />
+                              <FaStar
+                                className="star"
+                                color={ratingsValue <= (feedbackHover || feedbackRating) ? "#ffc107" : "#e4e5e9"}
+                                size={25}
+                                onMouseEnter={() => setHover(ratingsValue)}
+                                onMouseLeave={() => setHover(0)}
+                              />
+                            </label>
+                          )
+                        })
+                        }
+
+                      </div>
+                    </div>
+                  </>
                 )}
               </div>
+
+
             </div>
             <div className="modal-footer">
               <button

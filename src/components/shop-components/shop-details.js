@@ -207,6 +207,7 @@ const ShopDetails = () => {
 						<li><label>model: </label> <span>{data.model}</span></li>
 						<li><label>vehicle_number:</label> <span>{data.vehicle_number}</span></li>
 						<li><label>kms_driven:</label> <span>{data.kms_driven}</span></li>
+						<li><label>price:</label> <span>{data.price}</span></li>
 					</ul>
 
 				</div>
