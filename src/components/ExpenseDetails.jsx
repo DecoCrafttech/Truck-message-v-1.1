@@ -119,7 +119,7 @@ const ExpenseDetails = () => {
                                 <div className="col-12 mb-3 row py-3 text-center">
                                     <div className="col-4">
                                         <p className="card-text mb-1">
-                                            <b>Load Price :</b>
+                                            <b>Total Credit:</b>
                                             <span className='ps-2'>{loadCashDetails[0].load_price}</span>
                                         </p>
                                     </div>
@@ -131,7 +131,7 @@ const ExpenseDetails = () => {
                                     </div>
                                     <div className="col-4">
                                         <p className="card-text mb-1">
-                                            <b>Spend amount :</b>
+                                            <b>Total Debit:</b>
                                             <span className='ps-2'>{loadCashDetails[0].spend_amount}</span>
                                         </p>
                                     </div>
@@ -203,7 +203,7 @@ const ExpenseDetails = () => {
                             <div className="modal-body">
                                 <div className="row">
                                     <div className="col-md-12">
-                                        <h5>Name</h5>
+                                        <h5>Description</h5>
                                         <div className="input-item input-item-name">
                                             <input
                                                 type="text"
@@ -235,7 +235,7 @@ const ExpenseDetails = () => {
                                     </div> */}
                                 </div>
                                 <div className="row">
-                                    <div className="col-md-12">
+                                    {/* <div className="col-md-12">
                                         <h5>Description</h5>
                                         <div className="input-item input-item-name">
                                             <input
@@ -247,7 +247,7 @@ const ExpenseDetails = () => {
                                                 required
                                             />
                                         </div>
-                                    </div>
+                                    </div> */}
                                     <div className="col-md-12">
                                         <h5>Amount</h5>
                                         <div className="input-item input-item-name">

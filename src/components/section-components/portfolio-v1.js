@@ -14,8 +14,8 @@ import { useNavigate } from 'react-router-dom';
 
 const PortfolioV1 = () => {
     const LoginDetails = useSelector((state) => state.login);
-    const navigate =useNavigate();
-    
+    const navigate = useNavigate();
+
 
     const [cards, setCards] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -456,6 +456,7 @@ const PortfolioV1 = () => {
                                 <h6>No. of Tyres</h6>
                                 <div className="input-item">
                                     <select className="nice-select" name="tyre_count" required>
+                                        <option value="4">4</option>
                                         <option value="6">6</option>
                                         <option value="10">10</option>
                                         <option value="12">12</option>
@@ -487,7 +488,7 @@ const PortfolioV1 = () => {
         }
     }
 
-    const handleGetDistance = (from,to) =>{
+    const handleGetDistance = (from, to) => {
 
     }
 
@@ -694,7 +695,7 @@ const PortfolioV1 = () => {
                                             <div><label><FaLocationDot className='me-2 text-success' />{card.to_location}</label></div>
                                         </div>
 
-                                        {handleGetDistance(card.from_location,card.to_location)}
+                                        {handleGetDistance(card.from_location, card.to_location)}
                                     </div>
                                     <hr className="hr m-2" />
                                     <div className='row mt-3'>

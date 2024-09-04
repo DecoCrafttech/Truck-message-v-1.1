@@ -189,12 +189,12 @@ export const ExpenseCalculator = () => {
                                 <div className="col text-center">
                                     <BsExclamationCircle className='fs-1 text-danger'/>
                                 </div>
-                                <p className='mt-3 text-center'>Are you sure do you want to delete this</p>
+                                <p className='mt-3 text-center'>Are you sure do you want to delete this...</p>
                             </div>
                         </div>
                         <div class="modal-footer border-0 row">
                             <div className="col-6 m-0">
-                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">No</button>
+                                <button type="button" class="btn btn-outline-secondary pe-3 " data-bs-dismiss="modal">No</button>
                             </div>
                             <div className="col-6 m-0">
                                 <button type="button" class="btn btn-outline-primary" onClick={handleDelete}>Yes</button>
@@ -218,7 +218,7 @@ export const ExpenseCalculator = () => {
                                     <label htmlFor="loadName">Load Name</label>
                                     <input
                                         type="text"
-                                        className="form-control"
+                                        className="form-control mb-0"
                                         id="loadName"
                                         name="load_name"
                                         value={formData.load_name}
@@ -230,7 +230,7 @@ export const ExpenseCalculator = () => {
                                     <label htmlFor="fromLocation">From Location</label>
                                     <input
                                         type="text"
-                                        className="form-control"
+                                        className="form-control mb-0"
                                         id="fromLocation"
                                         name="from_location"
                                         value={formData.from_location}
@@ -242,7 +242,7 @@ export const ExpenseCalculator = () => {
                                     <label htmlFor="toLocation">To Location</label>
                                     <input
                                         type="text"
-                                        className="form-control"
+                                        className="form-control mb-0"
                                         id="toLocation"
                                         name="to_location"
                                         value={formData.to_location}

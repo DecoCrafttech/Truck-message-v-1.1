@@ -15,6 +15,18 @@ import shortid from "https://cdn.skypack.dev/shortid@2.2.16";
 const BlogList = () => {
   const LoginDetails = useSelector((state) => state.login);
 
+  const [yearData,setYearData]=useState([]);
+  const truckBodyType=["LCV","Bus","Open body vehicle","Tanker","Trailer","Tipper"]
+
+  useEffect(()=>{
+    const getYear = new Date().getFullYear()
+    var l=[]
+    for(var i=1980;i<=getYear;i++){
+      l[l.length]=i
+    }
+    setYearData(l)
+  },[])
+
 
   const [cards, setCards] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -269,6 +281,7 @@ const BlogList = () => {
     formData.append("brand", edit.brand);
     formData.append("contact_no", edit.contact_no);
     formData.append("description", edit.description);
+    formData.append("price", edit.price);
     formData.append("kms_driven", edit.kms_driven);
     formData.append("location", showingBuyAndSellLocation);
     formData.append("model", edit.model);
@@ -539,25 +552,25 @@ const BlogList = () => {
           <div className="ltn__appointment-inner">
             <div>
               <div className="row">
+
                 <div className="col-12 col-md-6">
                   <h6>Model Year</h6>
-                  <div className="tel-item ">
-                    <input
-                      type="number"
-                      name="company_name"
-                      className="w-100 py-4"
-                      placeholder="Name of the Brand"
-                      value={editingData.brand}
-                      onChange={(e) =>
-                        setEditingData({
-                          ...editingData,
-                          brand: e.target.value,
+                  <div className="input-item">
+                    <select
+                      className="nice-select"
+                      name="modal_year"
+                      required
+                    >
+                      {
+                        yearData.map((yearVal)=>{
+                          return  <option value={yearVal}>{yearVal}</option>
                         })
                       }
-                      required
-                    />
+
+                    </select>
                   </div>
                 </div>
+
                 <div className="col-12 col-md-6">
                   <h6>Brand</h6>
                   <div className="input-item">
@@ -652,11 +665,11 @@ const BlogList = () => {
                       name="kms driven"
                       className="w-100 py-4"
                       placeholder="Enter your Price here..."
-                      value={editingData.kms_driven}
+                      value={editingData.price}
                       onChange={(e) =>
                         setEditingData({
                           ...editingData,
-                          kms_driven: e.target.value,
+                          price: e.target.value,
                         })
                       }
                       required
@@ -721,6 +734,7 @@ const BlogList = () => {
                     </select>
                   </div>
                 </div>
+
                 <div className="col-12 col-md-6">
                   <h6>No. of Tyres</h6>
                   <div className="input-item">
@@ -749,6 +763,7 @@ const BlogList = () => {
                   </div>
                 </div>
               </div>
+
               <div className="mb-3">
                 <label for="formFileMultiple" className="form-label">
                   Multiple files input example
@@ -809,6 +824,7 @@ const BlogList = () => {
                 })}
               </div>
             </div>
+
             <div className="row">
               <div className="col-12">
                 <h6>Descriptions (Optional)</h6>
