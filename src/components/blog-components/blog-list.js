@@ -104,11 +104,8 @@ const BlogList = () => {
     price: ''
   });
 
-  const [showingBuyAndSellLocation, setShowingBuyAndSellLocation] =
-    useState("");
+  const [showingBuyAndSellLocation, setShowingBuyAndSellLocation] =useState("");
 
-  const [kilometers, setkilometers] = useState('');
-  const [price, setPrice] = useState('')
   const [contactError, setContactError] = useState(""); // State to manage contact number validation error
   const [selectedfile, SetSelectedFile] = useState([]);
   const [multipleImages, setMultipleImages] = useState([]);
@@ -147,8 +144,21 @@ const BlogList = () => {
     setFilterLoading(true);
     const filterObj = { ...filterModelData };
     filterObj.location = showingFromLocation;
-    filterObj.kms_driven = `${filterObj.kms_driven} kms`;
-    filterObj.price = `${filterObj.price} lakhs`;
+    if(filterModelData.kms_driven){
+      filterObj.kms_driven = `${filterObj.kms_driven} kms`;
+    }
+    
+    if(filterModelData.price){
+      filterObj.price = `${filterObj.price} lakhs`;
+    }
+
+    if(filterModelData.model){
+      filterObj.model =  [filterObj.model.toString()];
+    }
+
+    if(filterModelData.brand){
+      filterObj.brand =  [filterObj.brand];
+    }
 
     setIsDataFiltered(true);
 
