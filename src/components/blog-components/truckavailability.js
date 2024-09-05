@@ -3,13 +3,14 @@ import toast, { Toaster } from 'react-hot-toast';
 import axios from 'axios';
 import { FaWeightHanging, FaTruck, FaLocationDot, FaTruckFast } from "react-icons/fa6";
 import { SiMaterialformkdocs } from "react-icons/si";
-import { GiCarWheel } from "react-icons/gi";
+import { GiCarWheel, GiTruck } from "react-icons/gi";
 import { Link, useNavigate } from 'react-router-dom'; // Assuming you are using react-router for navigation
 import { useSelector } from 'react-redux';
 import Cookies from 'js-cookie';
 import Autocomplete from "react-google-autocomplete";
 import { IoCall } from 'react-icons/io5';
 import { HiOutlineOfficeBuilding } from 'react-icons/hi';
+import { FaRegCopy } from 'react-icons/fa';
 
 
 const TruckAvailability = () => {
@@ -39,7 +40,7 @@ const TruckAvailability = () => {
         truck_body_type: "",
         no_of_tyres: "",
         tone: "",
-        truck_name:""
+        truck_name: ""
     })
 
     const [contactError, setContactError] = useState(''); // State to manage contact number validation error
@@ -74,7 +75,7 @@ const TruckAvailability = () => {
     const handleCopy = (contactNo) => {
         navigator.clipboard.writeText(contactNo)
             .then(() => {
-                toast.success('Contact number copied to clipboard!'); // Optional, show a success message
+                toast.success('Contact number copied!'); // Optional, show a success message
             })
             .catch(() => {
                 toast.error('Failed to copy contact number.');
@@ -391,13 +392,13 @@ const TruckAvailability = () => {
                         <div className="row">
                             <div className="col-12 col-md-6">
                                 <h6>Vehicle Number</h6>
-                                <div className="input-item input-item-name ltn__custom-icon">
+                                <div className="input-item input-item-name ">
                                     <input type="text" name="vehicle_number" placeholder="Enter a Vehicle Number" required />
                                 </div>
                             </div>
                             <div className="col-12 col-md-6">
                                 <h6>Owner Name</h6>
-                                <div className="input-item input-item-name ltn__custom-icon">
+                                <div className="input-item input-item-name ">
                                     <input type="text" name="company_name" placeholder="Name of the Owner" required />
                                 </div>
                             </div>
@@ -405,47 +406,55 @@ const TruckAvailability = () => {
                         <div className="row">
                             <div className="col-12 col-md-6">
                                 <h6>Contact Number</h6>
-                                <div className="input-item input-item-name ltn__custom-icon">
-                                    <input type="text" name="contact_no" placeholder="Type your contact number" required />
+                                <div className="input-item input-item-name ">
+                                <input
+                                        type="text"
+                                        name="contact_no"
+                                        placeholder="Enter your contact number"
+                                        maxLength="10"
+                                        pattern="\d{10}"
+                                        required
+                                        title="Please enter a 10-digit contact number"
+                                    />                               
                                     {contactError && <p style={{ color: 'red' }}>{contactError}</p>}
                                 </div>
                             </div>
 
                             <div className="col-12 col-md-6">
                                 <h6>Name of the transport</h6>
-                                <div className="input-item input-item-name ltn__custom-icon">
+                                <div className="input-item input-item-name ">
                                     <input type="text" name="name_of_the_transport" placeholder="Enter name of the transport" required />
                                 </div>
                             </div>
 
                             <div className="col-12 col-md-6">
                                 <h6>Ton</h6>
-                                <div className="input-item input-item-name ltn__custom-icon">
-                                    <input type="text" name="tone" placeholder="Example: 2 tones" required />
+                                <div className="input-item input-item-name ">
+                                    <input type="number" name="tone" placeholder="Example: 2 tons" required />
                                 </div>
                             </div>
 
                             <div className="col-12 col-md-6">
                                 <h6>Truck Name</h6>
 
-                                <button type="button" class="btn btn-transparent dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                                <button type="button" class="btn btn-transparent dropdown-toggle col-12 py-3 dropdown-arrow shadow-none border rounded text-start p-3" data-bs-toggle="dropdown" aria-expanded="false">
                                     {truckBrandName === '' ? 'select truck' : `${truckBrandName} `}
                                 </button>
-                                <ul class="dropdown-menu col-11 dropdown-ul">
-                                    <li onClick={() => setTruckBrandName('ashok_leyland')}><a class="dropdown-item">ashok_leyland</a></li>
-                                    <li onClick={() => setTruckBrandName('tata')}><a class="dropdown-item">tata</a></li>
-                                    <li onClick={() => setTruckBrandName('mahindra')}><a class="dropdown-item">mahindra</a></li>
-                                    <li onClick={() => setTruckBrandName('eicher')}><a class="dropdown-item">eicher</a></li>
-                                    <li onClick={() => setTruckBrandName('daimler_india')}><a class="dropdown-item">daimler_india</a></li>
-                                    <li onClick={() => setTruckBrandName('bharat_benz')}><a class="dropdown-item">bharat_benz</a></li>
-                                    <li onClick={() => setTruckBrandName('maruthi_suzuki')}><a class="dropdown-item">maruthi_suzuki</a></li>
-                                    <li onClick={() => setTruckBrandName('sml_isuzu')}><a class="dropdown-item">sml_isuzu</a></li >
-                                    <li onClick={() => setTruckBrandName('force')}><a class="dropdown-item">force</a></li >
-                                    <li onClick={() => setTruckBrandName('amw')}><a class="dropdown-item">amw</a></li >
-                                    <li onClick={() => setTruckBrandName('man')}><a class="dropdown-item">man</a></li >
-                                    <li onClick={() => setTruckBrandName('scania')}><a class="dropdown-item">scania</a></li >
-                                    <li onClick={() => setTruckBrandName('volvo')}><a class="dropdown-item">volvo</a></li >
-                                    <li onClick={() => setTruckBrandName('others')}><a class="dropdown-item">others</a></li >
+                                <ul class="dropdown-menu  cup shadow-0 col-11 dropdown-ul">
+                                    <li onClick={() => setTruckBrandName('ashok_leyland')}><a class="dropdown-item">Ashok_leyland</a></li>
+                                    <li onClick={() => setTruckBrandName('tata')}><a class="dropdown-item">Tata</a></li>
+                                    <li onClick={() => setTruckBrandName('mahindra')}><a class="dropdown-item">Mahindra</a></li>
+                                    <li onClick={() => setTruckBrandName('eicher')}><a class="dropdown-item">Eicher</a></li>
+                                    <li onClick={() => setTruckBrandName('daimler_india')}><a class="dropdown-item">Daimler_india</a></li>
+                                    <li onClick={() => setTruckBrandName('bharat_benz')}><a class="dropdown-item">Bharat_benz</a></li>
+                                    <li onClick={() => setTruckBrandName('maruthi_suzuki')}><a class="dropdown-item">Maruthi_suzuki</a></li>
+                                    <li onClick={() => setTruckBrandName('sml_isuzu')}><a class="dropdown-item">Sml_isuzu</a></li >
+                                    <li onClick={() => setTruckBrandName('force')}><a class="dropdown-item">Force</a></li >
+                                    <li onClick={() => setTruckBrandName('amw')}><a class="dropdown-item">Amw</a></li >
+                                    <li onClick={() => setTruckBrandName('man')}><a class="dropdown-item">Man</a></li >
+                                    <li onClick={() => setTruckBrandName('scania')}><a class="dropdown-item">Scania</a></li >
+                                    <li onClick={() => setTruckBrandName('volvo')}><a class="dropdown-item">Volvo</a></li >
+                                    <li onClick={() => setTruckBrandName('others')}><a class="dropdown-item">Others</a></li >
                                 </ul >
                             </div>
 
@@ -456,7 +465,7 @@ const TruckAvailability = () => {
                                 <div className="input-item input-item-name">
                                     <Autocomplete name="from_location"
                                         className="google-location location-input bg-transparent py-2"
-                                        apiKey="AIzaSyA09V2FtRwNpWu7Xh8hc7nf-HOqO7rbFqw"
+                                        apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
                                         onPlaceSelected={(place) => {
                                             if (place) {
                                                 handleFromLocation(place.address_components);
@@ -477,7 +486,7 @@ const TruckAvailability = () => {
                                 <div className="input-item input-item-name">
                                     <Autocomplete name="to_location"
                                         className="google-location location-input bg-transparent py-2"
-                                        apiKey="AIzaSyA09V2FtRwNpWu7Xh8hc7nf-HOqO7rbFqw"
+                                        apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
                                         onPlaceSelected={(place) => {
                                             if (place) {
                                                 handleToLocation(place.address_components);
@@ -560,8 +569,9 @@ const TruckAvailability = () => {
     return (
         <div>
             <Toaster />
-            <div className="ltn__product-area ltn__product-gutter mb-50 mt-60">
+            <div className="ltn__product-area ltn__product-gutter mb-50 ">
                 <div className="container">
+                <div className='text-center ' ><h2 className='cardmodifyhead'>Truck Availability</h2></div>   
                     <div className="row">
                         <div className="col-lg-12 mb-2">
                             <div className='row'>
@@ -628,7 +638,7 @@ const TruckAvailability = () => {
                 <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h1 className="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                            <h1 className="modal-title fs-5" id="exampleModalLabel">Add Truck</h1>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeFilterBox"></button>
                         </div>
                         <div className="modal-body ps-4 pe-4 p-">
@@ -640,7 +650,7 @@ const TruckAvailability = () => {
                                             <div className="input-item input-item-name">
                                                 <Autocomplete name="from_location"
                                                     className="google-location location-input bg-transparent py-2"
-                                                    apiKey="AIzaSyA09V2FtRwNpWu7Xh8hc7nf-HOqO7rbFqw"
+                                                    apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
                                                     onPlaceSelected={(place) => {
                                                         if (place) {
                                                             handleFromLocation(place.address_components);
@@ -656,7 +666,7 @@ const TruckAvailability = () => {
                                             <div className="input-item input-item-name">
                                                 <Autocomplete name="to_location"
                                                     className="google-location location-input bg-transparent py-2"
-                                                    apiKey="AIzaSyA09V2FtRwNpWu7Xh8hc7nf-HOqO7rbFqw"
+                                                    apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
                                                     onPlaceSelected={(place) => {
                                                         if (place) {
                                                             handleToLocation(place.address_components);
@@ -725,9 +735,9 @@ const TruckAvailability = () => {
             {/* card */}
             <div className='container'>
                 <div className="row row-cols-1 row-cols-md-3 g-4 mb-60 ">
-                    {currentCards.map(card => (
+                    {currentCards.reverse().map(card => (
                         <div className="col" key={card.id}>
-                            <div className="card h-100 shadow truckcard">
+                            <div className="card h-100 shadow truckcard">   
                                 <div className='card-header mt-2 border-0 mb-2'>
                                     <h5 className="card-title cardmodify">{card.profile_name}</h5>
                                     <p className='.fs-6 mb-0 reviewtext '>
@@ -758,25 +768,28 @@ const TruckAvailability = () => {
                                     </div>
                                     <hr className="hr m-2" />
                                     <div className='row mt-3'>
-                                        <div className="col-lg-6 cardicon">
+                                        <div className="col-lg-6 cardicontext">
                                             <div>
                                                 <label><FaWeightHanging className='me-2' />{card.tone} ton</label>
                                             </div>
                                         </div>
-                                        <div className="col-lg-6 cardicon">
+                                        <div className="col-lg-6 cardicontext">
                                             <div><label><SiMaterialformkdocs className='me-2' />{card.truck_body_type}</label></div>
                                         </div>
-                                        <div className="col-lg-6 cardicon">
+                                        <div className="col-lg-6 cardicontext">
                                             <label><GiCarWheel className='me-2' />{card.no_of_tyres} wheels</label>
                                         </div>
-                                        <div className="col-lg-6 cardicon">
+                                        <div className="col-lg-6 cardicontext">
                                             <label><FaTruck className='me-2' />{card.truck_name}</label>
                                         </div>
-                                        <div className="col-lg-6 cardicon">
+                                        <div className="col-lg-6 cardicontext">
                                             <label><FaTruckFast className='me-2' />{card.vehicle_number}</label>
                                         </div>
-                                        <div className="col-lg-6 cardicon">
+                                        <div className="col-lg-6 cardicontext">
                                             <label><HiOutlineOfficeBuilding className='me-2' />{card.company_name}</label>
+                                        </div>
+                                        <div className="col-lg-6 cardicontext">
+                                            <label><GiTruck className='me-2' />{card.name_of_the_transport}</label>
                                         </div>
                                     </div>
                                     <div className='m-2'>
@@ -798,8 +811,8 @@ const TruckAvailability = () => {
                                                         type="button"
                                                         onClick={() => handleCopy(card.contact_no)}
                                                     >
-                                                        <IoCall className='me-3' />{card.contact_no}
-                                                    </button>
+                                                        <FaRegCopy className='me-2' />
+                                                        Contact                                                     </button>
                                                 </div>
                                                 <div className='col-6'>
                                                     <button className="btn cardbutton w-100" type="button" onClick={() => handleMessageClick(card)}>Message</button>

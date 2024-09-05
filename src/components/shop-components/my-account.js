@@ -559,7 +559,7 @@ const MyAccount = () => {
                               <label>Operating State and City</label>
                               <Autocomplete name="from_location"
                                 className="google-location location-input bg-transparent mb-1"
-                                apiKey="AIzaSyA09V2FtRwNpWu7Xh8hc7nf-HOqO7rbFqw"
+                                apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
                                 onPlaceSelected={(place) => {
                                   if (place) {
                                     handleFromLocation(place.address_components);

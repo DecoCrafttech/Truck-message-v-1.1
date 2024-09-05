@@ -141,6 +141,19 @@ a:hover {
   }
 }
 
+.cardmodifyhead {
+  /* margin-bottom: 20px;
+  margin-right: 10px; */
+  /* margin: 20px; */
+  font-size: 22px;
+  font-weight: 800;
+  background-color: rgb(240, 246, 255);
+  padding: 20px 0px 20px 0px;
+  
+  border-radius: 5px;
+  text-align: center;
+  }
+
 .cardmodify {
 /* margin-bottom: 20px;
 margin-right: 10px; */
@@ -199,4 +212,13 @@ text-align: center;
   margin-top: 0;
   font-weight: 400 !important;
   color: #4e4e4e;
+}
+
+
+.cardicontext{
+  display: inline-block;
+  position: relative;
+  font-size: 14px;
+  margin-top: 0;
+  color: #333333;
 }

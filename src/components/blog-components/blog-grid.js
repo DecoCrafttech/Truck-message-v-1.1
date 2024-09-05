@@ -10,6 +10,7 @@ import Cookies from 'js-cookie';
 import Autocomplete from "react-google-autocomplete";
 import { HiOutlineOfficeBuilding } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
+import { FaRegCopy } from 'react-icons/fa';
 
 
 const BlogGrid = () => {
@@ -86,7 +87,7 @@ const BlogGrid = () => {
     const handleCopy = (contactNo) => {
         navigator.clipboard.writeText(contactNo)
             .then(() => {
-                toast.success('Contact number copied to clipboard!'); // Optional, show a success message
+                toast.success('Contact number copied!'); // Optional, show a success message
             })
             .catch(() => {
                 toast.error('Failed to copy contact number.');
@@ -378,31 +379,39 @@ const BlogGrid = () => {
                         <div className="row">
                             <div className="col-12 col-md-6" >
                                 <h6>Vehicle Number</h6>
-                                <div className="input-item input-item-name ltn__custom-icon">
+                                <div className="input-item input-item-name ">
                                     <input type="text" name="vehicle_number" placeholder="Enter a Vehicle Number" required />
                                 </div>
                             </div>
 
                             <div className="col-12 col-md-6">
                                 <h6>Company Name</h6>
-                                <div className="input-item input-item-name ltn__custom-icon">
-                                    <input type="text" name="company_name" placeholder="Name of the Owner" required />
+                                <div className="input-item input-item-name ">
+                                    <input type="text" name="company_name" placeholder="Enter your company name" required />
                                 </div>
                             </div>
                         </div>
                         <div className="row">
                             <div className="col-12 col-md-6">
                                 <h6>Owner Name</h6>
-                                <div className="input-item input-item-name ltn__custom-icon">
-                                    <input type="text" name="driver_name" placeholder="Name of the Owner" required />
+                                <div className="input-item input-item-name ">
+                                    <input type="text" name="driver_name" placeholder="Enter the owner name" required />
                                 </div>
                             </div>
 
                             <div className="col-12 col-md-6">
                                 <h6>Contact Number</h6>
-                                <div className="input-item input-item-name ltn__custom-icon">
-                                    <input type="text" name="contact_no" placeholder="Type your contact number" required />
-                                    {contactError && <p style={{ color: 'red' }}>{contactError}</p>}
+                                <div className="input-item input-item-name ">
+                                <input
+                                         type="text"
+                                         name="contact_no"
+                                         placeholder="Enter your contact number"
+                                         maxLength="10"
+                                         pattern="\d{10}"
+                                         required
+                                         title="Please enter a 10-digit contact number"
+                                    />  
+                                        {contactError && <p style={{ color: 'red' }}>{contactError}</p>}
                                 </div>
                             </div>
                         </div >
@@ -412,7 +421,7 @@ const BlogGrid = () => {
                                 <div className="input-item input-item-name">
                                     <Autocomplete name="from_location"
                                         className="google-location location-input bg-transparent py-2"
-                                        apiKey="AIzaSyA09V2FtRwNpWu7Xh8hc7nf-HOqO7rbFqw"
+                                        apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
                                         onPlaceSelected={(place) => {
                                             if (place) {
                                                 handleFromLocation(place.address_components);
@@ -429,7 +438,7 @@ const BlogGrid = () => {
                                 <div className="input-item input-item-name">
                                     <Autocomplete name="to_location"
                                         className="google-location location-input bg-transparent py-2"
-                                        apiKey="AIzaSyA09V2FtRwNpWu7Xh8hc7nf-HOqO7rbFqw"
+                                        apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
                                         onPlaceSelected={(place) => {
                                             if (place) {
                                                 handleToLocation(place.address_components);
@@ -448,9 +457,7 @@ const BlogGrid = () => {
                                 <h6>Truck Body Type</h6>
                                 <div className="input-item">
                                     <select className="nice-select" name="truck_body_type" required>
-                                        <option value="open_body">LCV</option>
-                                        <option value="container">Bus</option>
-                                        <option value="trailer">Open body vehicle</option>
+                                        <option value="trailer">Open body   </option>
                                         <option value="tanker">Tanker</option>
                                         <option value="tanker">Trailer</option>
                                         <option value="tanker">Tipper</option>
@@ -500,8 +507,9 @@ const BlogGrid = () => {
     return (
         <div>
             <Toaster />
-            <div className="ltn__product-area ltn__product-gutter mb-50 mt-60">
+            <div className="ltn__product-area ltn__product-gutter mb-50 ">
                 <div className="container">
+                    <div className='text-center ' ><h2 className='cardmodifyhead'>Driver Availability</h2></div>
                     <div className="row">
                         <div className="col-lg-12 mb-2">
                             <div className='row'>
@@ -581,7 +589,7 @@ const BlogGrid = () => {
                                             <div className="input-item input-item-name">
                                                 <Autocomplete name="from_location"
                                                     className="google-location location-input bg-transparent py-2"
-                                                    apiKey="AIzaSyA09V2FtRwNpWu7Xh8hc7nf-HOqO7rbFqw"
+                                                    apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
                                                     onPlaceSelected={(place) => {
                                                         if (place) {
                                                             handleFromLocation(place.address_components);
@@ -597,7 +605,7 @@ const BlogGrid = () => {
                                             <div className="input-item input-item-name">
                                                 <Autocomplete name="to_location"
                                                     className="google-location location-input bg-transparent py-2"
-                                                    apiKey="AIzaSyA09V2FtRwNpWu7Xh8hc7nf-HOqO7rbFqw"
+                                                    apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
                                                     onPlaceSelected={(place) => {
                                                         if (place) {
                                                             handleToLocation(place.address_components);
@@ -664,7 +672,7 @@ const BlogGrid = () => {
             {/* card */}
             <div className='container'>
                 <div className="row row-cols-1 row-cols-md-3 g-4 mb-60 ">
-                    {currentCards.map(card => (
+                    {currentCards.reverse().map(card => (
                         <div className="col" key={card.id}>
                             <div className="card h-100 shadow truckcard">
                                 <div className='card-header mt-2 border-0 mb-2'>
@@ -695,21 +703,21 @@ const BlogGrid = () => {
                                     </div>
                                     <hr className="hr m-2" />
                                     <div className='row mt-3'>
-                                        <div className="col-lg-6 cardicon">
+                                        <div className="col-lg-6 cardicontext">
                                             <div>
                                                 <label><GiCarWheel className='me-2' />{card.no_of_tyres} wheels</label>
                                             </div>
                                         </div>
-                                        <div className="col-lg-6 cardicon">
+                                        <div className="col-lg-6 cardicontext">
                                             <label><SiMaterialformkdocs className='me-2' />{card.truck_body_type}</label>
                                         </div>
-                                        <div className="col-lg-6 cardicon">
+                                        {/* <div className="col-lg-6 cardicontext">
                                             <label><FaTruck className='me-2' />{card.truck_name}</label>
-                                        </div>
-                                        <div className="col-lg-6 cardicon">
+                                        </div> */}
+                                        <div className="col-lg-6 cardicontext">
                                             <label><FaTruckFast className='me-2' />{card.vehicle_number}</label>
                                         </div>
-                                        <div className="col-lg-12 cardicon">
+                                        <div className="col-lg-6 cardicontext">
                                             <label><HiOutlineOfficeBuilding className='me-2' />{card.company_name}</label>
                                         </div>
                                     </div>
@@ -730,8 +738,8 @@ const BlogGrid = () => {
                                                         type="button"
                                                         onClick={() => handleCopy(card.contact_no)}
                                                     >
-                                                        <IoCall className='me-3' />{card.contact_no}
-                                                    </button>
+                                                        <FaRegCopy className='me-2' />
+                                                        Contact                                                       </button>
                                                 </div>
                                                 <div className='col-6'>
                                                     <button className="btn cardbutton w-100" type="button" onClick={() => handleMessageClick(card)}>Message</button>

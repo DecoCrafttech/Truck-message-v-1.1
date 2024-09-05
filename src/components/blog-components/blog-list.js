@@ -104,7 +104,7 @@ const BlogList = () => {
     price: ''
   });
 
-  const [showingBuyAndSellLocation, setShowingBuyAndSellLocation] =useState("");
+  const [showingBuyAndSellLocation, setShowingBuyAndSellLocation] = useState("");
 
   const [contactError, setContactError] = useState(""); // State to manage contact number validation error
   const [selectedfile, SetSelectedFile] = useState([]);
@@ -144,25 +144,27 @@ const BlogList = () => {
     setFilterLoading(true);
     const filterObj = { ...filterModelData };
     filterObj.location = showingFromLocation;
-    if(filterModelData.kms_driven){
+    if (filterModelData.kms_driven) {
       filterObj.kms_driven = `${filterObj.kms_driven} kms`;
     }
-    
-    if(filterModelData.price){
+
+    if (filterModelData.price) {
       filterObj.price = `${filterObj.price} lakhs`;
     }
 
-    if(filterModelData.model){
-      filterObj.model =  [filterObj.model.toString()];
+    if (filterModelData.model) {
+      filterObj.model = [filterObj.model.toString()];
     }
 
-    if(filterModelData.brand){
-      filterObj.brand =  [filterObj.brand];
+    if (filterModelData.brand) {
+      filterObj.brand = [filterObj.brand];
     }
 
     setIsDataFiltered(true);
 
     try {
+
+      console.log(filterObj)
       const res = await axios.post(
         "https://truck.truckmessage.com/user_buy_sell_filter",
         filterObj,
@@ -531,10 +533,10 @@ const BlogList = () => {
         return (
           <div className="py-5 row align-items-center justify-content-center text-center">
             <div className="col">
-            <div className="spinner-border text-success" role="status">
-              <span className="sr-only">Loading...</span>
-            </div>
-            <p className="text-success mt-3">Verifying Aadhar</p>
+              <div className="spinner-border text-success" role="status">
+                <span className="sr-only">Loading...</span>
+              </div>
+              <p className="text-success mt-3">Verifying Aadhar</p>
             </div>
           </div>
         );
@@ -784,7 +786,7 @@ const BlogList = () => {
                     <Autocomplete
                       name="from_location"
                       className="google-location location-input bg-transparent py-2"
-                      apiKey="AIzaSyA09V2FtRwNpWu7Xh8hc7nf-HOqO7rbFqw"
+                      apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
                       onPlaceSelected={(place) => {
                         if (place) {
                           handleBuyAndSellLocation(place.address_components);
@@ -1060,7 +1062,7 @@ const BlogList = () => {
                       <Autocomplete
                         name="to_location"
                         className="w-100 bg-transparent mb-0 "
-                        apiKey="AIzaSyA09V2FtRwNpWu7Xh8hc7nf-HOqO7rbFqw"
+                        apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
                         onPlaceSelected={(place) => {
                           if (place) {
                             handleLocation(place.address_components);
@@ -1182,22 +1184,22 @@ const BlogList = () => {
               </div>
             </div>
             <div className="modal-footer">
-              
-                {filterLoading ? (
-                  <button type="button" className="btn btn-primary w-100">
-                    <div class="spinner-border" role="status">
-                      <span class="visually-hidden">Loading...</span>
-                    </div>
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    className="btn btn-primary w-100"
-                    onClick={handleApplyFilter}
-                  >
-                    Apply Filter
-                  </button>
-                )} 
+
+              {filterLoading ? (
+                <button type="button" className="btn btn-primary w-100">
+                  <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="btn btn-primary w-100"
+                  onClick={handleApplyFilter}
+                >
+                  Apply Filter
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -1237,7 +1239,7 @@ const BlogList = () => {
 
       <div className="container-fluid px-lg-5 blog-list-filter-min-height">
         <div className="row filter-min-height pb-5">
-          <div className="filter-column-width h-100 d-none d-lg-flex flex-wrap flex-column gap-4 pt-4">
+          <div className="filter-column-width border rounded  d-none d-lg-flex flex-wrap flex-column gap-4 pt-4">
 
             <div className="col-12 d-flex flex-wrap p-0">
               <div className="col-6 p-0">
@@ -1250,7 +1252,7 @@ const BlogList = () => {
                 ) : (
                   <button
                     type="button"
-                    className="btn btn-primary w-100"
+                    className="btn border w-100"
                     onClick={handleClearFilter}
                   >
                     Clear Filter
@@ -1260,7 +1262,7 @@ const BlogList = () => {
 
               <div className="col-6 p-0 ps-1">
                 {filterLoading ? (
-                  <button type="button" className="btn btn-primary w-100">
+                  <button type="button" className="btn btn-danger w-100">
                     <div class="spinner-border" role="status">
                       <span class="visually-hidden">Loading...</span>
                     </div>
@@ -1315,7 +1317,7 @@ const BlogList = () => {
                 <Autocomplete
                   name="to_location"
                   className="w-100 bg-transparent mb-0 "
-                  apiKey="AIzaSyA09V2FtRwNpWu7Xh8hc7nf-HOqO7rbFqw"
+                  apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
                   onPlaceSelected={(place) => {
                     if (place) {
                       handleLocation(place.address_components);
@@ -1327,7 +1329,7 @@ const BlogList = () => {
               </div>
             </div>
 
-            <div className="col-12 p-0">
+            {/* <div className="col-12 p-0">
               <h6>Vehicle Number</h6>
               <input
                 type="tel"
@@ -1343,12 +1345,12 @@ const BlogList = () => {
                 }
                 required
               />
-            </div>
+            </div> */}
 
             <div className="col-12 px-0">
               <h6>Kilometers driven</h6>
 
-              <button type="button" class="btn btn-transparent dropdown-toggle col-12 py-2 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+              <button type="button" class="btn btn-transparent dropdown-toggle col-12 py-3 border shadow-none  dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
                 {filterModelData.kms_driven === '' ? 'select kilometers' : `${filterModelData.kms_driven} kms`}
               </button>
               <ul class="dropdown-menu col-12 dropdown-ul">
@@ -1364,7 +1366,7 @@ const BlogList = () => {
 
               <div className="col-12 mt-3 p-0">
                 <h6>Price</h6>
-                <button type="button" class="btn btn-transparent dropdown-toggle col-12 py-2 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                <button type="button" class="btn btn-transparent dropdown-toggle col-12 py-3 border shadow-none dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
                   {filterModelData.price === '' ? 'select price' : `${filterModelData.price} lakhs`}
                 </button>
                 <ul class="dropdown-menu col-12 dropdown-ul">
@@ -1414,7 +1416,7 @@ const BlogList = () => {
               </ul >
             </div>
 
-            <div className="col-12 px-0">
+            {/* <div className="col-12 px-0">
               <h6>Contact Number</h6>
               <div className="input-item input-item-email">
                 <input
@@ -1432,7 +1434,7 @@ const BlogList = () => {
                   required
                 />
               </div>
-            </div>
+            </div> */}
           </div >
 
           <div className="col h-100 overflow-auto webkitScroll-buy-sell pt-3">
@@ -1464,20 +1466,20 @@ const BlogList = () => {
                 </div>
                 <div className="col-4">
                   {clearFilterLoading ? (
-                  <button type="button" className="btn-primary w-100">
-                    <div class="spinner-border" role="status">
-                      <span class="visually-hidden">Loading...</span>
-                    </div>
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    className={`w-100 col-12 ${isDataFiltered ? "filterbtn" : " btn-secondary pe-none"}`}
-                    onClick={handleClearFilter}
-                  >
-                    Clear Filter
-                  </button>
-                )}
+                    <button type="button" className="btn-primary w-100">
+                      <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                      </div>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className={`w-100 col-12 ${isDataFiltered ? "filterbtn" : " btn-secondary pe-none"}`}
+                      onClick={handleClearFilter}
+                    >
+                      Clear Filter
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -1493,7 +1495,7 @@ const BlogList = () => {
                   </div>
                 </div>
               ) : currentCards.length ? (
-                currentCards.map((card) => (
+                currentCards.reverse().map((card) => (
                   <div
                     className="col-12 col-sm-6 col-xxl-4 p-2"
                     key={card.buy_sell_id}
@@ -1539,29 +1541,29 @@ const BlogList = () => {
                         </div>
                         <div>
                           <label>
-                            <FaLocationDot className="me-2 text-danger" />
+                            <FaLocationDot className="me-2 text-danger cardicontext" />
                             {card.location}
                           </label>
                         </div>
                         <div>
                           <div className="row">
-                            <div className="col-6 col-md-6">
-                              <FaUserAlt className="me-2" />
+                            <div className="col-6 col-md-6 cardicontext">
+                              <FaUserAlt className="me-2 cardicontext" />
                               {card.owner_name}
                             </div>
-                            <div className="col-6 col-md-6">
+                            <div className="col-6 col-md-6 cardicontext">
                               <FaTruckFast className="me-2" />
                               {card.vehicle_number}
                             </div>
-                            <div className="col-6 col-md-6">
+                            <div className="col-6 col-md-6 cardicontext">
                               <BsFillCalendar2DateFill className="me-2" />
                               {card.model}
                             </div>
-                            <div className="col-6 col-md-6">
+                            <div className="col-6 col-md-6 cardicontext">
                               <RiPinDistanceFill className="me-2" />
                               {card.kms_driven} kms
                             </div>
-                            <div className="col-6 col-md-6">
+                            <div className="col-6 col-md-6 cardicontext">
                               <FaIndianRupeeSign className="me-2" />
                               {card.price}
                             </div>

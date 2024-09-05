@@ -8,15 +8,15 @@ import { GiCarWheel } from "react-icons/gi";
 import { useSelector } from 'react-redux';
 import Cookies from 'js-cookie';
 import Autocomplete from "react-google-autocomplete";
-import { IoCall } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
+import { FaRegCopy } from 'react-icons/fa';
 
 
 const PortfolioV1 = () => {
     const LoginDetails = useSelector((state) => state.login);
     const navigate = useNavigate();
 
-
+    const [contactNumLength, setContactNumLength] = useState('')
     const [cards, setCards] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [cardsPerPage] = useState(21); // Adjust the number of cards per page as needed
@@ -43,28 +43,29 @@ const PortfolioV1 = () => {
 
     const formRef = useRef(null);
 
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                await axios.get('https://truck.truckmessage.com/all_load_details')
-                    .then(response => {
-                        if (response.data.success && Array.isArray(response.data.data)) {
-                            setCards(response.data.data);
-                        } else {
-                            console.error('Unexpected response format:', response.data);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('There was an error fetching the data!', error);
-                    });
-            }
-            catch (err) {
-                console.log(err)
-            }
-        }
-        fetchData()
-
+    const fetchData = async () => {
         window.scrollTo(0, 0)
+        try {
+            await axios.get('https://truck.truckmessage.com/all_load_details')
+                .then(response => {
+                    if (response.data.success && Array.isArray(response.data.data)) {
+                        console.log(response.data.data)
+                        setCards(response.data.data);
+                    } else {
+                        console.error('Unexpected response format:', response.data);
+                    }
+                })
+                .catch(error => {
+                    console.error('There was an error fetching the data!', error);
+                });
+        }
+        catch (err) {
+            console.log(err)
+        }
+    }
+
+    useEffect(() => {
+        fetchData()
     }, []);
 
     const handleFilterChange = (e) => {
@@ -76,7 +77,7 @@ const PortfolioV1 = () => {
     const handleCopy = (contactNo) => {
         navigator.clipboard.writeText(contactNo)
             .then(() => {
-                toast.success('Contact number copied to clipboard!'); // Optional, show a success message
+                toast.success('Contact number copied!'); // Optional, show a success message
             })
             .catch(() => {
                 toast.error('Failed to copy contact number.');
@@ -134,12 +135,11 @@ const PortfolioV1 = () => {
 
         })
             .then(response => {
-                toast.success('Form submitted successfully!');
+                toast.success('Loas posted successfully!');
                 formRef.current.reset();
                 setContactError('');
-                setTimeout(() => {
-                    window.location.reload();
-                }, 100);
+                document.getElementById("clodeBuySellModel").click()
+                fetchData()
             })
             .catch(error => {
                 toast.error('Failed to submit the form.');
@@ -379,18 +379,27 @@ const PortfolioV1 = () => {
                             <div className="col-12 col-md-6">
                                 <h6>Company Name</h6>
 
-                                <div className="input-item input-item-name ltn__custom-icon">
-                                    <input type="text" name="company_name" placeholder="Name of the Owner" required />
+                                <div className="input-item input-item-name ">
+                                    <input type="text" name="company_name" placeholder="Name of the Company" required />
                                 </div>
 
                             </div>
                             <div className="col-12 col-md-6">
                                 <h6>Contact Number</h6>
-                                <div className="input-item input-item-email ltn__custom-icon">
-                                    <input type="tel" name="contact_no" placeholder="Type your contact number" required />
+                                <div className="input-item input-item-email">
+                                    <input
+                                        type="text"
+                                        name="contact_no"
+                                        placeholder="Enter your contact number"
+                                        maxLength="10"
+                                        pattern="\d{10}"
+                                        required
+                                        title="Please enter a 10-digit contact number"
+                                    />
                                     {contactError && <p style={{ color: 'red' }}>{contactError}</p>}
                                 </div>
                             </div>
+
                         </div>
                         <div className="row">
                             <div className="col-12 col-md-6">
@@ -398,7 +407,7 @@ const PortfolioV1 = () => {
                                 <div className="input-item input-item-name">
                                     <Autocomplete name="from_location"
                                         className="google-location location-input bg-transparent py-2"
-                                        apiKey="AIzaSyA09V2FtRwNpWu7Xh8hc7nf-HOqO7rbFqw"
+                                        apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
                                         onPlaceSelected={(place) => {
                                             if (place) {
                                                 handleFromLocation(place.address_components);
@@ -415,7 +424,7 @@ const PortfolioV1 = () => {
                                 <div className="input-item input-item-name">
                                     <Autocomplete name="to_location"
                                         className="google-location location-input bg-transparent py-2"
-                                        apiKey="AIzaSyA09V2FtRwNpWu7Xh8hc7nf-HOqO7rbFqw"
+                                        apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
                                         onPlaceSelected={(place) => {
                                             if (place) {
                                                 handleToLocation(place.address_components);
@@ -431,14 +440,14 @@ const PortfolioV1 = () => {
                         <div className="row">
                             <div className="col-12 col-md-6">
                                 <h6>Material</h6>
-                                <div className="input-item input-item-name ltn__custom-icon">
+                                <div className="input-item input-item-name ">
                                     <input type="text" name="material" placeholder="What type of material" required />
                                 </div>
                             </div>
                             <div className="col-12 col-md-6">
                                 <h6>Ton</h6>
-                                <div className="input-item input-item-name ltn__custom-icon">
-                                    <input type="text" name="tone" placeholder="Example: 2 tones" required />
+                                <div className="input-item input-item-name ">
+                                    <input type="number" name="tone" placeholder="Example: 2 tons" required />
                                 </div>
                             </div>
                         </div>
@@ -500,8 +509,9 @@ const PortfolioV1 = () => {
 
     return (
         <div>
-            <div className="ltn__product-area ltn__product-gutter mb-50 mt-60">
+            <div className="ltn__product-area ltn__product-gutter mb-50 ">
                 <div className="container">
+                <div className='text-center ' ><h2 className='cardmodifyhead'>Load Availability</h2></div>   
                     <div className="row">
                         <div className="col-lg-12 mb-2">
                             <div className='row'>
@@ -580,7 +590,7 @@ const PortfolioV1 = () => {
                                             <div className="input-item input-item-name">
                                                 <Autocomplete name="from_location"
                                                     className="google-location location-input bg-transparent py-2"
-                                                    apiKey="AIzaSyA09V2FtRwNpWu7Xh8hc7nf-HOqO7rbFqw"
+                                                    apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
                                                     onPlaceSelected={(place) => {
                                                         if (place) {
                                                             handleFromLocation(place.address_components);
@@ -596,7 +606,7 @@ const PortfolioV1 = () => {
                                             <div className="input-item input-item-name">
                                                 <Autocomplete name="to_location"
                                                     className="google-location location-input bg-transparent py-2"
-                                                    apiKey="AIzaSyA09V2FtRwNpWu7Xh8hc7nf-HOqO7rbFqw"
+                                                    apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
                                                     onPlaceSelected={(place) => {
                                                         if (place) {
                                                             handleToLocation(place.address_components);
@@ -613,8 +623,6 @@ const PortfolioV1 = () => {
                                             <h6>Truck Body Type</h6>
                                             <div className="input-item">
                                                 <select className="nice-select" name="truck_body_type" required>
-                                                    <option value="open_body">LCV</option>
-                                                    <option value="container">Bus</option>
                                                     <option value="trailer">Open body vehicle</option>
                                                     <option value="tanker">Tanker</option>
                                                     <option value="tanker">Trailer</option>
@@ -667,7 +675,7 @@ const PortfolioV1 = () => {
             {/* card  */}
             <div className='container'>
                 <div className="row row-cols-1 row-cols-md-3 g-4 mb-60 ">
-                    {currentCards.map(card => (
+                    {currentCards.reverse().map(card => (
                         <div className="col" key={card.id}>
                             <div className="card h-100 shadow truckcard">
                                 <div className='card-header mt-2 border-0 mb-0 '>
@@ -701,21 +709,21 @@ const PortfolioV1 = () => {
                                     </div>
                                     <hr className="hr m-2" />
                                     <div className='row mt-3'>
-                                        <div className="col-lg-6 cardicon">
+                                        <div className="col-lg-6 cardicontext">
                                             <div>
                                                 <label><FaWeightHanging className='me-2' />{card.tone} ton</label>
                                             </div>
                                         </div>
-                                        <div className="col-lg-6 cardicon">
+                                        <div className="col-lg-6 cardicontext">
                                             <div><label><SiMaterialformkdocs className='me-2' />{card.material}</label></div>
                                         </div>
-                                        <div className="col-lg-6 cardicon">
+                                        <div className="col-lg-6 cardicontext">
                                             <label><GiCarWheel className='me-2' />{card.no_of_tyres} wheels</label>
                                         </div>
-                                        <div className="col-lg-6 cardicon">
+                                        <div className="col-lg-6 cardicontext">
                                             <label><FaTruck className='me-2' />{card.truck_body_type}</label>
                                         </div>
-                                        <div className="col-lg-12 cardicon">
+                                        <div className="col-lg-12 cardicontext">
                                             <label><HiOutlineOfficeBuilding className='me-2' />{card.company_name}</label>
                                         </div>
                                     </div>
@@ -738,8 +746,8 @@ const PortfolioV1 = () => {
                                                         type="button"
                                                         onClick={() => handleCopy(card.contact_no)}
                                                     >
-                                                        <IoCall className='me-3' />{card.contact_no}
-                                                    </button>
+                                                       <FaRegCopy className='me-2'/>
+                                                       Contact                                                    </button>
                                                 </div>
                                                 <div className='col-6'>
                                                     <button className="btn cardbutton w-100" type="button" onClick={() => handleMessageClick(card)}>Message</button>

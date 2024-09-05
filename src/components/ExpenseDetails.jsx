@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import toast from 'react-hot-toast';
+import { IoChevronBackCircleOutline } from 'react-icons/io5';
+import { MdFileDownload } from 'react-icons/md';
 
 const ExpenseDetails = () => {
     const params = useParams()
@@ -76,6 +78,53 @@ const ExpenseDetails = () => {
         }
     };
 
+    const downloadCSV = () => {
+        let csvContent = "data:text/csv;charset=utf-8,";
+
+        csvContent += "truckmessage\n";
+
+        csvContent += "\n";
+
+
+        // csvContent += "Total Credit,Total Debit,Available Balance\n";
+
+
+        // csvContent += `${entry.load_name || 'N/A'},${totalCredit},${totalDebit},${entry.balance}\n`;
+
+        csvContent += "Date,Current Balance,S.no,Description,Debit/Credit,Rupees,Time,Load Name\n";
+
+
+        data.forEach(entry => {
+            entry.transactions.forEach((transaction, index) => {
+                let row = [
+                    entry.date,
+                    entry.balance,
+                    index + 1,
+                    transaction.reason,
+                    transaction.debitorcredit,
+                    transaction.rupees,
+                    transaction.time
+                ].join(","); // Join values by comma
+                csvContent += row + "\n"; // Add new line
+            });
+        });
+
+        // Create a downloadable link and trigger the download
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "truckmessage.csv");
+        document.body.appendChild(link);
+
+        // Trigger the download
+        link.click();
+
+        // Clean up
+        document.body.removeChild(link);
+    };
+
+
+
     const handleFormChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
@@ -109,10 +158,18 @@ const ExpenseDetails = () => {
     return (
         <section>
             <div className="ltn__page-details-area ltn__service-details-area mb-105">
-                <div className="container py-5">
-                    <div className='my-4'>
-                        <button type='button' className='btn btn-primary col-12 col-md-4 col-lg-2 col-xl-1' onClick={() => pageRender('/expense-calculator')}>Back</button>
+                <div className="container py-2">
+                    <div className='my-4 row d-flex justify-content-between align-items-center'>
+                        <button type='button' className='btn btn-transparent border shadow-none col-12 col-md-4 col-lg-2 col-xl-1' onClick={() => pageRender('/expense-calculator')}>
+                        <IoChevronBackCircleOutline className='me-2' />
+                        Back
+                        </button>
+                        <button className="btn btn-primary mt-3 col-12 col-md-6 col-lg-4 col-xl-2" onClick={downloadCSV}>
+                        <MdFileDownload className='me-2' />
+                        Download report
+                        </button>
                     </div>
+
                     <div className="row shadow">
                         <div className="card w-100 shadow">
                             <div className="card-body">
@@ -182,7 +239,10 @@ const ExpenseDetails = () => {
                                             </div>
                                         ))}
                                     </div>
+                                    {/* Button to download CSV */}
+
                                 </div>
+
                             </div>
                         </div>
                     </div>

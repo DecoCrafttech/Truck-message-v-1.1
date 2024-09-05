@@ -1047,6 +1047,7 @@ input[type="submit"],
 input[type="form"],
 input[type="date"],
 input[type="tel"],
+input[type="number"],
 textarea {
   background-color: var(--white);
   border: 2px solid;
@@ -20407,4 +20408,26 @@ button {
 .star{
   cursor: pointer;
   transition: color 200ms;
+}
+
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+-webkit-appearance: none;
+margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+-moz-appearance: textfield;
+}
+
+
+.cup{
+  cursor: pointer;
+}
+
+.input-height-reset{
+  height: 40px !important;
 }
