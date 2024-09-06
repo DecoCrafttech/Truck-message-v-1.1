@@ -544,12 +544,12 @@ const MyAccount = () => {
                                 {category === '' ? 'select Category' : category}
                               </button>
                               <ul class="dropdown-menu col-11">
-                                <li onClick={() => setCategory('Lorry Owner')}><a class="dropdown-item">Lorry Owner</a></li>
-                                <li onClick={() => setCategory('Logistics')}><a class="dropdown-item">Logistics</a></li>
-                                <li onClick={() => setCategory('Lorry Contractors')}><a class="dropdown-item">Lorry Contractors</a></li>
-                                <li onClick={() => setCategory('Load Booking Agent')}><a class="dropdown-item">Load Booking Agent</a></li>
-                                <li onClick={() => setCategory('Driver')}><a class="dropdown-item">Driver</a></li>
-                                <li onClick={() => setCategory('Lorry Buy & Sell Dealer/Owner')}><a class="dropdown-item">Lorry Buy & Sell Dealer/Owner</a></li>
+                                <li onClick={() => setCategory('Lorry Owner')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Lorry Owner</a></li>
+                                <li onClick={() => setCategory('Logistics')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Logistics</a></li>
+                                <li onClick={() => setCategory('Lorry Contractors')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Lorry Contractors</a></li>
+                                <li onClick={() => setCategory('Load Booking Agent')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Load Booking Agent</a></li>
+                                <li onClick={() => setCategory('Driver')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Driver</a></li>
+                                <li onClick={() => setCategory('Lorry Buy & Sell Dealer/Owner')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Lorry Buy & Sell Dealer/Owner</a></li>
                               </ul >
 
                               {/* <label htmlFor="editCategory" className="form-label">Category</label>

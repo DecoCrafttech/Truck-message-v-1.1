@@ -252,15 +252,16 @@ function TeamDetails() {
                 />
               </div>
               <div className="col-lg-12 d-flex flex-wrap  mt-4">
+               
+
+                <div className='col'>
+                  <button type="button" className="btn btn-transparent border shadow-none border-3  py-1 col-lg-6 btn-md w-100" onClick={resetForm}>
+                    Reset
+                  </button>
+                </div>
                 <div className='col'>
                   <button type="button" className="btn mileage col-lg-6 py-1 btn-md w-100" onClick={calculateMileage}>
                     Calculate
-                  </button>
-                </div>
-
-                <div className='col'>
-                  <button type="button" className="btn mileageseconday py-1 col-lg-6 btn-md w-100" onClick={resetForm}>
-                    Reset
                   </button>
                 </div>
 

@@ -441,20 +441,20 @@ const TruckAvailability = () => {
                                     {truckBrandName === '' ? 'select truck' : `${truckBrandName} `}
                                 </button>
                                 <ul class="dropdown-menu  cup shadow-0 col-11 dropdown-ul">
-                                    <li onClick={() => setTruckBrandName('ashok_leyland')}><a class="dropdown-item">Ashok_leyland</a></li>
-                                    <li onClick={() => setTruckBrandName('tata')}><a class="dropdown-item">Tata</a></li>
-                                    <li onClick={() => setTruckBrandName('mahindra')}><a class="dropdown-item">Mahindra</a></li>
-                                    <li onClick={() => setTruckBrandName('eicher')}><a class="dropdown-item">Eicher</a></li>
-                                    <li onClick={() => setTruckBrandName('daimler_india')}><a class="dropdown-item">Daimler_india</a></li>
-                                    <li onClick={() => setTruckBrandName('bharat_benz')}><a class="dropdown-item">Bharat_benz</a></li>
-                                    <li onClick={() => setTruckBrandName('maruthi_suzuki')}><a class="dropdown-item">Maruthi_suzuki</a></li>
-                                    <li onClick={() => setTruckBrandName('sml_isuzu')}><a class="dropdown-item">Sml_isuzu</a></li >
-                                    <li onClick={() => setTruckBrandName('force')}><a class="dropdown-item">Force</a></li >
-                                    <li onClick={() => setTruckBrandName('amw')}><a class="dropdown-item">Amw</a></li >
-                                    <li onClick={() => setTruckBrandName('man')}><a class="dropdown-item">Man</a></li >
-                                    <li onClick={() => setTruckBrandName('scania')}><a class="dropdown-item">Scania</a></li >
-                                    <li onClick={() => setTruckBrandName('volvo')}><a class="dropdown-item">Volvo</a></li >
-                                    <li onClick={() => setTruckBrandName('others')}><a class="dropdown-item">Others</a></li >
+                                    <li onClick={() => setTruckBrandName('ashok_leyland')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Ashok_leyland</a></li>
+                                    <li onClick={() => setTruckBrandName('tata')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Tata</a></li>
+                                    <li onClick={() => setTruckBrandName('mahindra')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Mahindra</a></li>
+                                    <li onClick={() => setTruckBrandName('eicher')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Eicher</a></li>
+                                    <li onClick={() => setTruckBrandName('daimler_india')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Daimler_india</a></li>
+                                    <li onClick={() => setTruckBrandName('bharat_benz')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Bharat_benz</a></li>
+                                    <li onClick={() => setTruckBrandName('maruthi_suzuki')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Maruthi_suzuki</a></li>
+                                    <li onClick={() => setTruckBrandName('sml_isuzu')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Sml_isuzu</a></li >
+                                    <li onClick={() => setTruckBrandName('force')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Force</a></li >
+                                    <li onClick={() => setTruckBrandName('amw')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Amw</a></li >
+                                    <li onClick={() => setTruckBrandName('man')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Man</a></li >
+                                    <li onClick={() => setTruckBrandName('scania')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Scania</a></li >
+                                    <li onClick={() => setTruckBrandName('volvo')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Volvo</a></li >
+                                    <li onClick={() => setTruckBrandName('others')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Others</a></li >
                                 </ul >
                             </div>
 

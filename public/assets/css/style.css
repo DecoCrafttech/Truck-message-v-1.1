@@ -20023,7 +20023,7 @@ button {
 
 @media (min-width:992px) {
   .filter-min-height {
-    height: 64rem;
+    height: 52rem;
   }
 
   .webkitScroll-buy-sell::-webkit-scrollbar {
@@ -20430,4 +20430,12 @@ input[type=number] {
 
 .input-height-reset{
   height: 40px !important;
+}
+
+.dropdown-list-hover:hover{
+  background-color: rgb(202, 202, 202) !important;
+}
+.dropdown-list-hover:hover .dropdown-item{
+  background-color: transparent !important;
+  color: black !important;
 }

@@ -71,9 +71,9 @@ class Footer_v1 extends Component {
                           <i className="icon-call footercls" />
                         </div>
                         <div className="footer-address-info">
-                          <a  style={{textDecoration:"none", color:"white"}} href="tel:8300745340">+91 83007 45340</a>
+                          <a style={{ textDecoration: "none", color: "white" }} href="tel:8300745340">+91 83007 45340</a>
                           <br />
-                          <a  style={{textDecoration:"none", color:"white"}} href="tel:8300678740">+91 83006 78740 </a>
+                          <a style={{ textDecoration: "none", color: "white" }} href="tel:8300678740">+91 83006 78740 </a>
                         </div>
                       </li>
                       <li>
@@ -81,15 +81,15 @@ class Footer_v1 extends Component {
                           <i className="icon-mail footercls " />
                         </div>
                         <div className="footer-address-info footercls ">
-                          <a style={{textDecoration:"none", color:"white"}}href="mailto:info@truckmessage.com">
+                          <a style={{ textDecoration: "none", color: "white" }} href="mailto:info@truckmessage.com">
                             info@truckmessage.com
                           </a>{" "}
                           <br />
-                          <a  style={{textDecoration:"none", color:"white"}}href="mailto:sales@truckmessage.com">
+                          <a style={{ textDecoration: "none", color: "white" }} href="mailto:sales@truckmessage.com">
                             sales@truckmessage.com
                           </a>
                           <br />
-                          <a  style={{textDecoration:"none", color:"white"}}href="mailto:service@truckmessage.com">
+                          <a style={{ textDecoration: "none", color: "white" }} href="mailto:service@truckmessage.com">
                             service@truckmessage.com
                           </a>
                         </div>
@@ -125,6 +125,8 @@ class Footer_v1 extends Component {
                           Contact us
                         </Link>
                       </li>
+                      <li><Link to="/" className='footercls'>Terms &amp; Conditions</Link></li>
+                      <li><Link to="/" className='footercls'>Privacy &amp; Policy</Link></li>
                     </ul>
                   </div>
                 </div>

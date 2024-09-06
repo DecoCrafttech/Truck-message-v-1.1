@@ -41,6 +41,7 @@ const WishList = () => {
     no_of_tyres: "",
     tone: "",
     truck_body_type: "",
+    truck_brand_name:''
   });
 
   const [showingFromLocation, setShowingFromLocation] = useState("");
@@ -192,7 +193,8 @@ const WishList = () => {
           truck_body_type: editingData.truck_body_type,
           no_of_tyres: editingData.no_of_tyres,
           description: editingData.description,
-          truck_name: editingData.truck_name,
+          truck_name:'',
+          truck_brand_name: editingData.truck_name,
           truck_id: JSON.stringify(editingData.truck_id),
           user_id: userId,
         };
@@ -210,7 +212,8 @@ const WishList = () => {
           truck_body_type: editingData.truck_body_type,
           no_of_tyres: editingData.no_of_tyres,
           description: editingData.description,
-          truck_name: editingData.truck_name,
+          truck_name:'',
+          truck_brand_name: editingData.truck_name,
           driver_name: editingData.driver_name,
           driver_id: JSON.stringify(editingData.driver_id),
           user_id: userId,
@@ -1376,7 +1379,7 @@ const WishList = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Modal title
+                Edit Post
               </h1>
               <button
                 type="button"
@@ -2228,7 +2231,7 @@ const WishList = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="staticBackdropLabel">
-                Modal title
+                Delete POst
               </h5>
               <button
                 type="button"

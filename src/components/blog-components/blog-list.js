@@ -655,7 +655,7 @@ const BlogList = () => {
                       yearData.map((yearVal) => {
                         return <li onClick={() => setEditingData({
                           ...editingData, model: yearVal,
-                        })}><a class="dropdown-item">{yearVal}</a></li>
+                        })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{yearVal}</a></li>
                       })
                     }
                   </ul >
@@ -671,7 +671,7 @@ const BlogList = () => {
                       truckBrand.map((brandVal) => {
                         return <li onClick={() => setEditingData({
                           ...editingData, brand: brandVal,
-                        })}><a class="dropdown-item">{brandVal}</a></li>
+                        })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{brandVal}</a></li>
                       })
                     }
                   </ul >
@@ -811,7 +811,7 @@ const BlogList = () => {
                       truckBodyType.map((bodyType) => {
                         return <li onClick={() => setEditingData({
                           ...editingData, truck_body_type: bodyType,
-                        })}><a class="dropdown-item">{bodyType}</a></li>
+                        })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{bodyType}</a></li>
                       })
                     }
                   </ul >
@@ -827,7 +827,7 @@ const BlogList = () => {
                       numOfTyres.map((numOfTyres) => {
                         return <li onClick={() => setEditingData({
                           ...editingData, no_of_tyres: numOfTyres,
-                        })}><a class="dropdown-item">{numOfTyres}</a></li>
+                        })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{numOfTyres}</a></li>
                       })
                     }
                   </ul >
@@ -954,51 +954,7 @@ const BlogList = () => {
 
   return (
     <div>
-      <div className="ltn__product-area ltn__product-gutter mt-60 ">
-        <div className="container-fluid px-lg-5">
-          <div className="row border-bottom">
-            <div className="col-lg-12 mb-2">
-              <div className="ltn__shop-options">
-                <ul>
-                  <li>
-                    <div className="showing-product-number text-right">
-                      <span>
-                        Showing {indexOfFirstCard + 1}-
-                        {Math.min(indexOfLastCard, filteredCards.length)} of{" "}
-                        {filteredCards.length} results
-                      </span>
-                    </div>
-                  </li>
-                  <div className="header-top-btn">
-                    {LoginDetails.isLoggedIn ? (
-                      <button
-                        type="button "
-                        className="cardbutton truck-brand-button "
-                        data-bs-toggle="modal"
-                        data-bs-target="#addloadavailability"
-                        onClick={handleBuyAndSellModelOpen}
-                      >
-                        {" "}
-                        + Add vehicle post
-                      </button>
-                    ) : (
-                      <button
-                        type="button "
-                        className="cardbutton truck-brand-button "
-                        data-bs-toggle="modal"
-                        data-bs-target="#loginModal"
-                      >
-                        {" "}
-                        + Add vehicle post
-                      </button>
-                    )}
-                  </div>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+
 
       <div
         className="modal fade"
@@ -1026,7 +982,7 @@ const BlogList = () => {
                 <div className="d-flex flex-wrap flex-column gap-4">
                   <div className="col-12 p-0">
                     <h6>Model Year</h6>
-                    <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-2 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
                       {filterModelData.model === '' ? 'select model' : `${filterModelData.model}`}
                     </button>
                     <ul class="dropdown-menu col-12 dropdown-ul">
@@ -1034,7 +990,7 @@ const BlogList = () => {
                         yearData.map((yearVal) => {
                           return <li onClick={() => SetfilterModelData({
                             ...filterModelData, model: yearVal,
-                          })}><a class="dropdown-item">{yearVal}</a></li>
+                          })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{yearVal}</a></li>
                         })
                       }
                     </ul >
@@ -1042,7 +998,7 @@ const BlogList = () => {
 
                   <div className="col-12 p-0">
                     <h6>Brand</h6>
-                    <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-2 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
                       {filterModelData.brand === '' ? 'select model' : `${filterModelData.brand}`}
                     </button>
                     <ul class="dropdown-menu col-12 dropdown-ul">
@@ -1050,7 +1006,7 @@ const BlogList = () => {
                         truckBrand.map((brandVal) => {
                           return <li onClick={() => SetfilterModelData({
                             ...filterModelData, brand: brandVal,
-                          })}><a class="dropdown-item">{brandVal}</a></li>
+                          })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{brandVal}</a></li>
                         })
                       }
                     </ul >
@@ -1074,7 +1030,7 @@ const BlogList = () => {
                     </div>
                   </div>
 
-                  <div className="col-12 p-0">
+                  {/* <div className="col-12 p-0">
                     <h6>Vehicle Number</h6>
                     <input
                       type="tel"
@@ -1090,12 +1046,12 @@ const BlogList = () => {
                       }
                       required
                     />
-                  </div>
+                  </div> */}
 
                   <div className="col-12 px-0">
                     <h6>Kilometers driven</h6>
 
-                    <button type="button" class="btn btn-transparent dropdown-toggle col-12 py-2 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
                       {filterModelData.kms_driven === '' ? 'select kilometers' : `${filterModelData.kms_driven} kms`}
                     </button>
                     <ul class="dropdown-menu col-12 dropdown-ul">
@@ -1103,7 +1059,7 @@ const BlogList = () => {
                         filterKilometers.map((kms, ind) => {
                           return <li onClick={() => SetfilterModelData({
                             ...filterModelData, kms_driven: kms
-                          })}><a class="dropdown-item">{kms} kms</a></li>
+                          })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{kms} kms</a></li>
                         })
                       }
                     </ul >
@@ -1111,7 +1067,7 @@ const BlogList = () => {
 
                     <div className="col-12 mt-3 p-0">
                       <h6>Price</h6>
-                      <button type="button" class="btn btn-transparent dropdown-toggle col-12 py-2 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                      <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
                         {filterModelData.price === '' ? 'select price' : `${filterModelData.price} lakhs`}
                       </button>
                       <ul class="dropdown-menu col-12 dropdown-ul">
@@ -1119,7 +1075,7 @@ const BlogList = () => {
                           filterPrice.map((fltrPrice, ind) => {
                             return <li onClick={() => SetfilterModelData({
                               ...filterModelData, price: fltrPrice
-                            })}><a class="dropdown-item">{fltrPrice} lakhs</a></li>
+                            })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{fltrPrice} lakhs</a></li>
                           })
                         }
                       </ul >
@@ -1139,7 +1095,7 @@ const BlogList = () => {
                         truckBodyType.map((bodyType) => {
                           return <li onClick={() => SetfilterModelData({
                             ...filterModelData, truck_body_type: bodyType,
-                          })}><a class="dropdown-item">{bodyType}</a></li>
+                          })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{bodyType}</a></li>
                         })
                       }
                     </ul >
@@ -1155,13 +1111,13 @@ const BlogList = () => {
                         numOfTyres.map((numOfTyres) => {
                           return <li onClick={() => SetfilterModelData({
                             ...filterModelData, no_of_tyres: numOfTyres,
-                          })}><a class="dropdown-item">{numOfTyres}</a></li>
+                          })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{numOfTyres}</a></li>
                         })
                       }
                     </ul >
                   </div>
 
-                  <div className="col-12 px-0">
+                  {/* <div className="col-12 px-0">
                     <h6>Contact Number</h6>
                     <div className="input-item input-item-email">
                       <input
@@ -1179,7 +1135,7 @@ const BlogList = () => {
                         required
                       />
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -1222,7 +1178,7 @@ const BlogList = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="staticBackdropLabel">
-                Add Load
+                Add vehicle
               </h1>
               <button
                 type="button"
@@ -1239,8 +1195,8 @@ const BlogList = () => {
 
       <div className="container-fluid px-lg-5 blog-list-filter-min-height">
         <div className="row filter-min-height pb-5">
-          <div className="filter-column-width border rounded  d-none d-lg-flex flex-wrap flex-column gap-4 pt-4">
 
+          <div className="filter-column-width border rounded d-none d-lg-flex flex-wrap flex-column gap-4 pt-4">
             <div className="col-12 d-flex flex-wrap p-0">
               <div className="col-6 p-0">
                 {clearFilterLoading ? (
@@ -1289,7 +1245,7 @@ const BlogList = () => {
                   yearData.map((yearVal) => {
                     return <li onClick={() => SetfilterModelData({
                       ...filterModelData, model: yearVal,
-                    })}><a class="dropdown-item">{yearVal}</a></li>
+                    })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{yearVal}</a></li>
                   })
                 }
               </ul >
@@ -1305,7 +1261,7 @@ const BlogList = () => {
                   truckBrand.map((brandVal) => {
                     return <li onClick={() => SetfilterModelData({
                       ...filterModelData, brand: brandVal,
-                    })}><a class="dropdown-item">{brandVal}</a></li>
+                    })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{brandVal}</a></li>
                   })
                 }
               </ul >
@@ -1358,7 +1314,7 @@ const BlogList = () => {
                   filterKilometers.map((kms, ind) => {
                     return <li onClick={() => SetfilterModelData({
                       ...filterModelData, kms_driven: kms
-                    })}><a class="dropdown-item">{kms} kms</a></li>
+                    })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{kms} kms</a></li>
                   })
                 }
               </ul >
@@ -1374,7 +1330,7 @@ const BlogList = () => {
                     filterPrice.map((fltrPrice, ind) => {
                       return <li onClick={() => SetfilterModelData({
                         ...filterModelData, price: fltrPrice
-                      })}><a class="dropdown-item">{fltrPrice} lakhs</a></li>
+                      })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{fltrPrice} lakhs</a></li>
                     })
                   }
                 </ul >
@@ -1394,7 +1350,7 @@ const BlogList = () => {
                   truckBodyType.map((bodyType) => {
                     return <li onClick={() => SetfilterModelData({
                       ...filterModelData, truck_body_type: bodyType,
-                    })}><a class="dropdown-item">{bodyType}</a></li>
+                    })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{bodyType}</a></li>
                   })
                 }
               </ul >
@@ -1410,7 +1366,7 @@ const BlogList = () => {
                   numOfTyres.map((numOfTyres) => {
                     return <li onClick={() => SetfilterModelData({
                       ...filterModelData, no_of_tyres: numOfTyres,
-                    })}><a class="dropdown-item">{numOfTyres}</a></li>
+                    })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{numOfTyres}</a></li>
                   })
                 }
               </ul >
@@ -1438,6 +1394,51 @@ const BlogList = () => {
           </div >
 
           <div className="col h-100 overflow-auto webkitScroll-buy-sell pt-3">
+            <div className="ltn__product-area ltn__product-gutter">
+              <div className="container-fluid">
+                <div className="row border-bottom">
+                  <div className="col-lg-12 mb-2">
+                    <div className="ltn__shop-options">
+                      <ul>
+                        <li>
+                          <div className="showing-product-number text-right">
+                            <span>
+                              Showing {indexOfFirstCard + 1}-
+                              {Math.min(indexOfLastCard, filteredCards.length)} of{" "}
+                              {filteredCards.length} results
+                            </span>
+                          </div>
+                        </li>
+                        <div className="header-top-btn">
+                          {LoginDetails.isLoggedIn ? (
+                            <button
+                              type="button "
+                              className="cardbutton truck-brand-button "
+                              data-bs-toggle="modal"
+                              data-bs-target="#addloadavailability"
+                              onClick={handleBuyAndSellModelOpen}
+                            >
+                              {" "}
+                              + Add vehicle post
+                            </button>
+                          ) : (
+                            <button
+                              type="button "
+                              className="cardbutton truck-brand-button "
+                              data-bs-toggle="modal"
+                              data-bs-target="#loginModal"
+                            >
+                              {" "}
+                              + Add vehicle post
+                            </button>
+                          )}
+                        </div>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             <div className="row">
               <div className="col-12 col-lg-12">
                 {/* Search Widget */}
@@ -1452,8 +1453,8 @@ const BlogList = () => {
                   </form>
                 </div>
               </div>
-              <div className="col-lg-4 row d-lg-none">
-                <div className="col-8">
+              <div className="col-lg-4 d-flex flex-wrap d-lg-none">
+                <div className="col-12 col-sm-8">
                   {/* Filter */}
                   <button
                     type="button"
@@ -1464,7 +1465,7 @@ const BlogList = () => {
                     Filter
                   </button>
                 </div>
-                <div className="col-4">
+                <div className="col-12 col-sm-4 mt-2 mt-sm-0">
                   {clearFilterLoading ? (
                     <button type="button" className="btn-primary w-100">
                       <div class="spinner-border" role="status">

@@ -6,7 +6,6 @@ import CallToActionV1 from './section-components/call-to-action-v1';
 const BlogRightSidebarPage = () => {
     return <div>
         <BlogRightSidebar />
-        <CallToActionV1 />
     </div>
 }
 
