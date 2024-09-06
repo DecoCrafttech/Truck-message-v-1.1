@@ -112,7 +112,7 @@ const Navbar = () => {
 
     const register = async () => {
         try {
-            if (firstName === '' || dob === '' || phoneNumber === '' || category==='' || password === '' || confirmPassword === '' || operatingStates.length === 0 || pincode.length === 0) {
+            if (firstName === '' || dob === '' || phoneNumber === '' || category==='' || password === '' || confirmPassword === '' || pincode.length === 0) {
                 toast.error('Please fill in all fields.');
                 return;
             } else if (password !== confirmPassword) {
@@ -560,7 +560,7 @@ const Navbar = () => {
                                                         <ul className="dropdown-menu dropdown-menu-lg-end">
                                                             <li className='m-0' onClick={() => pageRender("my_profile")}><button className="dropdown-item" type="button">My account</button></li>
                                                             <li className='m-0' onClick={() => pageRender("wishlist/load")}><button className="dropdown-item" type="button">My post</button></li>
-                                                            <li className='m-0'><button className="dropdown-item" type="button">Enquiry</button></li>
+                                                            <li className='m-0' onClick={() => pageRender("chat")}><button className="dropdown-item" type="button">Enquiry</button></li>
                                                             <li className='m-0' onClick={handleLogOut}><button className="dropdown-item" type="button">Log out</button></li>
                                                         </ul>
                                                     </div>

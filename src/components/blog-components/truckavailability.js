@@ -46,9 +46,7 @@ const TruckAvailability = () => {
     const [contactError, setContactError] = useState(''); // State to manage contact number validation error
 
 
-    const formRef = useRef(null);
-    const modalRef = useRef(null);
-
+    const formRef = useRef(null); 
 
     const fetchData = async () => {
         try {
@@ -571,7 +569,7 @@ const TruckAvailability = () => {
             <Toaster />
             <div className="ltn__product-area ltn__product-gutter mb-50 ">
                 <div className="container">
-                <div className='text-center ' ><h2 className='cardmodifyhead'>Truck Availability</h2></div>   
+                <div className='text-center'><h2 className='cardmodifyhead'>Truck Availability</h2></div>   
                     <div className="row">
                         <div className="col-lg-12 mb-2">
                             <div className='row'>
