@@ -46,7 +46,6 @@ import Profile from "./components/Profile";
 import { ExpenseCalculator } from "./components/ExpenseCalculator";
 import ExpenseDetails from "./components/ExpenseDetails";
 import TollCalculator from "./components/TollCalculator";
-import { useEffect } from "react";
 import ChatView from "./components/Chat/Chat";
 
 function App() {

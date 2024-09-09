@@ -24,17 +24,40 @@ const BlogGrid = () => {
         search: '',
     });
 
+    const truckBodyType = ["LCV", "Bus", "Open body vehicle", "Tanker", "Trailer", "Tipper"];
+    const numOfTyres = [4,
+        6,
+        10,
+        12,
+        14,
+        16,
+        18,
+        20,
+        22
+    ]
+
+    const [editingData, setEditingData] = useState({
+        driver_name: "",
+        vehicle_number: "",
+        company_name: "",
+        contact_no: "",
+        truck_body_type: "",
+        no_of_tyres: "",
+        description: ''
+    });
+
     const [filterModelData, SetfilterModelData] = useState({
         user_id: "",
         driver_name: "",
         vehicle_number: "",
         company_name: "",
         contact_no: "",
-        from_location: "",
-        to_location: "",
-        truck_name: "",
+        from: "",
+        to: "",
         truck_body_type: "",
-        no_of_tyres: ""
+        no_of_tyres: "",
+        description: '',
+        truck_name : ''
     })
 
     const [aadharNumber, setAadharNumber] = useState("")
@@ -99,49 +122,53 @@ const BlogGrid = () => {
         return contactNumberPattern.test(contact);
     };
 
-    const handleSubmit = async (event) => {
+    const handleSubmit = async () => {
+        const userId = window.atob(Cookies.get("usrin"));
+
+        const data = {
+            ...editingData,
+            from: showingFromLocation,
+            to: showingToLocation,
+            user_id: userId,
+            truck_name: ''
+        };
+
         try {
-            event.preventDefault();
-            const formData = new FormData(event.target);
-            const contactNumber = formData.get('contact_no');
-
-            if (!validateContactNumber(contactNumber)) {
-                setContactError('Please enter a valid 10-digit contact number.');
-                return;
-            }
-
-            const userId = window.atob(Cookies.get("usrin"));
-            const data = {
-                vehicle_number: formData.get('vehicle_number'),
-                company_name: formData.get('company_name'),
-                driver_name: formData.get('driver_name'),
-                contact_no: contactNumber,
-                from: formData.get('from_location'),
-                to: formData.get('to_location'),
-                truck_name: '',
-                truck_body_type: formData.get('truck_body_type'),
-                no_of_tyres: formData.get('tyre_count'),
-                description: formData.get('description'),
-                user_id: userId
-            };
-
-            axios.post('https://truck.truckmessage.com/driver_entry', data, {
-                headers: {
-                    'Content-Type': 'application/json'
+            if (data.vehicle_number && data.company_name && data.driver_name && data.contact_no && data.from && data.to && data.truck_body_type && data.no_of_tyres && data.description) {
+                if (!validateContactNumber(data.contact_no)) {
+                    setContactError('Please enter a valid 10-digit contact number.');
+                    return;
                 }
-            })
-                .then(response => {
-                    document.getElementById('closeAddModel').click()
 
-                    toast.success('Form submitted successfully!');
-                    formRef.current.reset();
-                    setContactError('');
-                    fetchData()
+                const res = await axios.post('https://truck.truckmessage.com/driver_entry', data, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
                 })
-                .catch(error => {
-                    console.error('There was an error submitting the form:', error);
-                    toast.error('Failed to submit the form.');
-                });
+
+                if (res.data.error_code === 0) {
+                    document.getElementById('closeAddModel').click()
+                    toast.success(res.data.message);
+                    fetchData()
+
+                    setEditingData({
+                        driver_name: "",
+                        vehicle_number: "",
+                        company_name: "",
+                        contact_no: "",
+                        truck_body_type: "",
+                        no_of_tyres: "",
+                        description: ''
+                    })
+                    setShowingFromLocation("")
+                    setShowingToLocation("")
+                }
+                else {
+                    toast.error(res.data.message);
+                }
+            } else {
+                toast.error('Some fields are missing');
+            }
         } catch (err) {
             console.log(err)
         }
@@ -375,124 +402,168 @@ const BlogGrid = () => {
 
             case 4:
                 return <div className="ltn__appointment-inner">
-                    <form ref={formRef} onSubmit={handleSubmit}>
-                        <div className="row">
-                            <div className="col-12 col-md-6" >
-                                <h6>Vehicle Number</h6>
-                                <div className="input-item input-item-name ">
-                                    <input type="text" name="vehicle_number" placeholder="Enter a Vehicle Number" required />
-                                </div>
-                            </div>
-
-                            <div className="col-12 col-md-6">
-                                <h6>Company Name</h6>
-                                <div className="input-item input-item-name ">
-                                    <input type="text" name="company_name" placeholder="Enter your company name" required />
-                                </div>
-                            </div>
-                        </div>
-                        <div className="row">
-                            <div className="col-12 col-md-6">
-                                <h6>Owner Name</h6>
-                                <div className="input-item input-item-name ">
-                                    <input type="text" name="driver_name" placeholder="Enter the owner name" required />
-                                </div>
-                            </div>
-
-                            <div className="col-12 col-md-6">
-                                <h6>Contact Number</h6>
-                                <div className="input-item input-item-name ">
+                    <div className="row gy-4">
+                        <div className="col-12 col-md-6">
+                            <h6>Vehicle Number</h6>
+                            <div className="input-item input-item-email">
                                 <input
-                                         type="text"
-                                         name="contact_no"
-                                         placeholder="Enter your contact number"
-                                         maxLength="10"
-                                         pattern="\d{10}"
-                                         required
-                                         title="Please enter a 10-digit contact number"
-                                    />  
-                                        {contactError && <p style={{ color: 'red' }}>{contactError}</p>}
-                                </div>
-                            </div>
-                        </div >
-                        <div className="row">
-                            <div className="col-12 col-md-6">
-                                <h6>From</h6>
-                                <div className="input-item input-item-name">
-                                    <Autocomplete name="from_location"
-                                        className="google-location location-input bg-transparent py-2"
-                                        apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
-                                        onPlaceSelected={(place) => {
-                                            if (place) {
-                                                handleFromLocation(place.address_components);
-                                            }
-                                        }}
-                                        value={showingFromLocation}
-                                        onChange={(e) => setShowingFromLocation(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="col-12 col-md-6">
-                                <h6>To</h6>
-                                <div className="input-item input-item-name">
-                                    <Autocomplete name="to_location"
-                                        className="google-location location-input bg-transparent py-2"
-                                        apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
-                                        onPlaceSelected={(place) => {
-                                            if (place) {
-                                                handleToLocation(place.address_components);
-                                            }
-                                        }}
-                                        value={showingToLocation}
-                                        onChange={(e) => setShowingToLocation(e.target.value)}
-                                    />
-                                </div>
+                                    type="tel"
+                                    name="contact_no"
+                                    className="mb-0"
+                                    placeholder="Type your Vehicle Number"
+                                    value={editingData.vehicle_number}
+                                    onChange={(e) =>
+                                        setEditingData({
+                                            ...editingData,
+                                            vehicle_number: e.target.value,
+                                        })
+                                    }
+                                    required
+                                />
                             </div>
                         </div>
 
-                        <div className="row">
+                        <div className="col-12 col-md-6">
+                            <h6>Driver Name</h6>
+                            <div className="input-item input-item-name">
+                                <input
+                                    type="text"
+                                    className="mb-0"
+                                    name="driver_name"
+                                    placeholder="Name of the driver"
+                                    value={editingData.driver_name}
+                                    onChange={(e) =>
+                                        setEditingData({
+                                            ...editingData,
+                                            driver_name: e.target.value,
+                                        })
+                                    }
+                                    required
+                                />
+                            </div>
+                        </div>
 
-                            <div className="col-12 col-md-6">
-                                <h6>Truck Body Type</h6>
-                                <div className="input-item">
-                                    <select className="nice-select" name="truck_body_type" required>
-                                        <option value="trailer">Open body   </option>
-                                        <option value="tanker">Tanker</option>
-                                        <option value="tanker">Trailer</option>
-                                        <option value="tanker">Tipper</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div className="col-12 col-md-6">
-                                <h6>No. of Tyres</h6>
-                                <div className="input-item">
-                                    <select className="nice-select" name="tyre_count" required>
-                                        <option value="4">4</option>
-                                        <option value="6">6</option>
-                                        <option value="10">10</option>
-                                        <option value="12">12</option>
-                                        <option value="14">14</option>
-                                        <option value="16">16</option>
-                                        <option value="18">18</option>
-                                        <option value="20">20</option>
-                                        <option value="22">22</option>
-                                    </select>
-                                </div>
+                        <div className="col-12 col-md-6">
+                            <h6>Company Name</h6>
+                            <div className="input-item input-item-name">
+                                <input
+                                    type="text"
+                                    className="mb-0"
+                                    name="company_name"
+                                    placeholder="Name of the company"
+                                    value={editingData.company_name}
+                                    onChange={(e) =>
+                                        setEditingData({
+                                            ...editingData,
+                                            company_name: e.target.value,
+                                        })
+                                    }
+                                    required
+                                />
                             </div>
                         </div>
-                        <div className="row">
-                            <div className="col-12 col-md-12">
-                                <h6>Descriptions (Optional)</h6>
-                                <div className="input-item input-item-textarea ltn__custom-icon">
-                                    <textarea name="description" placeholder="Enter a text here" />
-                                </div>
+
+                        <div className="col-12 col-md-6">
+                            <h6>Contact Number</h6>
+                            <div className="input-item input-item-email">
+                                <input
+                                    type="tel"
+                                    name="contact_no"
+                                    className="mb-0"
+                                    placeholder="Type your contact number"
+                                    value={editingData.contact_no}
+                                    onChange={(e) =>
+                                        setEditingData({
+                                            ...editingData,
+                                            contact_no: e.target.value,
+                                        })
+                                    }
+                                    required
+                                />
+                                {contactError && (
+                                    <p style={{ color: "red" }}>{contactError}</p>
+                                )}
                             </div>
                         </div>
-                        <div className="modal-footer btn-wrapper text-center mt-4">
-                            <button className="btn theme-btn-1 text-uppercase" type="submit">Submit</button>
+
+                        <div className="col-12 col-md-6">
+                            <h6>From</h6>
+                            <div className="input-item input-item-name">
+                                <Autocomplete name="from_location"
+                                    className="google-location location-input bg-transparent py-2"
+                                    apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
+                                    onPlaceSelected={(place) => {
+                                        if (place) {
+                                            handleFromLocation(place.address_components);
+                                        }
+                                    }}
+                                    value={showingFromLocation}
+                                    onChange={(e) => setShowingFromLocation(e.target.value)}
+                                />
+                            </div>
                         </div>
-                    </form>
+
+                        <div className="col-12 col-md-6">
+                            <h6>To</h6>
+                            <div className="input-item input-item-name">
+                                <Autocomplete name="to_location"
+                                    className="google-location location-input bg-transparent py-2"
+                                    apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
+                                    onPlaceSelected={(place) => {
+                                        if (place) {
+                                            handleToLocation(place.address_components);
+                                        }
+                                    }}
+                                    value={showingToLocation}
+                                    onChange={(e) => setShowingToLocation(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="col-12 col-md-6 m-0">
+                            <h6>Truck Body Type</h6>
+                            <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                                {editingData.truck_body_type === '' ? 'select body type' : `${editingData.truck_body_type}`}
+                            </button>
+                            <ul class="dropdown-menu col-11 dropdown-ul">
+                                {
+                                    truckBodyType.map((bodyType) => {
+                                        return <li onClick={() => setEditingData({
+                                            ...editingData, truck_body_type: bodyType,
+                                        })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{bodyType}</a></li>
+                                    })
+                                }
+                            </ul >
+                        </div>
+
+                        <div className="col-12 col-md-6 m-0">
+                            <h6>No. of Tyres</h6>
+                            <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                                {editingData.no_of_tyres === '' ? 'select number of tyres' : `${editingData.no_of_tyres}`}
+                            </button>
+                            <ul class="dropdown-menu col-11 dropdown-ul">
+                                {
+                                    numOfTyres.map((numOfTyres) => {
+                                        return <li onClick={() => setEditingData({
+                                            ...editingData, no_of_tyres: numOfTyres,
+                                        })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{numOfTyres}</a></li>
+                                    })
+                                }
+                            </ul >
+                        </div>
+
+                        <div className="col-12 col-md-12">
+                            <h6>Descriptions (Optional)</h6>
+                            <div className="input-item input-item-textarea ltn__custom-icon">
+                                <textarea name="description" placeholder="Enter a text here" value={editingData.description} onChange={(e) => setEditingData({
+                                    ...editingData, description: e.target.value
+                                })} />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="modal-footer btn-wrapper text-center mt-4">
+                        <button className="btn btn-primary text-uppercase" type="button" onClick={handleSubmit}>Submit</button>
+                    </div>
                 </div>
 
             default:
@@ -581,85 +652,81 @@ const BlogGrid = () => {
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeFilterBox"></button>
                         </div>
                         <div className="modal-body ps-4 pe-4 p-">
-                            <div className="ltn__appointment-inner ">
-                                <form ref={formRef} onSubmit={handleSubmit}>
-                                    <div className="row">
-                                        <div className="col-12 col-md-6">
-                                            <h6>From</h6>
-                                            <div className="input-item input-item-name">
-                                                <Autocomplete name="from_location"
-                                                    className="google-location location-input bg-transparent py-2"
-                                                    apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
-                                                    onPlaceSelected={(place) => {
-                                                        if (place) {
-                                                            handleFromLocation(place.address_components);
-                                                        }
-                                                    }}
-                                                    value={showingFromLocation}
-                                                    onChange={(e) => setShowingFromLocation(e.target.value)}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="col-12 col-md-6">
-                                            <h6>To</h6>
-                                            <div className="input-item input-item-name">
-                                                <Autocomplete name="to_location"
-                                                    className="google-location location-input bg-transparent py-2"
-                                                    apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
-                                                    onPlaceSelected={(place) => {
-                                                        if (place) {
-                                                            handleToLocation(place.address_components);
-                                                        }
-                                                    }}
-                                                    value={showingToLocation}
-                                                    onChange={(e) => setShowingToLocation(e.target.value)}
-                                                />
-                                            </div>
+                            <div className="ltn__appointment-inner pb-5">
+                                <div className="row pb-5">
+                                    <div className="col-12 col-md-6">
+                                        <h6>From</h6>
+                                        <div className="input-item input-item-name">
+                                            <Autocomplete name="from_location"
+                                                className="google-location location-input bg-transparent py-2"
+                                                apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
+                                                onPlaceSelected={(place) => {
+                                                    if (place) {
+                                                        handleFromLocation(place.address_components);
+                                                    }
+                                                }}
+                                                value={showingFromLocation}
+                                                onChange={(e) => setShowingFromLocation(e.target.value)}
+                                            />
                                         </div>
                                     </div>
-                                    <div className="row">
-                                        <div className="col-12 col-md-6">
-                                            <h6>Truck Body Type</h6>
-                                            <div className="input-item">
-                                                <select className="nice-select" name="truck_body_type" onChange={(e) => SetfilterModelData({ ...filterModelData, truck_body_type: e.target.value })}>
-                                                    <option value="open_body">Open Body</option>
-                                                    <option value="container">Container</option>
-                                                    <option value="trailer">Trailer</option>
-                                                    <option value="tanker">Tanker</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div className="col-12 col-md-6">
-                                            <h6>No. of Tyres</h6>
-                                            <div className="input-item">
-                                                <select className="nice-select" name="tyre_count" onChange={(e) => SetfilterModelData({ ...filterModelData, no_of_tyres: e.target.value })}>
-                                                    <option value="6">6</option>
-                                                    <option value="10">10</option>
-                                                    <option value="12">12</option>
-                                                    <option value="14">14</option>
-                                                    <option value="16">16</option>
-                                                    <option value="18">18</option>
-                                                    <option value="20">20</option>
-                                                    <option value="22">22</option>
-                                                </select>
-                                            </div>
+
+                                    <div className="col-12 col-md-6">
+                                        <h6>To</h6>
+                                        <div className="input-item input-item-name">
+                                            <Autocomplete name="to_location"
+                                                className="google-location location-input bg-transparent py-2"
+                                                apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
+                                                onPlaceSelected={(place) => {
+                                                    if (place) {
+                                                        handleToLocation(place.address_components);
+                                                    }
+                                                }}
+                                                value={showingToLocation}
+                                                onChange={(e) => setShowingToLocation(e.target.value)}
+                                            />
                                         </div>
                                     </div>
-                                    <div className="row mb-0" >
-                                        <div className="col-12 col-md-6">
-                                            <h6>Material</h6>
-                                            <div className="input-item input-item-name ltn__custom-icon">
-                                                <input type="text" name="material" placeholder="What type of material" onChange={(e) => SetfilterModelData({ ...filterModelData, material: e.target.value })} />
-                                            </div>
-                                        </div>
-                                        <div className="col-12 col-md-6">
-                                            <h6>Ton</h6>
-                                            <div className="input-item input-item-name ltn__custom-icon">
-                                                <input type="text" name="tone" placeholder="Example: 2 tones" onChange={(e) => SetfilterModelData({ ...filterModelData, tone: e.target.value })} />
-                                            </div>
-                                        </div>
+
+                                    <div className="col-12 col-md-6 m-0">
+                                        <h6>Truck Body Type</h6>
+                                        <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                                            {filterModelData.truck_body_type === '' ? 'select body type' : `${filterModelData.truck_body_type}`}
+                                        </button>
+                                        <ul class="dropdown-menu col-11 dropdown-ul">
+                                            {
+                                                truckBodyType.map((bodyType) => {
+                                                    return <li onClick={() => SetfilterModelData({
+                                                        ...filterModelData, truck_body_type: bodyType,
+                                                    })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{bodyType}</a></li>
+                                                })
+                                            }
+                                        </ul >
                                     </div>
-                                </form>
+
+                                    <div className="col-12 col-md-6 m-0">
+                                        <h6>No. of Tyres</h6>
+                                        <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                                            {filterModelData.no_of_tyres === '' ? 'select number of tyres' : `${filterModelData.no_of_tyres}`}
+                                        </button>
+                                        <ul class="dropdown-menu col-11 dropdown-ul">
+                                            {
+                                                numOfTyres.map((numOfTyres) => {
+                                                    return <li onClick={() => SetfilterModelData({
+                                                        ...filterModelData, no_of_tyres: numOfTyres,
+                                                    })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{numOfTyres}</a></li>
+                                                })
+                                            }
+                                        </ul >
+                                    </div>
+                                    
+                                    {/* <div className="col-12 col-md-6">
+                                        <h6>Ton</h6>
+                                        <div className="input-item input-item-name ltn__custom-icon">
+                                            <input type="text" name="tone" placeholder="Example: 2 tones" onChange={(e) => SetfilterModelData({ ...filterModelData, tone: e.target.value })} />
+                                        </div>
+                                    </div> */}
+                                </div>
                             </div>
                         </div>
                         <div className="modal-footer">

@@ -18,8 +18,7 @@ function ChatContainer({ receipt }) {
       `https://truck.truckmessage.com/get_conversation?user_id=${userDetails}&person_id=${receipt.id}`
     );
     
-    response?.data?.data.forEach(msg => {
-      console.log(msg, userDetails, receipt.id, "get_conversation")
+    response?.data?.data.forEach(msg => { 
       if (msg?.user_id == userDetails) {
         dispatch(updateCurrentUserMessage({
           id: msg.id,

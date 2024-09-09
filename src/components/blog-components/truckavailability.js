@@ -4,11 +4,10 @@ import axios from 'axios';
 import { FaWeightHanging, FaTruck, FaLocationDot, FaTruckFast } from "react-icons/fa6";
 import { SiMaterialformkdocs } from "react-icons/si";
 import { GiCarWheel, GiTruck } from "react-icons/gi";
-import { Link, useNavigate } from 'react-router-dom'; // Assuming you are using react-router for navigation
+import { useNavigate } from 'react-router-dom'; // Assuming you are using react-router for navigation
 import { useSelector } from 'react-redux';
 import Cookies from 'js-cookie';
 import Autocomplete from "react-google-autocomplete";
-import { IoCall } from 'react-icons/io5';
 import { HiOutlineOfficeBuilding } from 'react-icons/hi';
 import { FaRegCopy } from 'react-icons/fa';
 
@@ -29,6 +28,32 @@ const TruckAvailability = () => {
     const [otpNumber, setOtpNumber] = useState("")
     const [truckBrandName, setTruckBrandName] = useState('')
 
+    const truckBodyType = ["LCV", "Bus", "Open body vehicle", "Tanker", "Trailer", "Tipper"];
+    const numOfTyres = [4,
+        6,
+        10,
+        12,
+        14,
+        16,
+        18,
+        20,
+        22
+    ]
+
+    const [editingData, setEditingData] = useState({
+        vehicle_number: '',
+        company_name: '',
+        name_of_the_transport: '',
+        contact_no: '',
+        truck_name: '',
+        truck_brand_name: '',
+        tone: '',
+        truck_body_type: '',
+        no_of_tyres: '',
+        description: ''
+    });
+
+
     const [filterModelData, SetfilterModelData] = useState({
         user_id: "",
         vehicle_number: "",
@@ -44,9 +69,6 @@ const TruckAvailability = () => {
     })
 
     const [contactError, setContactError] = useState(''); // State to manage contact number validation error
-
-
-    const formRef = useRef(null); 
 
     const fetchData = async () => {
         try {
@@ -107,50 +129,57 @@ const TruckAvailability = () => {
     };
 
 
-    const handleSubmit = async (event) => {
+    const handleSubmit = async () => {
+        const userId = window.atob(Cookies.get("usrin"));
+        const data = {
+            vehicle_number: editingData.vehicle_number,
+            company_name: editingData.company_name,
+            name_of_the_transport: editingData.name_of_the_transport,
+            contact_no: editingData.contact_no,
+            from: showingFromLocation,
+            to: showingToLocation,
+            truck_name: editingData.truck_brand_name,
+            truck_brand_name: editingData.truck_brand_name,
+            tone: editingData.tone,
+            truck_body_type: editingData.truck_body_type,
+            no_of_tyres: editingData.no_of_tyres,
+            description: editingData.description,
+            user_id: userId
+        };
+
         try {
-            event.preventDefault();
-            const formData = new FormData(event.target);
-            const contactNumber = formData.get('contact_no');
-
-            if (!validateContactNumber(contactNumber)) {
-                setContactError('Please enter a valid 10-digit contact number.');
-                return;
-            }
-            const userId = window.atob(Cookies.get("usrin"));
-            const data = {
-                vehicle_number: formData.get('vehicle_number'),
-                company_name: formData.get('company_name'),
-                name_of_the_transport: formData.get('name_of_the_transport'),
-                contact_no: formData.get('contact_no'),
-                from: formData.get('from_location'),
-                to: formData.get('to_location'),
-                truck_name: truckBrandName,
-                truck_brand_name: truckBrandName,
-                tone: formData.get('tone'),
-                truck_body_type: formData.get('truck_body_type'),
-                no_of_tyres: formData.get('tyre_count'),
-                description: formData.get('description'),
-                user_id: userId
-            };
-
-            await axios.post('https://truck.truckmessage.com/truck_entry', data, {
-                headers: {
-                    'Content-Type': 'application/json'
+            if (data.vehicle_number && data.company_name && data.name_of_the_transport && data.contact_no && data.from && data.to && data.truck_brand_name && data.truck_brand_name && data.tone && data.truck_body_type && data.no_of_tyres && data.description) {
+                if (!validateContactNumber(data.contact_no)) {
+                    setContactError('Please enter a valid 10-digit contact number.');
+                    return;
                 }
-            })
-                .then(response => {
-                    document.getElementById('closeAddModel').click();
 
-                    toast.success('Form submitted successfully!');
-                    formRef.current.reset();
-                    setContactError('');
+                const res = await axios.post('https://truck.truckmessage.com/truck_entry', data, {})
+                if (res.data.error_code === 0) {
+                    document.getElementById('closeAddModel').click();
+                    setEditingData({
+                        vehicle_number: '',
+                        company_name: '',
+                        name_of_the_transport: '',
+                        contact_no: '',
+                        truck_name: '',
+                        truck_brand_name: '',
+                        tone: '',
+                        truck_body_type: '',
+                        no_of_tyres: '',
+                        description: ''
+                    })
+                    setShowingFromLocation('')
+                    setShowingToLocation('')
+
+                    toast.success(res.data.message);
                     fetchData()
-                })
-                .catch(error => {
-                    toast.error('Failed to submit the form.');
-                    console.error('There was an error!', error);
-                });
+                } else {
+                    toast.error(res.data.message);
+                }
+            } else {
+                toast.error('Some fields are missing');
+            }
         }
         catch (err) {
             console.log(err)
@@ -215,20 +244,34 @@ const TruckAvailability = () => {
 
     const handleApplyFilter = async () => {
         const filterObj = { ...filterModelData }
+        filterObj.truck_name = filterModelData.truck_brand_name
         filterObj.from_location = showingFromLocation
         filterObj.to_location = showingToLocation
-
+        
         try {
-            const res = await axios.post("https://truck.truckmessage.com/user_truck_details_filter", filterObj, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
+            const res = await axios.post("https://truck.truckmessage.com/user_truck_details_filter", filterObj)
 
             if (res.data.error_code === 0) {
                 setCards(res.data.data)
                 toast.success(res.data.message)
                 document.getElementById("closeFilterBox").click()
+
+                // SetfilterModelData({
+                //     user_id: "",
+                //     vehicle_number: "",
+                //     company_name: "",
+                //     contact_no: "",
+                //     from_location: "",
+                //     to_location: "",
+                //     truck_brand_name: "",
+                //     truck_body_type: "",
+                //     no_of_tyres: "",
+                //     tone: "",
+                //     truck_name: ""
+                // })
+                // setShowingFromLocation("")
+                // setShowingToLocation("")
+
             } else {
                 toast.error(res.data.message)
             }
@@ -237,9 +280,6 @@ const TruckAvailability = () => {
             console.log(err)
         }
     }
-
-
-
 
     const handleTruckAvailabilityModelOpen = async () => {
         if (Cookies.get("otpId")) {
@@ -386,172 +426,240 @@ const TruckAvailability = () => {
 
             case 4:
                 return <div className="ltn__appointment-inner">
-                    <form ref={formRef} onSubmit={handleSubmit}>
-                        <div className="row">
-                            <div className="col-12 col-md-6">
-                                <h6>Vehicle Number</h6>
-                                <div className="input-item input-item-name ">
-                                    <input type="text" name="vehicle_number" placeholder="Enter a Vehicle Number" required />
-                                </div>
+                    <div className="row gy-4">
+                        <div className="col-12 col-md-6">
+                            <h6>Vehicle Number</h6>
+                            <div className="input-item input-item-email">
+                                <input
+                                    type="tel"
+                                    name="contact_no"
+                                    className="mb-0"
+                                    placeholder="Type your Vehicle Number"
+                                    value={editingData.vehicle_number}
+                                    onChange={(e) =>
+                                        setEditingData({
+                                            ...editingData,
+                                            vehicle_number: e.target.value,
+                                        })
+                                    }
+                                    required
+                                />
                             </div>
-                            <div className="col-12 col-md-6">
+                        </div>
+
+                        <div className="col-12 col-md-6">
+                            <h6>Owner Name</h6>
+                            <div className="input-item input-item-name">
+                                <input
+                                    type="text"
+                                    className="mb-0"
+                                    name="company_name"
+                                    placeholder="Name of the Owner"
+                                    value={editingData.company_name}
+                                    onChange={(e) =>
+                                        setEditingData({
+                                            ...editingData,
+                                            company_name: e.target.value,
+                                        })
+                                    }
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        {/* <div className="col-12 col-md-6">
                                 <h6>Owner Name</h6>
                                 <div className="input-item input-item-name ">
                                     <input type="text" name="company_name" placeholder="Name of the Owner" required />
                                 </div>
-                            </div>
-                        </div>
-                        <div className="row">
-                            <div className="col-12 col-md-6">
-                                <h6>Contact Number</h6>
-                                <div className="input-item input-item-name ">
+                            </div> */}
+
+                        <div className="col-12 col-md-6">
+                            <h6>Contact Number</h6>
+                            <div className="input-item input-item-email">
                                 <input
-                                        type="text"
-                                        name="contact_no"
-                                        placeholder="Enter your contact number"
-                                        maxLength="10"
-                                        pattern="\d{10}"
-                                        required
-                                        title="Please enter a 10-digit contact number"
-                                    />                               
-                                    {contactError && <p style={{ color: 'red' }}>{contactError}</p>}
-                                </div>
+                                    type="tel"
+                                    name="contact_no"
+                                    className="mb-0"
+                                    placeholder="Type your contact number"
+                                    value={editingData.contact_no}
+                                    onChange={(e) =>
+                                        setEditingData({
+                                            ...editingData,
+                                            contact_no: e.target.value,
+                                        })
+                                    }
+                                    required
+                                />
+                                {contactError && (
+                                    <p style={{ color: "red" }}>{contactError}</p>
+                                )}
                             </div>
+                        </div>
 
-                            <div className="col-12 col-md-6">
-                                <h6>Name of the transport</h6>
-                                <div className="input-item input-item-name ">
-                                    <input type="text" name="name_of_the_transport" placeholder="Enter name of the transport" required />
-                                </div>
+                        <div className="col-12 col-md-6">
+                            <h6>Name of the transport</h6>
+                            <div className="input-item input-item-name ">
+                                <input type="text" name="name_of_the_transport" className='m-0' placeholder="Enter name of the transport"
+                                    value={editingData.name_of_the_transport}
+                                    onChange={(e) =>
+                                        setEditingData({
+                                            ...editingData,
+                                            name_of_the_transport: e.target.value,
+                                        })
+                                    }
+                                    required />
                             </div>
+                        </div>
 
-                            <div className="col-12 col-md-6">
-                                <h6>Ton</h6>
-                                <div className="input-item input-item-name ">
-                                    <input type="number" name="tone" placeholder="Example: 2 tons" required />
-                                </div>
+                        <div className="col-12 col-md-6">
+                            <h6>Ton</h6>
+                            <div className="input-item input-item-name ">
+                                <input type="number" name="tone" className='m-0' placeholder="Example: 2 tons"
+                                    value={editingData.tone}
+                                    onChange={(e) =>
+                                        setEditingData({
+                                            ...editingData,
+                                            tone: e.target.value,
+                                        })
+                                    }
+                                    required />
                             </div>
+                        </div>
 
-                            <div className="col-12 col-md-6">
-                                <h6>Truck Name</h6>
+                        <div className="col-12 col-md-6">
+                            <h6>Truck Name</h6>
 
-                                <button type="button" class="btn btn-transparent dropdown-toggle col-12 py-3 dropdown-arrow shadow-none border rounded text-start p-3" data-bs-toggle="dropdown" aria-expanded="false">
-                                    {truckBrandName === '' ? 'select truck' : `${truckBrandName} `}
-                                </button>
-                                <ul class="dropdown-menu  cup shadow-0 col-11 dropdown-ul">
-                                    <li onClick={() => setTruckBrandName('ashok_leyland')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Ashok_leyland</a></li>
-                                    <li onClick={() => setTruckBrandName('tata')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Tata</a></li>
-                                    <li onClick={() => setTruckBrandName('mahindra')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Mahindra</a></li>
-                                    <li onClick={() => setTruckBrandName('eicher')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Eicher</a></li>
-                                    <li onClick={() => setTruckBrandName('daimler_india')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Daimler_india</a></li>
-                                    <li onClick={() => setTruckBrandName('bharat_benz')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Bharat_benz</a></li>
-                                    <li onClick={() => setTruckBrandName('maruthi_suzuki')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Maruthi_suzuki</a></li>
-                                    <li onClick={() => setTruckBrandName('sml_isuzu')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Sml_isuzu</a></li >
-                                    <li onClick={() => setTruckBrandName('force')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Force</a></li >
-                                    <li onClick={() => setTruckBrandName('amw')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Amw</a></li >
-                                    <li onClick={() => setTruckBrandName('man')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Man</a></li >
-                                    <li onClick={() => setTruckBrandName('scania')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Scania</a></li >
-                                    <li onClick={() => setTruckBrandName('volvo')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Volvo</a></li >
-                                    <li onClick={() => setTruckBrandName('others')} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Others</a></li >
-                                </ul >
+                            <button type="button" class="btn btn-transparent dropdown-toggle col-12 py-3 dropdown-arrow shadow-none border rounded text-start p-3" data-bs-toggle="dropdown" aria-expanded="false">
+                                {editingData.truck_brand_name === '' ? 'select truck' : `${editingData.truck_brand_name} `}
+                            </button>
+                            <ul class="dropdown-menu  cup shadow-0 col-11 dropdown-ul">
+                                <li onClick={() => setEditingData({
+                                    ...editingData, truck_brand_name: 'ashok_leyland'
+                                })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Ashok_leyland</a></li>
+                                <li onClick={() => setEditingData({
+                                    ...editingData, truck_brand_name: 'tata'
+                                })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Tata</a></li>
+                                <li onClick={() => setEditingData({
+                                    ...editingData, truck_brand_name: 'mahindra'
+                                })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Mahindra</a></li>
+                                <li onClick={() => setEditingData({
+                                    ...editingData, truck_brand_name: 'eicher'
+                                })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Eicher</a></li>
+                                <li onClick={() => setEditingData({
+                                    ...editingData, truck_brand_name: 'daimler_india'
+                                })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Daimler_india</a></li>
+                                <li onClick={() => setEditingData({
+                                    ...editingData, truck_brand_name: 'bharat_benz'
+                                })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Bharat_benz</a></li>
+                                <li onClick={() => setEditingData({
+                                    ...editingData, truck_brand_name: 'maruthi_suzuki'
+                                })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Maruthi_suzuki</a></li>
+                                <li onClick={() => setEditingData({
+                                    ...editingData, truck_brand_name: 'sml_isuzu'
+                                })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Sml_isuzu</a></li >
+                                <li onClick={() => setEditingData({
+                                    ...editingData, truck_brand_name: 'force'
+                                })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Force</a></li >
+                                <li onClick={() => setEditingData({
+                                    ...editingData, truck_brand_name: 'amw'
+                                })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Amw</a></li >
+                                <li onClick={() => setEditingData({
+                                    ...editingData, truck_brand_name: 'man'
+                                })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Man</a></li >
+                                <li onClick={() => setEditingData({
+                                    ...editingData, truck_brand_name: 'scania'
+                                })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Scania</a></li >
+                                <li onClick={() => setEditingData({
+                                    ...editingData, truck_brand_name: 'volvo'
+                                })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Volvo</a></li >
+                                <li onClick={() => setEditingData({
+                                    ...editingData, truck_brand_name: 'others'
+                                })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Others</a></li >
+                            </ul >
+                        </div>
+
+                        <div className="col-12 col-md-6">
+                            <h6>From</h6>
+                            <div className="input-item input-item-name">
+                                <Autocomplete name="from_location"
+                                    className="google-location location-input bg-transparent py-2 m-0"
+                                    apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
+                                    onPlaceSelected={(place) => {
+                                        if (place) {
+                                            handleFromLocation(place.address_components);
+                                        }
+                                    }}
+                                    required
+                                    value={showingFromLocation}
+                                    onChange={(e) => setShowingFromLocation(e.target.value)}
+                                />
                             </div>
 
                         </div>
-                        <div className="row">
-                            <div className="col-12 col-md-6">
-                                <h6>From</h6>
-                                <div className="input-item input-item-name">
-                                    <Autocomplete name="from_location"
-                                        className="google-location location-input bg-transparent py-2"
-                                        apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
-                                        onPlaceSelected={(place) => {
-                                            if (place) {
-                                                handleFromLocation(place.address_components);
-                                            }
-                                        }}
-                                        required
-                                        value={showingFromLocation}
-                                        onChange={(e) => setShowingFromLocation(e.target.value)}
-                                    />
-                                </div>
-                                {/*                                             
-                            <div className="input-item input-item-name ltn__custom-icon">
-                                <input type="text" name="from_location" placeholder="Location" required />
-                            </div> */}
+                        <div className="col-12 col-md-6">
+                            <h6>To</h6>
+                            <div className="input-item input-item-name">
+                                <Autocomplete name="to_location"
+                                    className="google-location location-input bg-transparent py-2 m-0"
+                                    apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
+                                    onPlaceSelected={(place) => {
+                                        if (place) {
+                                            handleToLocation(place.address_components);
+                                        }
+                                    }}
+                                    required
+                                    value={showingToLocation}
+                                    onChange={(e) => setShowingToLocation(e.target.value)}
+                                />
                             </div>
-                            <div className="col-12 col-md-6">
-                                <h6>To</h6>
-                                <div className="input-item input-item-name">
-                                    <Autocomplete name="to_location"
-                                        className="google-location location-input bg-transparent py-2"
-                                        apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
-                                        onPlaceSelected={(place) => {
-                                            if (place) {
-                                                handleToLocation(place.address_components);
-                                            }
-                                        }}
-                                        required
-                                        value={showingToLocation}
-                                        onChange={(e) => setShowingToLocation(e.target.value)}
-                                    />
-                                </div>
-                                {/*                                             
-                            <div className="input-item input-item-name ltn__custom-icon">
-                                <input type="text" name="to_location" placeholder="Location" required />
-                            </div> */}
-                            </div>
-                        </div>
-                        <div className="row">
-                            {/* <div>
-                            <h6>Material</h6>
-                            <div className="input-item input-item-name ltn__custom-icon">
-                                <input type="text" name="material_type" placeholder="What type of material" required />
-                            </div>
-                        </div> */}
-
 
                         </div>
-                        <div className="row">
-                            <div className="col-12 col-md-6">
-                                <h6>Truck Body Type</h6>
-                                <div className="input-item">
-                                    <select className="nice-select" name="truck_body_type" required>
-                                        <option value="open_body">Open Body</option>
-                                        <option value="container">Container</option>
-                                        <option value="trailer">Trailer</option>
-                                        <option value="tanker">Tanker</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div className="col-12 col-md-6">
-                                <h6>No. of Tyres</h6>
-                                <div className="input-item">
-                                    <select className="nice-select" name="tyre_count" required>
-                                        <option value="4">4</option>
-                                        <option value="6">6</option>
-                                        <option value="10">10</option>
-                                        <option value="12">12</option>
-                                        <option value="14">14</option>
-                                        <option value="16">16</option>
-                                        <option value="18">18</option>
-                                        <option value="20">20</option>
-                                        <option value="22">22</option>
-                                    </select>
-                                </div>
+
+                        <div className="col-12 col-md-6">
+                            <h6>Truck Body Type</h6>
+                            <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                                {editingData.truck_body_type === '' ? 'select body type' : `${editingData.truck_body_type}`}
+                            </button>
+                            <ul class="dropdown-menu col-11 dropdown-ul">
+                                {
+                                    truckBodyType.map((bodyType) => {
+                                        return <li onClick={() => setEditingData({
+                                            ...editingData, truck_body_type: bodyType,
+                                        })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{bodyType}</a></li>
+                                    })
+                                }
+                            </ul >
+                        </div>
+
+                        <div className="col-12 col-md-6">
+                            <h6>No. of Tyres</h6>
+                            <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                                {editingData.no_of_tyres === '' ? 'select number of tyres' : `${editingData.no_of_tyres}`}
+                            </button>
+                            <ul class="dropdown-menu col-11 dropdown-ul">
+                                {
+                                    numOfTyres.map((numOfTyres) => {
+                                        return <li onClick={() => setEditingData({
+                                            ...editingData, no_of_tyres: numOfTyres,
+                                        })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{numOfTyres}</a></li>
+                                    })
+                                }
+                            </ul >
+                        </div>
+
+                        <div className="col-12 col-md-12">
+                            <h6>Descriptions (Optional)</h6>
+                            <div className="input-item input-item-textarea ltn__custom-icon">
+                                <textarea name="description" placeholder="Enter a text here" value={editingData.description} onChange={(e) => setEditingData({
+                                    ...editingData, description: e.target.value
+                                })} />
                             </div>
                         </div>
-                        <div className="row">
-                            <div>
-                                <h6>Descriptions (Optional)</h6>
-                                <div className="input-item input-item-textarea ltn__custom-icon">
-                                    <textarea name="description" placeholder="Enter a text here" required />
-                                </div>
-                            </div>
-                        </div>
-                        <div className="modal-footer btn-wrapper text-center mt-3">
-                            <button className="btn theme-btn-1 text-uppercase" type="submit">Submit</button>
-                        </div>
-                    </form>
+                    </div>
+                    <div className="modal-footer btn-wrapper text-center mt-3">
+                        <button className="btn btn-primary text-uppercase" type="button" onClick={handleSubmit}>Submit</button>
+                    </div>
                 </div>
 
             default:
@@ -569,7 +677,7 @@ const TruckAvailability = () => {
             <Toaster />
             <div className="ltn__product-area ltn__product-gutter mb-50 ">
                 <div className="container">
-                <div className='text-center'><h2 className='cardmodifyhead'>Truck Availability</h2></div>   
+                    <div className='text-center'><h2 className='cardmodifyhead'>Truck Availability</h2></div>
                     <div className="row">
                         <div className="col-lg-12 mb-2">
                             <div className='row'>
@@ -641,86 +749,131 @@ const TruckAvailability = () => {
                         </div>
                         <div className="modal-body ps-4 pe-4 p-">
                             <div className="ltn__appointment-inner ">
-                                <form ref={formRef} onSubmit={handleSubmit}>
-                                    <div className="row">
-                                        <div className="col-12 col-md-6">
-                                            <h6>From</h6>
-                                            <div className="input-item input-item-name">
-                                                <Autocomplete name="from_location"
-                                                    className="google-location location-input bg-transparent py-2"
-                                                    apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
-                                                    onPlaceSelected={(place) => {
-                                                        if (place) {
-                                                            handleFromLocation(place.address_components);
-                                                        }
-                                                    }}
-                                                    value={showingFromLocation}
-                                                    onChange={(e) => setShowingFromLocation(e.target.value)}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="col-12 col-md-6">
-                                            <h6>To</h6>
-                                            <div className="input-item input-item-name">
-                                                <Autocomplete name="to_location"
-                                                    className="google-location location-input bg-transparent py-2"
-                                                    apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
-                                                    onPlaceSelected={(place) => {
-                                                        if (place) {
-                                                            handleToLocation(place.address_components);
-                                                        }
-                                                    }}
-                                                    value={showingToLocation}
-                                                    onChange={(e) => setShowingToLocation(e.target.value)}
-                                                />
-                                            </div>
+                                <div className="row gy-4">
+                                    <div className="col-12 col-md-6">
+                                        <h6>From</h6>
+                                        <div className="input-item input-item-name">
+                                            <Autocomplete name="from_location"
+                                                className="google-location location-input bg-transparent py-2 mb-0"
+                                                apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
+                                                onPlaceSelected={(place) => {
+                                                    if (place) {
+                                                        handleFromLocation(place.address_components);
+                                                    }
+                                                }}
+                                                value={showingFromLocation}
+                                                onChange={(e) => setShowingFromLocation(e.target.value)}
+                                            />
                                         </div>
                                     </div>
-                                    <div className="row">
-                                        <div className="col-12 col-md-6">
-                                            <h6>Truck Body Type</h6>
-                                            <div className="input-item">
-                                                <select className="nice-select" name="truck_body_type" required>
-                                                    <option value="open_body">LCV</option>
-                                                    <option value="container">Bus</option>
-                                                    <option value="trailer">Open body vehicle</option>
-                                                    <option value="tanker">Tanker</option>
-                                                    <option value="tanker">Trailer</option>
-                                                    <option value="tanker">Tipper</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div className="col-12 col-md-6">
-                                            <h6>No. of Tyres</h6>
-                                            <div className="input-item">
-                                                <select className="nice-select" name="tyre_count" onChange={(e) => SetfilterModelData({ ...filterModelData, no_of_tyres: e.target.value })}>
-                                                    <option value="6">6</option>
-                                                    <option value="10">10</option>
-                                                    <option value="12">12</option>
-                                                    <option value="14">14</option>
-                                                    <option value="16">16</option>
-                                                    <option value="18">18</option>
-                                                    <option value="20">20</option>
-                                                    <option value="22">22</option>
-                                                </select>
-                                            </div>
+                                    <div className="col-12 col-md-6">
+                                        <h6>To</h6>
+                                        <div className="input-item input-item-name">
+                                            <Autocomplete name="to_location"
+                                                className="google-location location-input bg-transparent py-2 mb-0"
+                                                apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
+                                                onPlaceSelected={(place) => {
+                                                    if (place) {
+                                                        handleToLocation(place.address_components);
+                                                    }
+                                                }}
+                                                value={showingToLocation}
+                                                onChange={(e) => setShowingToLocation(e.target.value)}
+                                            />
                                         </div>
                                     </div>
-                                    <div className="row mb-0" >
-                                        <div className="col-12 col-md-6">
-                                            <h6>Material</h6>
-                                            <div className="input-item input-item-name ltn__custom-icon">
-                                                <input type="text" name="material" placeholder="What type of material" onChange={(e) => SetfilterModelData({ ...filterModelData, material: e.target.value })} />
-                                            </div>
-                                        </div>
-                                        <div className="col-12 col-md-6">
-                                            <h6>Ton</h6>
-                                            <div className="input-item input-item-name ltn__custom-icon">
-                                                <input type="text" name="tone" placeholder="Example: 2 tones" onChange={(e) => SetfilterModelData({ ...filterModelData, tone: e.target.value })} />
-                                            </div>
+
+                                    <div className="col-12 col-md-6">
+                                        <h6>Truck Name</h6>
+
+                                        <button type="button" class="btn btn-transparent dropdown-toggle col-12 py-3 dropdown-arrow shadow-none border rounded text-start p-3" data-bs-toggle="dropdown" aria-expanded="false">
+                                            {filterModelData.truck_brand_name === '' ? 'select truck' : `${filterModelData.truck_brand_name} `}
+                                        </button>
+                                        <ul class="dropdown-menu  cup shadow-0 col-11 dropdown-ul">
+                                            <li onClick={() => SetfilterModelData({
+                                                ...filterModelData, truck_brand_name: 'ashok_leyland'
+                                            })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Ashok_leyland</a></li>
+                                            <li onClick={() => SetfilterModelData({
+                                                ...filterModelData, truck_brand_name: 'tata'
+                                            })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Tata</a></li>
+                                            <li onClick={() => SetfilterModelData({
+                                                ...filterModelData, truck_brand_name: 'mahindra'
+                                            })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Mahindra</a></li>
+                                            <li onClick={() => SetfilterModelData({
+                                                ...filterModelData, truck_brand_name: 'eicher'
+                                            })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Eicher</a></li>
+                                            <li onClick={() => SetfilterModelData({
+                                                ...filterModelData, truck_brand_name: 'daimler_india'
+                                            })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Daimler_india</a></li>
+                                            <li onClick={() => SetfilterModelData({
+                                                ...filterModelData, truck_brand_name: 'bharat_benz'
+                                            })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Bharat_benz</a></li>
+                                            <li onClick={() => SetfilterModelData({
+                                                ...filterModelData, truck_brand_name: 'maruthi_suzuki'
+                                            })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Maruthi_suzuki</a></li>
+                                            <li onClick={() => SetfilterModelData({
+                                                ...filterModelData, truck_brand_name: 'sml_isuzu'
+                                            })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Sml_isuzu</a></li >
+                                            <li onClick={() => SetfilterModelData({
+                                                ...filterModelData, truck_brand_name: 'force'
+                                            })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Force</a></li >
+                                            <li onClick={() => SetfilterModelData({
+                                                ...filterModelData, truck_brand_name: 'amw'
+                                            })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Amw</a></li >
+                                            <li onClick={() => SetfilterModelData({
+                                                ...filterModelData, truck_brand_name: 'man'
+                                            })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Man</a></li >
+                                            <li onClick={() => SetfilterModelData({
+                                                ...filterModelData, truck_brand_name: 'scania'
+                                            })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Scania</a></li >
+                                            <li onClick={() => SetfilterModelData({
+                                                ...filterModelData, truck_brand_name: 'volvo'
+                                            })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Volvo</a></li >
+                                            <li onClick={() => SetfilterModelData({
+                                                ...filterModelData, truck_brand_name: 'others'
+                                            })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">Others</a></li >
+                                        </ul >
+                                    </div>
+
+                                    <div className="col-12 col-md-6">
+                                        <h6>Truck Body Type</h6>
+                                        <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                                            {filterModelData.truck_body_type === '' ? 'select body type' : `${filterModelData.truck_body_type}`}
+                                        </button>
+                                        <ul class="dropdown-menu col-11 dropdown-ul">
+                                            {
+                                                truckBodyType.map((bodyType) => {
+                                                    return <li onClick={() => SetfilterModelData({
+                                                        ...filterModelData, truck_body_type: bodyType,
+                                                    })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{bodyType}</a></li>
+                                                })
+                                            }
+                                        </ul >
+                                    </div>
+
+                                    <div className="col-12 col-md-6">
+                                        <h6>No. of Tyres</h6>
+                                        <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                                            {filterModelData.no_of_tyres === '' ? 'select number of tyres' : `${filterModelData.no_of_tyres}`}
+                                        </button>
+                                        <ul class="dropdown-menu col-11 dropdown-ul">
+                                            {
+                                                numOfTyres.map((numOfTyres) => {
+                                                    return <li onClick={() => SetfilterModelData({
+                                                        ...filterModelData, no_of_tyres: numOfTyres,
+                                                    })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{numOfTyres}</a></li>
+                                                })
+                                            }
+                                        </ul >
+                                    </div>
+
+                                    <div className="col-12 col-md-6">
+                                        <h6>Ton</h6>
+                                        <div className="input-item input-item-name ltn__custom-icon">
+                                            <input type="text" name="tone" placeholder="Example: 2 tones" className='m-0' onChange={(e) => SetfilterModelData({ ...filterModelData, tone: e.target.value })} />
                                         </div>
                                     </div>
-                                </form>
+                                </div>
                             </div>
                         </div>
                         <div className="modal-footer">
@@ -735,7 +888,7 @@ const TruckAvailability = () => {
                 <div className="row row-cols-1 row-cols-md-3 g-4 mb-60 ">
                     {currentCards.reverse().map(card => (
                         <div className="col" key={card.id}>
-                            <div className="card h-100 shadow truckcard">   
+                            <div className="card h-100 shadow truckcard">
                                 <div className='card-header mt-2 border-0 mb-2'>
                                     <h5 className="card-title cardmodify">{card.profile_name}</h5>
                                     <p className='.fs-6 mb-0 reviewtext '>

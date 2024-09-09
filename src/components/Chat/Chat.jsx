@@ -28,20 +28,49 @@ const ChatView = () => {
       );
 
       if (response.data.error_code === 0) {
-        
 
-        const sortByData = response.data.data.sort(function(a,b){
+        const filterUser = response.data.data.filter((v)=>{
+          return v.person_id != window.atob(userId)
+        })
+
+        const sortByData = filterUser.sort(function(a,b){
           return new Date(b.last_time) - new Date(a.last_time);
         })
 
-        setUserList(sortByData);
-
-        const findUser = sortByData.filter((findUSer) => {
+        const findUser = response.data.data.filter((findUSer) => {
           return findUSer.person_id == personId;
         });
 
-        setPersonId(findUser.length > 0 ? findUser[0].person_id : 0);
-        fetchChatMessages(findUser.length > 0 ? findUser[0].person_id : 0);
+        console.log(findUser,filterUser,window.atob(userId))
+
+        if(findUser.length === 0){
+          const getUserProfileResponse = await axios.post('https://truck.truckmessage.com/get_user_profile',{
+            user_id: personId
+          })
+ 
+          if(getUserProfileResponse.data.data.length > 0){
+            const userProfileNotInList = {
+              last_msg:'',
+              last_time:'',
+              person_id:parseInt(getUserProfileResponse.data.data[1].user_id),
+              profile_image_name:getUserProfileResponse.data.data[1].profile_image_name,
+              profile_name:getUserProfileResponse.data.data[1].name
+            }
+
+            const addUserInList = [userProfileNotInList,...sortByData]
+            
+            setUserList(addUserInList);
+          }
+
+          setPersonId(personId);
+          fetchChatMessages(personId);
+        }else{
+          setUserList(sortByData);
+          setPersonId(personId);
+          fetchChatMessages(personId);
+        }
+
+        
       }
     } catch (err) {
       console.error("Error getting user list:", err);
@@ -109,9 +138,9 @@ const ChatView = () => {
     fetchChatMessages(personId);
   };
 
-  const handleRefresh = () => {
-    getUserList(); // Refresh the contact list
-  };
+  // const handleRefresh = () => {
+  //   getUserList(); // Refresh the contact list
+  // };
 
   useEffect(() => {
     getUserList();
@@ -136,7 +165,7 @@ const ChatView = () => {
                 <button
                   key={userIndex}
                   className={`chat-person-card mb-2 d-flex align-items-center ${
-                    users.person_id === personId ? "active" : ""
+                    users.person_id == personId ? "active" : ""
                   }`}
                   onClick={() => {
                     handleSelectConversation("Conversation 1", users.person_id);

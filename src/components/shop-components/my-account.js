@@ -26,6 +26,7 @@ const MyAccount = () => {
   const [image, setImage] = useState("");
   const [updateImage, setUpdateImage] = useState("");
   const [pageRefresh, setPageRefresh] = useState(false);
+  const [deletionOperatingStates, setDeletionOperatingStates] = useState([]);
 
   const [operatingStates, setOperatingStates] = useState([])
   const [operatingStateString, setoperatingStateString] = useState('')
@@ -55,6 +56,28 @@ const MyAccount = () => {
     }
   }, [operatingStateStringdupli])
 
+  const handleGetOperatingStates = async () => {
+    try {
+      const data = {
+        user_id: Cookies.get("usrin") ? window.atob(Cookies.get("usrin")) : ''
+      }
+
+      const res = await axios.post("https://truck.truckmessage.com/get_user_state_list", data)
+      if (res.data.error_code === 0) {
+        if (res.data.data[0].state_list.length > 0) {
+          if (res.data.data[0].state_list[0] === "All state and cities" && res.data.data[0].state_list.length === 1) {
+            setChecked(true)
+          } else {
+            setChecked(false)
+          }
+        }
+        setOperatingStates(res.data.data[0].state_list)
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
   const handleFromLocation = (selectedLocation) => {
     if (selectedLocation) {
       const cityComponent = selectedLocation.find(component => component.types.includes('locality'));
@@ -67,52 +90,86 @@ const MyAccount = () => {
     }
   };
 
-  const handleDeleteOperatingState = (deletingIndex) => {
+  const handleDeleteOperatingState = async (deletingValue) => {
     const deleteState = operatingStates.filter((v, i) => {
-      return i !== deletingIndex
+      return v !== deletingValue
     })
     setOperatingStates(deleteState)
-  }
 
-  const handleCheckbox = (e) => {
-    setChecked(e.target.checked)
-    if (e.target.checked) {
-      setOperatingStates(["All state and cities"])
-    } else {
-      setOperatingStates([])
-    }
-  }
-
-  const fetchUserProfile = () => {
     const encodedUserId = Cookies.get("usrin");
     if (encodedUserId) {
       const userId = window.atob(encodedUserId);
 
-      axios.post('https://truck.truckmessage.com/get_user_profile', {
+      const data = {
         user_id: userId,
-      })
-        .then(response => {
-          console.log(response.data);
-          setProfileData(response.data.data);
-          setVehicleData(response.data.data[0].vehicle_data)
-          setEditProfile(response.data.data[1])
-          setCategory(response.data.data[1].category)
-          if (response.data.data[1].operating_city[0] === "All state and cities") {
-            setOperatingStates(["All state and cities"])
-            setChecked(true)
-          } else {
-            setOperatingStates(response.data.data[1].operating_city)
-            setChecked(false)
-          }
-          setLoading(false);
+        state_name: [deletingValue]
+      }
+
+      try {
+        const res = await axios.post("https://truck.truckmessage.com/remove_user_state_list", data);
+
+        if (res.data.error_code === 0) {
+          toast.success(res.data.message)
+        } else {
+          toast.error(res.data.message)
+        }
+      } catch (err) {
+        console.log(err)
+      }
+    }
+
+  }
+
+  const handleCheckbox = async (e) => {
+    setChecked(e.target.checked) 
+
+    if (operatingStates.length > 0) {
+      const encodedUserId = Cookies.get("usrin");
+      if (encodedUserId) {
+        const userId = window.atob(encodedUserId);
+
+        const removedata = {
+          user_id: userId,
+          state_name: operatingStates
+        }
+
+        const res = await axios.post("https://truck.truckmessage.com/remove_user_state_list", removedata);
+
+        if (res.data.error_code === 0) {
+          setOperatingStates([])
+        }
+      }
+    }
+  }
+
+  const fetchUserProfile = async () => {
+    handleGetOperatingStates()
+    try {
+      const encodedUserId = Cookies.get("usrin");
+      if (encodedUserId) {
+        const userId = window.atob(encodedUserId);
+
+        await axios.post('https://truck.truckmessage.com/get_user_profile', {
+          user_id: userId,
         })
-        .catch(error => {
-          setError(error);
-          setLoading(false);
-        });
-    } else {
-      setError("User ID not found in cookies");
-      setLoading(false);
+          .then(response => {
+            console.log(response.data);
+            setProfileData(response.data.data);
+            setVehicleData(response.data.data[0].vehicle_data)
+            setEditProfile(response.data.data[1])
+            setCategory(response.data.data[1].category)
+            setLoading(false);
+          })
+          .catch(error => {
+            setError(error);
+            setLoading(false);
+          });
+      } else {
+        setError("User ID not found in cookies");
+        setLoading(false);
+      }
+    } catch (err) {
+      console.log(err)
     }
   };
 
@@ -290,6 +347,40 @@ const MyAccount = () => {
   };
 
 
+  const handleUpdateOperatingStates = async () => {
+    const encodedUserId = Cookies.get("usrin");
+    const updateStates = checked ? ["All state and cities"] : operatingStates
+
+    if (updateStates.length > 0) {
+      try {
+        if (encodedUserId) {
+          const userId = window.atob(encodedUserId);
+
+          const data = {
+            user_id: userId,
+            state_name: updateStates
+          }
+
+          const res = await axios.post("https://truck.truckmessage.com/user_state_entry", data);
+
+          if (res.data.error_code === 0) {
+            document.getElementById("closeOperatingStatesModel").click()
+            handleGetOperatingStates()
+
+            toast.success(res.data.message)
+          } else {
+            toast.error(res.data.message)
+          }
+        }
+      }
+      catch (err) {
+        console.log(err)
+      }
+    } else {
+      toast.error("Operating states should not be empty")
+    }
+  }
+
   return (
     <div className="liton__wishlist-area mt-5 pb-70">
       <div className="container">
@@ -327,21 +418,26 @@ const MyAccount = () => {
                                 <p><FaUsersGear className='me-3' /> {userProfile.category || 'Not Available'}</p>
                               </div>
                             </li>
-                            <li>
-                              <div className="footer-address-icon"></div>
-                              <div className="footer-address-info">
-                                <p> <GrMapLocation className='me-3' />   {userProfile.operating_city.length ? userProfile.operating_city.join(', ') : 'Not Available'}</p>
+                            <li className='py-3'>
+                              <div className='row align-items-center'>
+                                <div className="col-9">
+                                  <div className="footer-address-icon"></div>
+                                  <div className="footer-address-info">
+                                    <p> <GrMapLocation className='me-3' />   {operatingStates.length ? operatingStates.join(', ') : 'Not Available'}</p>
+                                  </div>
+                                </div>
+
+                                <div className="col-3 text-center">
+                                  <button type="button" className="btn btn-sm text-decoration-underline w-75" data-bs-toggle="modal" data-bs-target="#operatingStatesModel">
+                                    Edit
+                                  </button>
+                                </div>
                               </div>
                             </li>
-                            {/* <li>
-                              <div className="footer-address-icon"></div>
-                              <div className="footer-address-info">
-                                <p> <GrLocation className='me-3' />   {userProfile.state.length ? userProfile.state.join(', ') : 'Not Available'}</p>
-                              </div>
-                            </li> */}
                           </ul>
                         </div>
                       </div>
+
                       <button type="button" className="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#editProfileModal">
                         Edit Profile
                       </button>
@@ -499,7 +595,6 @@ const MyAccount = () => {
                   </div>
 
 
-
                   {/* Edit Profile Modal */}
                   <div className="modal fade" id="editProfileModal" tabIndex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
                     <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
@@ -555,6 +650,31 @@ const MyAccount = () => {
                               {/* <label htmlFor="editCategory" className="form-label">Category</label>
                               <input type="text" className="form-control" id="editCategory" value={editProfile.category} onChange={(e) => setEditProfile({ ...editProfile, category: e.target.value })} /> */}
                             </div>
+                          </div>
+                          <hr />
+                          <div className="d-flex flex-column flex-md-row gap-2 justify-content-md-between">
+                            <button type="button" className="btn btn-primary p-2 col-12 col-md-6" onClick={handleSaveChanges}>
+                              Save Changes
+                            </button>
+                            <button type="button" className="btn btn-secondary  mb-md-0 p-2 col-12 col-md-6" data-bs-dismiss="modal" id="closeEditProfileModalButton" onClick={() => { setUpdateImage("") }}>
+                              Close
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Edit operating states  */}
+                  <div className="modal fade" id="operatingStatesModel" tabIndex="-1" aria-labelledby="operatingStatesModelLabel" aria-hidden="true">
+                    <div className="modal-dialog modal-centered modal-lg">
+                      <div className="modal-content">
+                        <div className="modal-header">
+                          <h5 className="modal-title" id="operatingStatesModelLabel">Operating states and cities Details</h5>
+                          <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeOperatingStatesModel"></button>
+                        </div>
+                        <div className="modal-body row justify-content-center py-5">
+                          <div className="col-12 col-md-9 col-lg-9">
                             <div className="form-group mb-3">
                               <label>Operating State and City</label>
                               <Autocomplete name="from_location"
@@ -578,11 +698,11 @@ const MyAccount = () => {
                                   operatingStates.map((v, i) => {
                                     return <div className='col-6 '>
                                       <div className='p-2 border rounded-2 col-12 d-flex flex-wrap'>
-                                        <div className="col-10 p-0">
+                                        <div className="col-9 p-0">
                                           <p className='m-0 text-break'>{v}</p>
                                         </div>
-                                        <div className="col-2">
-                                          <MdDelete className='cursor-pointer text-danger' onClick={() => handleDeleteOperatingState(i)} />
+                                        <div className="col-3">
+                                          <MdDelete className='cursor-pointer text-danger' onClick={() => handleDeleteOperatingState(v)} />
                                         </div>
                                       </div>
                                     </div>
@@ -597,16 +717,14 @@ const MyAccount = () => {
                                 </label>
                               </div>
                             </div>
-
                           </div>
-                          <hr />
-                          <div className="d-flex flex-column flex-md-row gap-2 justify-content-md-between">
-                            <button type="button" className="btn btn-primary p-2 col-12 col-md-6" onClick={handleSaveChanges}>
-                              Save Changes
-                            </button>
-                            <button type="button" className="btn btn-secondary  mb-md-0 p-2 col-12 col-md-6" data-bs-dismiss="modal" id="closeEditProfileModalButton" onClick={() => { setUpdateImage("") }}>
-                              Close
-                            </button>
+                        </div>
+                        <div className="modal-footer row">
+                          <div className="col m-0">
+                            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          </div>
+                          <div className="col m-0">
+                            <button type="button" className="btn btn-primary" onClick={handleUpdateOperatingStates}>Save</button>
                           </div>
                         </div>
                       </div>

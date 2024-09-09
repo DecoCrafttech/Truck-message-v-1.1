@@ -642,258 +642,256 @@ const BlogList = () => {
       case 4:
         return (
           <div className="ltn__appointment-inner">
-            <div>
-              <div className="row gy-4">
+            <div className="row gy-4">
 
-                <div className="col-12 col-md-6">
-                  <h6>Model Year</h6>
-                  <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
-                    {editingData.model === '' ? 'select model' : `${editingData.model}`}
-                  </button>
-                  <ul class="dropdown-menu col-11 dropdown-ul">
-                    {
-                      yearData.map((yearVal) => {
-                        return <li onClick={() => setEditingData({
-                          ...editingData, model: yearVal,
-                        })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{yearVal}</a></li>
+              <div className="col-12 col-md-6">
+                <h6>Model Year</h6>
+                <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                  {editingData.model === '' ? 'select model' : `${editingData.model}`}
+                </button>
+                <ul class="dropdown-menu col-11 dropdown-ul">
+                  {
+                    yearData.map((yearVal) => {
+                      return <li onClick={() => setEditingData({
+                        ...editingData, model: yearVal,
+                      })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{yearVal}</a></li>
+                    })
+                  }
+                </ul >
+              </div>
+
+              <div className="col-12 col-md-6">
+                <h6>Brand</h6>
+                <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                  {editingData.brand === '' ? 'select model' : `${editingData.brand}`}
+                </button>
+                <ul class="dropdown-menu col-11 dropdown-ul">
+                  {
+                    truckBrand.map((brandVal) => {
+                      return <li onClick={() => setEditingData({
+                        ...editingData, brand: brandVal,
+                      })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{brandVal}</a></li>
+                    })
+                  }
+                </ul >
+              </div>
+
+              <div className="col-12 col-md-6">
+                <h6>Owner Name</h6>
+                <div className="input-item input-item-name">
+                  <input
+                    type="text"
+                    className="mb-0"
+                    name="owner_name"
+                    placeholder="Name of the Owner"
+                    value={editingData.owner_name}
+                    onChange={(e) =>
+                      setEditingData({
+                        ...editingData,
+                        owner_name: e.target.value,
                       })
                     }
-                  </ul >
+                    required
+                  />
                 </div>
+              </div>
 
-                <div className="col-12 col-md-6">
-                  <h6>Brand</h6>
-                  <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
-                    {editingData.brand === '' ? 'select model' : `${editingData.brand}`}
-                  </button>
-                  <ul class="dropdown-menu col-11 dropdown-ul">
-                    {
-                      truckBrand.map((brandVal) => {
-                        return <li onClick={() => setEditingData({
-                          ...editingData, brand: brandVal,
-                        })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{brandVal}</a></li>
+              <div className="col-12 col-md-6">
+                <h6>Vehicle Number</h6>
+                <div className="input-item input-item-email">
+                  <input
+                    type="tel"
+                    name="contact_no"
+                    className="mb-0"
+                    placeholder="Type your Vehicle Number"
+                    value={editingData.vehicle_number}
+                    onChange={(e) =>
+                      setEditingData({
+                        ...editingData,
+                        vehicle_number: e.target.value,
                       })
                     }
-                  </ul >
+                    required
+                  />
                 </div>
+              </div>
 
-                <div className="col-12 col-md-6">
-                  <h6>Owner Name</h6>
-                  <div className="input-item input-item-name">
-                    <input
-                      type="text"
-                      className="mb-0"
-                      name="owner_name"
-                      placeholder="Name of the Owner"
-                      value={editingData.owner_name}
-                      onChange={(e) =>
-                        setEditingData({
-                          ...editingData,
-                          owner_name: e.target.value,
-                        })
-                      }
-                      required
-                    />
-                  </div>
+              <div className="col-12 col-md-6">
+                <h6>Kilometers driven</h6>
+                <div className="tel-item">
+                  <input
+                    type="number"
+                    name="kms driven"
+                    className="w-100 py-3"
+                    placeholder="Type Kms driven"
+                    value={editingData.kms_driven}
+                    onChange={(e) =>
+                      setEditingData({
+                        ...editingData,
+                        kms_driven: e.target.value,
+                      })
+                    }
+                    required
+                  />
                 </div>
+              </div>
 
-                <div className="col-12 col-md-6">
-                  <h6>Vehicle Number</h6>
-                  <div className="input-item input-item-email">
-                    <input
-                      type="tel"
-                      name="contact_no"
-                      className="mb-0"
-                      placeholder="Type your Vehicle Number"
-                      value={editingData.vehicle_number}
-                      onChange={(e) =>
-                        setEditingData({
-                          ...editingData,
-                          vehicle_number: e.target.value,
-                        })
-                      }
-                      required
-                    />
-                  </div>
+              <div className="col-12 col-md-6">
+                <h6>Price</h6>
+                <div className="tel-item">
+                  <input
+                    type="number"
+                    name="kms driven"
+                    className="w-100 py-3"
+                    placeholder="Enter your Price here..."
+                    value={editingData.price}
+                    onChange={(e) =>
+                      setEditingData({
+                        ...editingData,
+                        price: e.target.value,
+                      })
+                    }
+                    required
+                  />
                 </div>
+              </div>
 
-                <div className="col-12 col-md-6">
-                  <h6>Kilometers driven</h6>
-                  <div className="tel-item">
-                    <input
-                      type="number"
-                      name="kms driven"
-                      className="w-100 py-3"
-                      placeholder="Type Kms driven"
-                      value={editingData.kms_driven}
-                      onChange={(e) =>
-                        setEditingData({
-                          ...editingData,
-                          kms_driven: e.target.value,
-                        })
-                      }
-                      required
-                    />
-                  </div>
+              <div className="col-12 col-md-6">
+                <h6>Contact Number</h6>
+                <div className="input-item input-item-email">
+                  <input
+                    type="tel"
+                    name="contact_no"
+                    className="mb-0"
+                    placeholder="Type your contact number"
+                    value={editingData.contact_no}
+                    onChange={(e) =>
+                      setEditingData({
+                        ...editingData,
+                        contact_no: e.target.value,
+                      })
+                    }
+                    required
+                  />
+                  {contactError && (
+                    <p style={{ color: "red" }}>{contactError}</p>
+                  )}
                 </div>
+              </div>
 
-                <div className="col-12 col-md-6">
-                  <h6>Price</h6>
-                  <div className="tel-item">
-                    <input
-                      type="number"
-                      name="kms driven"
-                      className="w-100 py-3"
-                      placeholder="Enter your Price here..."
-                      value={editingData.price}
-                      onChange={(e) =>
-                        setEditingData({
-                          ...editingData,
-                          price: e.target.value,
-                        })
+              <div className="col-12 col-md-6">
+                <h6>Location</h6>
+                <div className="input-item input-item-name">
+                  <Autocomplete
+                    name="from_location"
+                    className="google-location location-input bg-transparent py-2"
+                    apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
+                    onPlaceSelected={(place) => {
+                      if (place) {
+                        handleBuyAndSellLocation(place.address_components);
                       }
-                      required
-                    />
-                  </div>
+                    }}
+                    required
+                    value={showingBuyAndSellLocation}
+                    onChange={(e) =>
+                      setShowingBuyAndSellLocation(e.target.value)
+                    }
+                  />
                 </div>
+              </div>
 
-                <div className="col-12 col-md-6">
-                  <h6>Contact Number</h6>
-                  <div className="input-item input-item-email">
-                    <input
-                      type="tel"
-                      name="contact_no"
-                      className="mb-0"
-                      placeholder="Type your contact number"
-                      value={editingData.contact_no}
-                      onChange={(e) =>
-                        setEditingData({
-                          ...editingData,
-                          contact_no: e.target.value,
-                        })
-                      }
-                      required
-                    />
-                    {contactError && (
-                      <p style={{ color: "red" }}>{contactError}</p>
+              <div className="col-12 col-md-6 m-0">
+                <h6>Truck Body Type</h6>
+                <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                  {editingData.truck_body_type === '' ? 'select body type' : `${editingData.truck_body_type}`}
+                </button>
+                <ul class="dropdown-menu col-11 dropdown-ul">
+                  {
+                    truckBodyType.map((bodyType) => {
+                      return <li onClick={() => setEditingData({
+                        ...editingData, truck_body_type: bodyType,
+                      })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{bodyType}</a></li>
+                    })
+                  }
+                </ul >
+              </div>
+
+              <div className="col-12 col-md-6 m-0">
+                <h6>No. of Tyres</h6>
+                <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                  {editingData.no_of_tyres === '' ? 'select number of tyres' : `${editingData.no_of_tyres}`}
+                </button>
+                <ul class="dropdown-menu col-11 dropdown-ul">
+                  {
+                    numOfTyres.map((numOfTyres) => {
+                      return <li onClick={() => setEditingData({
+                        ...editingData, no_of_tyres: numOfTyres,
+                      })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{numOfTyres}</a></li>
+                    })
+                  }
+                </ul >
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <label for="formFileMultiple" className="form-label">
+                Multiple files input example
+              </label>
+              <input
+                type="file"
+                id="fileupload"
+                className="file-upload-input form-control"
+                onChange={InputChange}
+                multiple
+                required
+              />
+            </div>
+
+            <div className="mt-4">
+              {selectedfile.map((data, index) => {
+                const {
+                  id,
+                  filename,
+                  filetype,
+                  fileimage,
+                  datetime,
+                  filesize,
+                } = data;
+                return (
+                  <div className="file-atc-box" key={id}>
+                    {filename.match(/.(jpg|jpeg|png|gif|svg)$/i) ? (
+                      <div className="file-image">
+                        {" "}
+                        <img src={fileimage} alt="" />
+                      </div>
+                    ) : (
+                      <div className="file-image">
+                        <i className="far fa-file-alt"></i>
+                      </div>
                     )}
-                  </div>
-                </div>
-
-                <div className="col-12 col-md-6">
-                  <h6>Location</h6>
-                  <div className="input-item input-item-name">
-                    <Autocomplete
-                      name="from_location"
-                      className="google-location location-input bg-transparent py-2"
-                      apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
-                      onPlaceSelected={(place) => {
-                        if (place) {
-                          handleBuyAndSellLocation(place.address_components);
-                        }
-                      }}
-                      required
-                      value={showingBuyAndSellLocation}
-                      onChange={(e) =>
-                        setShowingBuyAndSellLocation(e.target.value)
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div className="col-12 col-md-6 m-0">
-                  <h6>Truck Body Type</h6>
-                  <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
-                    {editingData.truck_body_type === '' ? 'select body type' : `${editingData.truck_body_type}`}
-                  </button>
-                  <ul class="dropdown-menu col-11 dropdown-ul">
-                    {
-                      truckBodyType.map((bodyType) => {
-                        return <li onClick={() => setEditingData({
-                          ...editingData, truck_body_type: bodyType,
-                        })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{bodyType}</a></li>
-                      })
-                    }
-                  </ul >
-                </div>
-
-                <div className="col-12 col-md-6 m-0">
-                  <h6>No. of Tyres</h6>
-                  <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
-                    {editingData.no_of_tyres === '' ? 'select number of tyres' : `${editingData.no_of_tyres}`}
-                  </button>
-                  <ul class="dropdown-menu col-11 dropdown-ul">
-                    {
-                      numOfTyres.map((numOfTyres) => {
-                        return <li onClick={() => setEditingData({
-                          ...editingData, no_of_tyres: numOfTyres,
-                        })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{numOfTyres}</a></li>
-                      })
-                    }
-                  </ul >
-                </div>
-              </div>
-
-              <div className="mt-4">
-                <label for="formFileMultiple" className="form-label">
-                  Multiple files input example
-                </label>
-                <input
-                  type="file"
-                  id="fileupload"
-                  className="file-upload-input form-control"
-                  onChange={InputChange}
-                  multiple
-                  required
-                />
-              </div>
-
-              <div className="mt-4">
-                {selectedfile.map((data, index) => {
-                  const {
-                    id,
-                    filename,
-                    filetype,
-                    fileimage,
-                    datetime,
-                    filesize,
-                  } = data;
-                  return (
-                    <div className="file-atc-box" key={id}>
-                      {filename.match(/.(jpg|jpeg|png|gif|svg)$/i) ? (
-                        <div className="file-image">
-                          {" "}
-                          <img src={fileimage} alt="" />
-                        </div>
-                      ) : (
-                        <div className="file-image">
-                          <i className="far fa-file-alt"></i>
-                        </div>
-                      )}
-                      <div className="file-detail row">
-                        <h6>{filename}</h6>
-                        <div className="col-9">
-                          <p>
-                            <span>Size : {filesize}</span>,
-                            <span className="ps-1 ml-2">
-                              Modified Time : {datetime}
-                            </span>
-                          </p>
-                        </div>
-                        <div className="file-actions col-3">
-                          <button
-                            type="button"
-                            className="file-action-btn"
-                            onClick={() => DeleteSelectFile(id)}
-                          >
-                            Delete
-                          </button>
-                        </div>
+                    <div className="file-detail row">
+                      <h6>{filename}</h6>
+                      <div className="col-9">
+                        <p>
+                          <span>Size : {filesize}</span>,
+                          <span className="ps-1 ml-2">
+                            Modified Time : {datetime}
+                          </span>
+                        </p>
+                      </div>
+                      <div className="file-actions col-3">
+                        <button
+                          type="button"
+                          className="file-action-btn"
+                          onClick={() => DeleteSelectFile(id)}
+                        >
+                          Delete
+                        </button>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
+                  </div>
+                );
+              })}
             </div>
 
             <div className="row">

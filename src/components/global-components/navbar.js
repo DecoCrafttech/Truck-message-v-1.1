@@ -112,7 +112,7 @@ const Navbar = () => {
 
     const register = async () => {
         try {
-            if (firstName === '' || dob === '' || phoneNumber === '' || category==='' || password === '' || confirmPassword === '' || pincode.length === 0) {
+            if (firstName === '' || dob === '' || phoneNumber === '' || category === '' || password === '' || confirmPassword === '' || pincode.length === 0) {
                 toast.error('Please fill in all fields.');
                 return;
             } else if (password !== confirmPassword) {
@@ -719,7 +719,7 @@ const Navbar = () => {
 
             {/* register modal  */}
             <div className="modal fade" id="registerModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                <div className={`modal-dialog ${step === 2 ? "modal-md" : "modal-lg" } modal-dialog-centered modal-dialog-scrollable`}>
                     <div className="modal-content">
                         <div className="modal-header border-0">
                             <h1 className="modal-title fs-5  " id="staticBackdropLabel">Registration</h1>
@@ -855,6 +855,18 @@ const Navbar = () => {
                                                     <label>Enter OTP</label>
                                                     <input type="text" className="form-control" placeholder="Enter OTP" value={otpInput} onChange={(e) => setOtpInput(e.target.value)} />
                                                 </div>
+
+                                                <div className='text-end mb-3'>
+                                                    <span className={`pe-2 ${resendCountDown > 0 ? "" :"d-none"}`}>{resendCountDown ? `00:${resendCountDown}` : '00:00'} </span>
+                                                    <a className={`text-decoration-underline ${resendCountDown !== null ? 'pe-none' : 'cursor-pointer'}`} onClick={resendCountDown !== null ?
+                                                        null : () => {
+                                                            setResendCountDown(60)
+                                                            sendOTP(phoneNumber)
+                                                        }}>
+                                                        resend otp
+                                                    </a>
+                                                </div>
+
                                                 {
                                                     verifyOtpLoading ?
                                                         <button type="button" className="btn btn-primary btn-block pe-none" >
