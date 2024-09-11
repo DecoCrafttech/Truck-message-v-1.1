@@ -62,7 +62,9 @@ const BlogGrid = () => {
 
     const [aadharNumber, setAadharNumber] = useState("")
     const [aadharStep, setAadharStep] = useState(1);
-    const [otpNumber, setOtpNumber] = useState("")
+    const [otpNumber, setOtpNumber] = useState("");
+    const [selectedContactNum, setSelectedContactNum] = useState(null)
+    const [viewContactId, setviewContactId] = useState(null)
 
     const [contactError, setContactError] = useState(''); // State to manage contact number validation error
 
@@ -107,14 +109,21 @@ const BlogGrid = () => {
         });
     };
 
-    const handleCopy = (contactNo) => {
-        navigator.clipboard.writeText(contactNo)
-            .then(() => {
-                toast.success('Contact number copied!'); // Optional, show a success message
-            })
-            .catch(() => {
-                toast.error('Failed to copy contact number.');
-            });
+    const handleCopy = (contactNo, cardId) => {
+        // navigator.clipboard.writeText(contactNo)
+        //     .then(() => {
+        //         toast.success('Contact number copied!'); // Optional, show a success message
+        //     })
+        //     .catch(() => {
+        //         toast.error('Failed to copy contact number.');
+        //     });
+        setSelectedContactNum(null)
+
+        setviewContactId(cardId)
+        setTimeout(() => {
+            setSelectedContactNum(contactNo)
+            setviewContactId(null)
+        }, 800)
     };
 
     const validateContactNumber = (contact) => {
@@ -800,13 +809,32 @@ const BlogGrid = () => {
                                             <div className="d-flex flex-wrap mt-3">
                                                 <div className='col-6'>
                                                     {/* <button className="btn btn-success w-100" type="button"> <IoCall  className='me-3' />{card.contact_no}</button> */}
-                                                    <button
-                                                        className="btn btn-success w-100"
-                                                        type="button"
-                                                        onClick={() => handleCopy(card.contact_no)}
-                                                    >
-                                                        <FaRegCopy className='me-2' />
-                                                        Contact                                                       </button>
+                                                    {
+                                                        viewContactId === card.id ?
+                                                            <button
+                                                                className="btn btn-success w-100"
+                                                                type="button">
+                                                                <div className="spinner-border text-light" role="status">
+                                                                    <span className="sr-only">Loading...</span>
+                                                                </div>
+                                                            </button>
+                                                            :
+
+                                                            selectedContactNum && card.contact_no === selectedContactNum ?
+                                                                <button
+                                                                    className="btn btn-success w-100"
+                                                                    type="button">
+                                                                    {selectedContactNum}
+                                                                </button>
+                                                                :
+                                                                <button
+                                                                    className="btn btn-success w-100"
+                                                                    type="button"
+                                                                    onClick={() => handleCopy(card.contact_no, card.id)}>
+                                                                    {/* <FaRegCopy className='me-2' /> */}
+                                                                    Contact
+                                                                </button>
+                                                    }
                                                 </div>
                                                 <div className='col-6'>
                                                     <button className="btn cardbutton w-100" type="button" onClick={() => handleMessageClick(card)}>Message</button>

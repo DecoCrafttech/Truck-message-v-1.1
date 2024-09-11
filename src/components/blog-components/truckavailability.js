@@ -70,6 +70,9 @@ const TruckAvailability = () => {
 
     const [contactError, setContactError] = useState(''); // State to manage contact number validation error
 
+    const [selectedContactNum, setSelectedContactNum] = useState(null)
+    const [viewContactId, setviewContactId] = useState(null)
+
     const fetchData = async () => {
         try {
             await axios.get('https://truck.truckmessage.com/all_truck_details')
@@ -92,14 +95,21 @@ const TruckAvailability = () => {
         fetchData()
     }, []);
 
-    const handleCopy = (contactNo) => {
-        navigator.clipboard.writeText(contactNo)
-            .then(() => {
-                toast.success('Contact number copied!'); // Optional, show a success message
-            })
-            .catch(() => {
-                toast.error('Failed to copy contact number.');
-            });
+    const handleCopy = (contactNo, cardId) => {
+        // navigator.clipboard.writeText(contactNo)
+        //     .then(() => {
+        //         toast.success('Contact number copied!'); // Optional, show a success message
+        //     })
+        //     .catch(() => {
+        //         toast.error('Failed to copy contact number.');
+        //     });
+        setSelectedContactNum(null)
+
+        setviewContactId(cardId)
+        setTimeout(() => {
+            setSelectedContactNum(contactNo)
+            setviewContactId(null)
+        }, 800)
     };
 
     const handleFilterChange = (e) => {
@@ -247,7 +257,7 @@ const TruckAvailability = () => {
         filterObj.truck_name = filterModelData.truck_brand_name
         filterObj.from_location = showingFromLocation
         filterObj.to_location = showingToLocation
-        
+
         try {
             const res = await axios.post("https://truck.truckmessage.com/user_truck_details_filter", filterObj)
 
@@ -957,13 +967,32 @@ const TruckAvailability = () => {
                                                 </div> */}
                                                 <div className='col-6'>
                                                     {/* <button className="btn btn-success w-100" type="button"> <IoCall  className='me-3' />{card.contact_no}</button> */}
-                                                    <button
-                                                        className="btn btn-success w-100"
-                                                        type="button"
-                                                        onClick={() => handleCopy(card.contact_no)}
-                                                    >
-                                                        <FaRegCopy className='me-2' />
-                                                        Contact                                                     </button>
+                                                    {
+                                                        viewContactId === card.id ?
+                                                            <button
+                                                                className="btn btn-success w-100"
+                                                                type="button">
+                                                                <div className="spinner-border text-light" role="status">
+                                                                    <span className="sr-only">Loading...</span>
+                                                                </div>
+                                                            </button>
+                                                            :
+
+                                                            selectedContactNum && card.contact_no === selectedContactNum ?
+                                                                <button
+                                                                    className="btn btn-success w-100"
+                                                                    type="button">
+                                                                    {selectedContactNum}
+                                                                </button>
+                                                                :
+                                                                <button
+                                                                    className="btn btn-success w-100"
+                                                                    type="button"
+                                                                    onClick={() => handleCopy(card.contact_no, card.id)}>
+                                                                    {/* <FaRegCopy className='me-2' /> */}
+                                                                    Contact
+                                                                </button>
+                                                    }
                                                 </div>
                                                 <div className='col-6'>
                                                     <button className="btn cardbutton w-100" type="button" onClick={() => handleMessageClick(card)}>Message</button>

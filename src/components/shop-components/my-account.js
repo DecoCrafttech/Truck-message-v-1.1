@@ -10,8 +10,9 @@ import Cookies from 'js-cookie';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { MdDelete } from "react-icons/md";
-import Autocomplete from "react-google-autocomplete";
+import { MdDelete } from "react-icons/md"; 
+import Select from 'react-dropdown-select';
+import {statesData} from '../../cityAndState';
 
 const MyAccount = () => {
   const [profileData, setProfileData] = useState(null);
@@ -28,10 +29,12 @@ const MyAccount = () => {
   const [pageRefresh, setPageRefresh] = useState(false);
   const [deletionOperatingStates, setDeletionOperatingStates] = useState([]);
 
+
   const [operatingStates, setOperatingStates] = useState([])
   const [operatingStateString, setoperatingStateString] = useState('')
   const [operatingStateStringdupli, setoperatingStateStringdupli] = useState('')
   const [checked, setChecked] = useState(false)
+  const [stateCitySelectedData,setstateCitySelectedData]=useState([])
 
   const LoginDetails = useSelector((state) => state.login);
   const pageRender = useNavigate();
@@ -381,6 +384,10 @@ const MyAccount = () => {
     }
   }
 
+  const handleSelectOperatingStatesData = (val) =>{
+
+  }
+
   return (
     <div className="liton__wishlist-area mt-5 pb-70">
       <div className="container">
@@ -677,7 +684,7 @@ const MyAccount = () => {
                           <div className="col-12 col-md-9 col-lg-9">
                             <div className="form-group mb-3">
                               <label>Operating State and City</label>
-                              <Autocomplete name="from_location"
+                              {/* <Autocomplete name="from_location"
                                 className="google-location location-input bg-transparent mb-1"
                                 apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
                                 onPlaceSelected={(place) => {
@@ -692,8 +699,10 @@ const MyAccount = () => {
                                 value={operatingStateString}
                                 onChange={(e) => setoperatingStateString(e.target.value)}
                                 disabled={checked}
-                              />
-                              <div className='row g-2 mb-3'>
+                              /> */}
+                              <Select multi options={statesData} onChange={(values) => setstateCitySelectedData(values)} value={stateCitySelectedData}/>
+
+                              {/* <div className='row g-2 mb-3'>
                                 {!checked ?
                                   operatingStates.map((v, i) => {
                                     return <div className='col-6 '>
@@ -709,7 +718,7 @@ const MyAccount = () => {
                                   })
                                   :
                                   null}
-                              </div>
+                              </div> */}
                               <div className="form-check ms-2 w-100">
                                 <input className="form-check-input" type="checkbox" id="profileAllStatesandCities" onChange={handleCheckbox} checked={checked} />
                                 <label className="form-check-label ps-2" for="profileAllStatesandCities">

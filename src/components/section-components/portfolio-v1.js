@@ -39,7 +39,8 @@ const PortfolioV1 = () => {
 
     const [aadharNumber, setAadharNumber] = useState("")
     const [aadharStep, setAadharStep] = useState(1);
-    const [otpNumber, setOtpNumber] = useState("")
+    const [otpNumber, setOtpNumber] = useState("");
+    const [selectedContactNum, setSelectedContactNum] = useState(null)
 
     const formRef = useRef(null);
 
@@ -74,14 +75,21 @@ const PortfolioV1 = () => {
         });
     };
 
-    const handleCopy = (contactNo) => {
-        navigator.clipboard.writeText(contactNo)
-            .then(() => {
-                toast.success('Contact number copied!'); // Optional, show a success message
-            })
-            .catch(() => {
-                toast.error('Failed to copy contact number.');
-            });
+    const handleCopy = (contactNo, cardId) => {
+        // navigator.clipboard.writeText(contactNo)
+        //     .then(() => {
+        //         toast.success('Contact number copied!'); // Optional, show a success message
+        //     })
+        //     .catch(() => {
+        //         toast.error('Failed to copy contact number.');
+        //     });
+        setSelectedContactNum(null)
+
+        setviewContactId(cardId)
+        setTimeout(() => {
+            setSelectedContactNum(contactNo)
+            setviewContactId(null)
+        }, 800)
     };
 
     const filterCards = (cards) => {
@@ -94,7 +102,8 @@ const PortfolioV1 = () => {
                 card.tone.toString().includes(search) ||
                 card.material.toLowerCase().includes(search) ||
                 card.no_of_tyres.toString().includes(search) ||
-                card.truck_body_type.toLowerCase().includes(search)
+                card.truck_body_type.toLowerCase().includes(search) ||
+                card.profile_name.toLowerCase().includes(search)
             );
         });
     };
@@ -173,6 +182,8 @@ const PortfolioV1 = () => {
         city: "",
         state: "",
     });
+
+    const [viewContactId, setviewContactId] = useState(null)
 
     const handleFromLocation = (selectedLocation) => {
         if (selectedLocation) {
@@ -511,7 +522,7 @@ const PortfolioV1 = () => {
         <div>
             <div className="ltn__product-area ltn__product-gutter mb-50 ">
                 <div className="container">
-                <div className='text-center ' ><h2 className='cardmodifyhead'>Load Availability</h2></div>   
+                    <div className='text-center ' ><h2 className='cardmodifyhead'>Load Availability</h2></div>
                     <div className="row">
                         <div className="col-lg-12 mb-2">
                             <div className='row'>
@@ -741,13 +752,32 @@ const PortfolioV1 = () => {
                                                 </div> */}
                                                 <div className='col-6'>
                                                     {/* <button className="btn btn-success w-100" type="button"> <IoCall  className='me-3' />{card.contact_no}</button> */}
-                                                    <button
-                                                        className="btn btn-success w-100"
-                                                        type="button"
-                                                        onClick={() => handleCopy(card.contact_no)}
-                                                    >
-                                                       <FaRegCopy className='me-2'/>
-                                                       Contact                                                    </button>
+                                                    {
+                                                        viewContactId === card.id ?
+                                                            <button
+                                                                className="btn btn-success w-100"
+                                                                type="button">
+                                                                <div className="spinner-border text-light" role="status">
+                                                                    <span className="sr-only">Loading...</span>
+                                                                </div>
+                                                            </button>
+                                                            :
+
+                                                            selectedContactNum && card.contact_no === selectedContactNum ?
+                                                                <button
+                                                                    className="btn btn-success w-100"
+                                                                    type="button">
+                                                                    {selectedContactNum}
+                                                                </button>
+                                                                :
+                                                                <button
+                                                                    className="btn btn-success w-100"
+                                                                    type="button"
+                                                                    onClick={() => handleCopy(card.contact_no, card.id)}>
+                                                                    {/* <FaRegCopy className='me-2' /> */}
+                                                                    Contact
+                                                                </button>
+                                                    }
                                                 </div>
                                                 <div className='col-6'>
                                                     <button className="btn cardbutton w-100" type="button" onClick={() => handleMessageClick(card)}>Message</button>

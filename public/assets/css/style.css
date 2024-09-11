@@ -20439,3 +20439,7 @@ input[type=number] {
   background-color: transparent !important;
   color: black !important;
 }
+
+.react-dropdown-select-dropdown{
+  width: 100% !important;
+}
