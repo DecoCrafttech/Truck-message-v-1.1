@@ -585,7 +585,7 @@ const PortfolioV1 = () => {
             </div>
 
             {/* filter modal */}
-            <div className="modal fade" id="loadfilter" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div className="modal fade" id="loadfilter" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
                     <div className="modal-content">
                         <div className="modal-header">

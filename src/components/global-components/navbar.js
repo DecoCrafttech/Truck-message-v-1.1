@@ -642,7 +642,7 @@ const Navbar = () => {
 
 
             {/* login modal  */}
-            <div className="modal fade" id="loginModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div className="modal fade" id="loginModal" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                 <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
                         <div className="modal-header border-0 ">
@@ -711,14 +711,14 @@ const Navbar = () => {
 
 
             {/* forgot password modal  */}
-            <div className="modal fade" id="forgotpasswordModel" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div className="modal fade" id="forgotpasswordModel" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                 <div className="modal-dialog modal-dialog-centered">
                     {dynamicForgotPassword()}
                 </div>
             </div>
 
             {/* register modal  */}
-            <div className="modal fade" id="registerModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div className="modal fade" id="registerModal" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                 <div className={`modal-dialog ${step === 2 ? "modal-md" : "modal-lg" } modal-dialog-centered modal-dialog-scrollable`}>
                     <div className="modal-content">
                         <div className="modal-header border-0">

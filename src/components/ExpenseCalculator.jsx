@@ -6,21 +6,23 @@ import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { BsExclamationCircle } from 'react-icons/bs';
 import { FaLocationDot } from 'react-icons/fa6';
+import Autocomplete from "react-google-autocomplete";
 
 export const ExpenseCalculator = () => {
+    const LoginDetails = useSelector((state) => state.login);
+
+    const [showingFromLocation, setShowingFromLocation] = useState("");
+    const [showingToLocation, setShowingToLocation] = useState("");
+
     const [loadTrips, setLoadTrips] = useState([]);
     const [formData, setFormData] = useState({
         user_id: '',
-        load_name: '',
-        from_location: '',
-        to_location: ''
+        load_name: ''
     });
 
     const [loadTripId, setLoadTripId] = useState('')
 
-    const LoginDetails = useSelector((state) => state.login);
     // const pageRender = useNavigate();
-
     useEffect(() => {
         if (Cookies.get("usrin")) {
             fetchLoadTrips();
@@ -33,6 +35,40 @@ export const ExpenseCalculator = () => {
         fetchLoadTrips();
     }, []);
 
+    const handleFromLocation = (selectedLocation) => {
+        if (selectedLocation) {
+            const cityComponent = selectedLocation.find((component) =>
+                component.types.includes("locality")
+            );
+            const stateComponent = selectedLocation.find((component) =>
+                component.types.includes("administrative_area_level_1")
+            );
+
+            if (cityComponent && stateComponent) {
+                setShowingFromLocation(
+                    `${cityComponent.long_name}, ${stateComponent.long_name}`
+                );
+            }
+        }
+    };
+
+    const handleToLocation = (selectedLocation) => {
+        if (selectedLocation) {
+            const cityComponent = selectedLocation.find((component) =>
+                component.types.includes("locality")
+            );
+            const stateComponent = selectedLocation.find((component) =>
+                component.types.includes("administrative_area_level_1")
+            );
+
+            if (cityComponent && stateComponent) {
+                setShowingToLocation(
+                    `${cityComponent.long_name}, ${stateComponent.long_name}`
+                );
+            }
+        }
+    };
+
     const fetchLoadTrips = async () => {
         const encodedUserId = Cookies.get('usrin');
         if (!encodedUserId) {
@@ -40,7 +76,7 @@ export const ExpenseCalculator = () => {
             return;
         }
         const userId = window.atob(encodedUserId);
-        
+
         await axios.post('https://truck.truckmessage.com/user_load_trip_details', { user_id: userId })
             .then(response => {
                 if (response.data.success) {
@@ -94,6 +130,8 @@ export const ExpenseCalculator = () => {
 
         const updatedFormData = {
             ...formData,
+            from_location: showingFromLocation,
+            to_location: showingToLocation,
             user_id: userId
         };
 
@@ -106,10 +144,10 @@ export const ExpenseCalculator = () => {
                     document.getElementById('addModalExpenseCalculator').click();
                     setFormData({
                         user_id: '',
-                        load_name: '',
-                        from_location: '',
-                        to_location: ''
+                        load_name: ''
                     });
+                    setShowingFromLocation("")
+                    setShowingToLocation("")
                 } else {
                     toast.error('Failed to add load trip');
                 }
@@ -145,13 +183,13 @@ export const ExpenseCalculator = () => {
                             <div className="col-12 col-md-6 col-lg-4" key={index}>
                                 <div className="card w-100 shadow-sm">
                                     <div className="card-body">
-                                    <h5 className="card-title cardmodify">{trip.load_name}</h5>
+                                        <h5 className="card-title cardmodify">{trip.load_name}</h5>
                                         <div className="py-2">
                                             <p className="card-text mb-1">
-                                            <label><FaLocationDot className="me-2 text-danger" />{trip.from_location}</label>
+                                                <label><FaLocationDot className="me-2 text-danger" />{trip.from_location}</label>
                                             </p>
                                             <p className="card-text mb-1">
-                                            <label><FaLocationDot className="me-2 text-success" />{trip.to_location}</label>
+                                                <label><FaLocationDot className="me-2 text-success" />{trip.to_location}</label>
                                             </p>
                                             <p className="card-text mb-1">
                                                 <b>Created on:</b> <span>{new Date(trip.updt).toLocaleString()}</span>
@@ -187,17 +225,17 @@ export const ExpenseCalculator = () => {
                         <div class="modal-body">
                             <div className="py-3">
                                 <div className="col text-center">
-                                    <BsExclamationCircle className='fs-1 text-danger'/>
+                                    <BsExclamationCircle className='fs-1 text-danger' />
                                 </div>
                                 <p className='mt-3 text-center'>Are you sure do you want to delete this...</p>
                             </div>
                         </div>
                         <div class="modal-footer border-0 row">
                             <div className="col-6 m-0">
-                                <button type="button" class="btn btn-outline-secondary pe-3 " data-bs-dismiss="modal">No</button>
+                                <button type="button" class="btn btn-outline-secondary pe-3 w-100" data-bs-dismiss="modal">No</button>
                             </div>
                             <div className="col-6 m-0">
-                                <button type="button" class="btn btn-outline-primary" onClick={handleDelete}>Yes</button>
+                                <button type="button" class="btn btn-outline-primary w-100" onClick={handleDelete}>Yes</button>
                             </div>
                         </div>
                     </div>
@@ -222,33 +260,48 @@ export const ExpenseCalculator = () => {
                                         id="loadName"
                                         name="load_name"
                                         value={formData.load_name}
-                                        onChange={handleFormChange}
+                                        onChange={(e) => setFormData({ ...formData, load_name: e.target.value })}
                                         required
                                     />
                                 </div>
-                                <div className="form-group">
-                                    <label htmlFor="fromLocation">From Location</label>
-                                    <input
-                                        type="text"
-                                        className="form-control mb-0"
-                                        id="fromLocation"
-                                        name="from_location"
-                                        value={formData.from_location}
-                                        onChange={handleFormChange}
-                                        required
-                                    />
+
+
+                                <div className="col-12 p-0">
+                                    <h6>From Location</h6>
+                                    <div className="input-item input-item-name">
+                                        <Autocomplete
+                                            name="from_location"
+                                            className="google-location location-input bg-transparent py-2"
+                                            apiKey="AIzaSyA09V2FtRwNpWu7Xh8hc7nf-HOqO7rbFqw"
+                                            onPlaceSelected={(place) => {
+                                                if (place) {
+                                                    handleFromLocation(place.address_components);
+                                                }
+                                            }}
+                                            required
+                                            value={showingFromLocation}
+                                            onChange={(e) => setShowingFromLocation(e.target.value)}
+                                        />
+                                    </div>
                                 </div>
-                                <div className="form-group">
-                                    <label htmlFor="toLocation">To Location</label>
-                                    <input
-                                        type="text"
-                                        className="form-control mb-0"
-                                        id="toLocation"
-                                        name="to_location"
-                                        value={formData.to_location}
-                                        onChange={handleFormChange}
-                                        required
-                                    />
+
+                                <div className="col-12 p-0">
+                                    <h6>To Location</h6>
+                                    <div className="input-item input-item-name">
+                                        <Autocomplete
+                                            name="to_location"
+                                            className="google-location location-input bg-transparent py-2"
+                                            apiKey="AIzaSyA09V2FtRwNpWu7Xh8hc7nf-HOqO7rbFqw"
+                                            onPlaceSelected={(place) => {
+                                                if (place) {
+                                                    handleToLocation(place.address_components);
+                                                }
+                                            }}
+                                            required
+                                            value={showingToLocation}
+                                            onChange={(e) => setShowingToLocation(e.target.value)}
+                                        />
+                                    </div>
                                 </div>
                                 <button type="submit" className="btn btn-primary">Add Load Trip</button>
                             </form>

@@ -957,7 +957,7 @@ const BlogList = () => {
       <div
         className="modal fade"
         id="buySellfilter"
-        tabindex="-1"
+        tabIndex="-1"
         aria-labelledby="exampleModalLabel"
         aria-hidden="true"
       >

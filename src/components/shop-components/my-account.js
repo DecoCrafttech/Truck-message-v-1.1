@@ -31,6 +31,9 @@ const MyAccount = () => {
 
 
   const [operatingStates, setOperatingStates] = useState([])
+  const [operatingStatesDupli, setOperatingStatesDupli] = useState([])
+  const [operatingStatesUi, setOperatingStatesUi] = useState([])
+
   const [operatingStateString, setoperatingStateString] = useState('')
   const [operatingStateStringdupli, setoperatingStateStringdupli] = useState('')
   const [checked, setChecked] = useState(false)
@@ -74,7 +77,10 @@ const MyAccount = () => {
             setChecked(false)
           }
         }
-        setOperatingStates(res.data.data[0].state_list)
+        const updateOperatingStatesUi = statesData.filter((v)=> res.data.data[0].state_list.includes(v.label))
+        setOperatingStatesUi( res.data.data[0].state_list)
+        setOperatingStates(updateOperatingStatesUi)
+        setOperatingStatesDupli(updateOperatingStatesUi)
       }
     } catch (err) {
       console.log(err)
@@ -93,35 +99,35 @@ const MyAccount = () => {
     }
   };
 
-  const handleDeleteOperatingState = async (deletingValue) => {
-    const deleteState = operatingStates.filter((v, i) => {
-      return v !== deletingValue
-    })
-    setOperatingStates(deleteState)
+  
 
+  const handleDeleteOperatingState = async (deletingValue) => {
     const encodedUserId = Cookies.get("usrin");
     if (encodedUserId) {
       const userId = window.atob(encodedUserId);
+      const spreadOperatingstatesForDelete = operatingStatesDupli.map((v)=>v.label)
 
       const data = {
         user_id: userId,
-        state_name: [deletingValue]
+        state_name: ["All state and cities",...spreadOperatingstatesForDelete]
       }
 
       try {
         const res = await axios.post("https://truck.truckmessage.com/remove_user_state_list", data);
 
         if (res.data.error_code === 0) {
-          toast.success(res.data.message)
-        } else {
-          toast.error(res.data.message)
-        }
+          handleGetOperatingStates()
+
+          document.getElementById("closeOperatingStatesModel").click()
+        } 
       } catch (err) {
         console.log(err)
       }
     }
 
   }
+
+  
 
   const handleCheckbox = async (e) => {
     setChecked(e.target.checked) 
@@ -352,7 +358,9 @@ const MyAccount = () => {
 
   const handleUpdateOperatingStates = async () => {
     const encodedUserId = Cookies.get("usrin");
-    const updateStates = checked ? ["All state and cities"] : operatingStates
+    const spreadOperatingstates = operatingStates.map((v)=>v.label)
+
+    const updateStates = checked ? ["All state and cities"] : spreadOperatingstates
 
     if (updateStates.length > 0) {
       try {
@@ -364,10 +372,11 @@ const MyAccount = () => {
             state_name: updateStates
           }
 
+          await handleDeleteOperatingState()
+
           const res = await axios.post("https://truck.truckmessage.com/user_state_entry", data);
 
           if (res.data.error_code === 0) {
-            document.getElementById("closeOperatingStatesModel").click()
             handleGetOperatingStates()
 
             toast.success(res.data.message)
@@ -382,10 +391,6 @@ const MyAccount = () => {
     } else {
       toast.error("Operating states should not be empty")
     }
-  }
-
-  const handleSelectOperatingStatesData = (val) =>{
-
   }
 
   return (
@@ -430,7 +435,7 @@ const MyAccount = () => {
                                 <div className="col-9">
                                   <div className="footer-address-icon"></div>
                                   <div className="footer-address-info">
-                                    <p> <GrMapLocation className='me-3' />   {operatingStates.length ? operatingStates.join(', ') : 'Not Available'}</p>
+                                    <p> <GrMapLocation className='me-3' />   {operatingStatesUi.length ? operatingStatesUi.join(', ') : 'Not Available'}</p>
                                   </div>
                                 </div>
 
@@ -700,7 +705,8 @@ const MyAccount = () => {
                                 onChange={(e) => setoperatingStateString(e.target.value)}
                                 disabled={checked}
                               /> */}
-                              <Select multi options={statesData} onChange={(values) => setstateCitySelectedData(values)} value={stateCitySelectedData}/>
+
+                              <Select multi options={statesData} onChange={(values) => setOperatingStates(values)} values={[...operatingStates]} disabled={checked}/>
 
                               {/* <div className='row g-2 mb-3'>
                                 {!checked ?
@@ -719,7 +725,7 @@ const MyAccount = () => {
                                   :
                                   null}
                               </div> */}
-                              <div className="form-check ms-2 w-100">
+                              <div className="form-check w-100 mt-3">
                                 <input className="form-check-input" type="checkbox" id="profileAllStatesandCities" onChange={handleCheckbox} checked={checked} />
                                 <label className="form-check-label ps-2" for="profileAllStatesandCities">
                                   All states and cities
