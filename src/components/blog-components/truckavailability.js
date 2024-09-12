@@ -659,7 +659,7 @@ const TruckAvailability = () => {
                         </div>
 
                         <div className="col-12 col-md-12">
-                            <h6>Descriptions (Optional)</h6>
+                            <h6>Descriptions </h6>
                             <div className="input-item input-item-textarea ltn__custom-icon">
                                 <textarea name="description" placeholder="Enter a text here" value={editingData.description} onChange={(e) => setEditingData({
                                     ...editingData, description: e.target.value
@@ -721,10 +721,15 @@ const TruckAvailability = () => {
                                         </form>
                                     </div>
                                 </div>
-                                <div className="col-lg-4 ">
-                                    {/* Filter */}
-                                    <button type="button" className="filterbtn" data-bs-toggle="modal" data-bs-target="#truckfilter" >Filter</button>
+                                
+                                <div className="col-6 col-lg-2 "> 
+                                    <button type="button" className="btn btn-primary filterbtn" data-bs-toggle="modal" data-bs-target="#truckfilter" >Filter</button>
                                 </div>
+
+                                <div className="col-6 col-lg-2 "> 
+                                    <button type="button" className="btn btn-secondary filterbtn" onClick={()=>  fetchData()}>Clear filter</button>
+                                </div>
+
 
                             </div>
 

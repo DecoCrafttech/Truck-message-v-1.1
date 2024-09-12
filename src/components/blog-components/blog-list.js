@@ -896,7 +896,7 @@ const BlogList = () => {
 
             <div className="row">
               <div className="col-12">
-                <h6>Descriptions (Optional)</h6>
+                <h6>Descriptions </h6>
                 <div className="input-item input-item-textarea">
                   <textarea
                     name="description"

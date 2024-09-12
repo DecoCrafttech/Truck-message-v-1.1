@@ -175,7 +175,6 @@ const Navbar = () => {
 
     const sendOTP = async (phone) => {
         try {
-
             await axiosInstance.post('/send_signup_otp', { phone_number: phone })
         } catch (err) {
             toast.error(err.code)
@@ -195,10 +194,13 @@ const Navbar = () => {
                 otp: otpInput
             };
 
-            const res = await axiosInstance.post('/validate_otp', otpData);
-            if (res.data.error_code === 0) {
-
+            const res = await axios.post('https://truck.truckmessage.com/validate_otp', otpData);
+            if (res.data.error_code === 1) {
+                toast.success(res.data.message)
+                
                 document.getElementById("registrationModalClose").click();
+            }else{
+                toast.error(res.data.message)
             }
             setVerifyOtpLoading(false)
         } catch (err) {

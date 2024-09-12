@@ -9,14 +9,12 @@ import { useSelector } from 'react-redux';
 import Cookies from 'js-cookie';
 import Autocomplete from "react-google-autocomplete";
 import { useNavigate } from 'react-router-dom';
-import { FaRegCopy } from 'react-icons/fa';
 
 
 const PortfolioV1 = () => {
     const LoginDetails = useSelector((state) => state.login);
     const navigate = useNavigate();
 
-    const [contactNumLength, setContactNumLength] = useState('')
     const [cards, setCards] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [cardsPerPage] = useState(21); // Adjust the number of cards per page as needed
@@ -493,7 +491,7 @@ const PortfolioV1 = () => {
                         </div>
                         <div className="row">
                             <div className="col-12">
-                                <h6>Descriptions (Optional)</h6>
+                                <h6>Descriptions </h6>
                                 <div className="input-item input-item-textarea ltn__custom-icon">
                                     <textarea name="description" placeholder="Enter a text here" />
                                 </div>
@@ -556,9 +554,12 @@ const PortfolioV1 = () => {
                                         </form>
                                     </div>
                                 </div>
-                                <div className="col-lg-4 ">
-                                    {/* Filter */}
-                                    <button type="button" className="filterbtn" data-bs-toggle="modal" data-bs-target="#loadfilter" >Filter</button>
+                                <div className="col-6 col-lg-2 ">
+                                    <button type="button" className="btn btn-primary filterbtn" data-bs-toggle="modal" data-bs-target="#loadfilter" >Filter</button>
+                                </div>
+
+                                <div className="col-6 col-lg-2 ">
+                                    <button type="button" className="btn btn-secondary filterbtn" onClick={() => fetchData()}>Clear filter</button>
                                 </div>
 
                             </div>
@@ -685,13 +686,12 @@ const PortfolioV1 = () => {
 
             {/* card  */}
             <div className='container'>
-                <div className="row row-cols-1 row-cols-md-3 g-4 mb-60 ">
+                <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-5 mb-60 ">
                     {currentCards.reverse().map(card => (
-                        <div className="col" key={card.id}>
+                        <div className="col " key={card.id}>
                             <div className="card h-100 shadow truckcard">
-                                <div className='card-header mt-2 border-0 mb-0 '>
-                                    <h5 className="card-title cardmodify">{card.profile_name}</h5>
-                                    <p className='.fs-6 mb-0 reviewtext '>
+                                <div className='card-header border-0 mb-0 '>
+                                    <p className='.fs-6 reviewtext '>
                                         {/* Generate the star ratings based on the response */}
                                         {[...Array(5)].map((_, index) => (
                                             <span key={index} className="float-right">
@@ -702,6 +702,15 @@ const PortfolioV1 = () => {
                                         <p className="float-end mb-0 text-b"> <strong>Posts </strong> : {card.user_post}</p>
 
                                     </p>
+
+                                    <div className="cardmodify py-1 py-3">
+                                        <h5 className='mb-1'>{card.profile_name}</h5>
+                                        <div className="col-lg-12 cardicontext">
+                                            <label><HiOutlineOfficeBuilding className='me-2' />{card.company_name}</label>
+                                        </div>
+                                    </div>
+
+
 
                                 </div>
 
@@ -734,9 +743,7 @@ const PortfolioV1 = () => {
                                         <div className="col-lg-6 cardicontext">
                                             <label><FaTruck className='me-2' />{card.truck_body_type}</label>
                                         </div>
-                                        <div className="col-lg-12 cardicontext">
-                                            <label><HiOutlineOfficeBuilding className='me-2' />{card.company_name}</label>
-                                        </div>
+
                                     </div>
                                     <div className='m-2'>
                                         <h5 className="card-title mt-3">Description</h5>

@@ -450,6 +450,7 @@ const WishList = () => {
   };
 
   const handleEdit = (editObject) => {
+    console.log(editObject)
 
     if (editObject.from_location) {
       setShowingFromLocation(editObject.from_location);
@@ -461,6 +462,19 @@ const WishList = () => {
       setShowingBuyAndSellLocation(editObject.location);
     }
     setEditingData(editObject);
+    // SetSelectedFile()
+
+    // var imgg = redirectingValue[0].image
+    // var splitBySlash = imgg.split("/")
+    // var splitByDot = imgg.split(".")
+    // fetch(`https://devcdn.2ndcareers.com/${redirectingValue[0].image}`)
+    //     .then((res) => res.blob())
+    //     .then(blob => {
+    //         const imgfile = new File([blob], splitBySlash[splitBySlash.length - 1], { type: `image/${splitByDot[splitByDot.length - 1]}` })
+    //         setImageUrlToBlob(imgfile)
+    //     })
+
+        
     setDriverDetailsEditingData(editObject)
   };
 
@@ -1077,9 +1091,16 @@ const WishList = () => {
                 </div>
               ))
             ) : (
-              <div className="card vh-100 w-100 my-2">
-                <div className="card-body h-25 row align-items-center">
-                  <p className="text-center">No data found</p>
+              <div className="card vh-100 m-2 w-100">
+                <div className="card-body h-25 row align-items-center justify-content-center w-100">
+                  <div className="col-4 text-center">
+                    <img
+                      src={publicUrl + "assets/img/2953962.jpg"}
+                      height={"250px"}
+                      alt="no data image"
+                      className="w-100"
+                    />
+                  </div>
                 </div>
               </div>
             )
@@ -1351,7 +1372,7 @@ const WishList = () => {
                     </ul>
                   </div>
                   <div className="col-12 mt-3">
-                    <h6>Descriptions (Optional)</h6>
+                    <h6>Descriptions </h6>
                     <div className="input-item input-item-textarea">
                       <textarea
                         name="description"
@@ -1600,7 +1621,7 @@ const WishList = () => {
                   </div>
 
                   <div className="col-12 mt-3">
-                    <h6>Descriptions (Optional)</h6>
+                    <h6>Descriptions </h6>
                     <div className="input-item input-item-textarea">
                       <textarea
                         name="description"
@@ -1814,7 +1835,7 @@ const WishList = () => {
                   </div>
 
                   <div className="col-12 col-md-12">
-                    <h6>Descriptions (Optional)</h6>
+                    <h6>Descriptions </h6>
                     <div className="input-item input-item-textarea ltn__custom-icon">
                       <textarea name="description" placeholder="Enter a text here" value={driverDetailsEditingData.description} onChange={(e) => setDriverDetailsEditingData({
                         ...driverDetailsEditingData, description: e.target.value
@@ -2028,7 +2049,7 @@ const WishList = () => {
                     </div>
                   </div>
 
-                  <div className="col-12 col-md-6 m-0">
+                  {/* <div className="col-12 col-md-6 m-0">
                     <h6>Truck Body Type</h6>
                     <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
                       {editingData.truck_body_type === '' ? 'select body type' : `${editingData.truck_body_type}`}
@@ -2042,9 +2063,9 @@ const WishList = () => {
                         })
                       }
                     </ul >
-                  </div>
+                  </div> */}
 
-                  <div className="col-12 col-md-6 m-0">
+                  {/* <div className="col-12 col-md-6 m-0">
                     <h6>No. of Tyres</h6>
                     <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
                       {editingData.no_of_tyres === '' ? 'select number of tyres' : `${editingData.no_of_tyres}`}
@@ -2058,10 +2079,10 @@ const WishList = () => {
                         })
                       }
                     </ul >
-                  </div>
+                  </div> */}
                 </div>
 
-                <div className="mt-4">
+                <div>
                   <label for="formFileMultiple" className="form-label">
                     Multiple files input example
                   </label>
@@ -2124,7 +2145,7 @@ const WishList = () => {
 
                 <div className="row">
                   <div className="col-12">
-                    <h6>Descriptions (Optional)</h6>
+                    <h6>Descriptions </h6>
                     <div className="input-item input-item-textarea">
                       <textarea
                         name="description"
