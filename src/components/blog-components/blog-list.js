@@ -339,7 +339,6 @@ const BlogList = () => {
     SetSelectedFile(result);
 
     const overallFile = result.map((data) => data.filename);
-
     var newImages = [];
     for (let i = 0; i < multipleImages.length; i++) {
       if (overallFile.includes(multipleImages[i].name)) {
@@ -351,14 +350,11 @@ const BlogList = () => {
   //
 
   const handleBuyAndSellUpdate = async () => {
-
     const userId = window.atob(Cookies.get("usrin"));
-
     const edit = { ...editingData };
     edit.images = multipleImages;
 
     const formData = new FormData();
-
     formData.append("user_id", userId);
     formData.append("brand", edit.brand);
     formData.append("contact_no", edit.contact_no);
@@ -952,15 +948,7 @@ const BlogList = () => {
 
   return (
     <div>
-
-
-      <div
-        className="modal fade"
-        id="buySellfilter"
-        tabIndex="-1"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
+      <div className="modal fade" id="buySellfilter" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" >
         <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
           <div className="modal-content">
             <div className="modal-header">
@@ -1078,9 +1066,6 @@ const BlogList = () => {
                         }
                       </ul >
                     </div>
-
-
-                    {/* </div> */}
                   </div >
 
                   <div className="col-12 px-0">
@@ -1114,31 +1099,11 @@ const BlogList = () => {
                       }
                     </ul >
                   </div>
-
-                  {/* <div className="col-12 px-0">
-                    <h6>Contact Number</h6>
-                    <div className="input-item input-item-email">
-                      <input
-                        type="tel"
-                        name="contact_no"
-                        placeholder="contact number"
-                        className="mb-0"
-                        value={filterModelData.contact_no}
-                        onChange={(e) =>
-                          SetfilterModelData({
-                            ...filterModelData,
-                            contact_no: e.target.value,
-                          })
-                        }
-                        required
-                      />
-                    </div>
-                  </div> */}
                 </div>
               </div>
             </div>
-            <div className="modal-footer">
 
+            <div className="modal-footer">
               {filterLoading ? (
                 <button type="button" className="btn btn-primary w-100">
                   <div class="spinner-border" role="status">
@@ -1149,8 +1114,7 @@ const BlogList = () => {
                 <button
                   type="button"
                   className="btn btn-primary w-100"
-                  onClick={handleApplyFilter}
-                >
+                  onClick={handleApplyFilter}>
                   Apply Filter
                 </button>
               )}
@@ -1160,19 +1124,8 @@ const BlogList = () => {
       </div>
 
       {/* modal */}
-      <div
-        className="modal fade"
-        id="addloadavailability"
-        data-bs-backdrop="static"
-        data-bs-keyboard="false"
-        tabIndex="-1"
-        aria-labelledby="staticBackdropLabel"
-        aria-hidden="true"
-      >
-        <div
-          className={`modal-dialog modal-dialog-centered modal-dialog-scrollable ${aadharStep === 4 ? "modal-lg" : "modal-md"
-            }`}
-        >
+      <div className="modal fade" id="addloadavailability" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" >
+        <div className={`modal-dialog modal-dialog-centered modal-dialog-scrollable ${aadharStep === 4 ? "modal-lg" : "modal-md"}`}>
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="staticBackdropLabel">
@@ -1194,7 +1147,7 @@ const BlogList = () => {
       <div className="container-fluid px-lg-5 blog-list-filter-min-height">
         <div className="row filter-min-height pb-5">
 
-          <div className="filter-column-width border rounded d-none d-lg-flex flex-wrap flex-column gap-4 pt-4">
+          <div className="filter-column-width border rounded d-none d-lg-flex flex-wrap flex-column gap-4 pt-4 bg-light">
             <div className="col-12 d-flex flex-wrap p-0">
               <div className="col-6 p-0">
                 {clearFilterLoading ? (
@@ -1283,24 +1236,6 @@ const BlogList = () => {
               </div>
             </div>
 
-            {/* <div className="col-12 p-0">
-              <h6>Vehicle Number</h6>
-              <input
-                type="tel"
-                name="contact_no"
-                className="tel-input-height mb-0"
-                placeholder="Vehicle Number"
-                value={filterModelData.vehicle_number}
-                onChange={(e) =>
-                  SetfilterModelData({
-                    ...filterModelData,
-                    vehicle_number: e.target.value,
-                  })
-                }
-                required
-              />
-            </div> */}
-
             <div className="col-12 px-0">
               <h6>Kilometers driven</h6>
 
@@ -1332,10 +1267,7 @@ const BlogList = () => {
                     })
                   }
                 </ul >
-              </div>
-
-
-              {/* </div> */}
+              </div> 
             </div >
 
             <div className="col-12 px-0">
@@ -1369,26 +1301,6 @@ const BlogList = () => {
                 }
               </ul >
             </div>
-
-            {/* <div className="col-12 px-0">
-              <h6>Contact Number</h6>
-              <div className="input-item input-item-email">
-                <input
-                  type="tel"
-                  name="contact_no"
-                  placeholder="contact number"
-                  className="mb-0"
-                  value={filterModelData.contact_no}
-                  onChange={(e) =>
-                    SetfilterModelData({
-                      ...filterModelData,
-                      contact_no: e.target.value,
-                    })
-                  }
-                  required
-                />
-              </div>
-            </div> */}
           </div >
 
           <div className="col h-100 overflow-auto webkitScroll-buy-sell pt-3">
@@ -1562,9 +1474,12 @@ const BlogList = () => {
                               <RiPinDistanceFill className="me-2" />
                               {card.kms_driven} kms
                             </div>
-                            <div className="col-6 col-md-6 cardicontext">
+
+                            <div className="col-12 text-center mt-4 mb-2">
+                              <div className="col card-title fs-5 me-4">
                               <FaIndianRupeeSign className="me-2" />
                               {card.price}
+                              </div>
                             </div>
                           </div>
                         </div>

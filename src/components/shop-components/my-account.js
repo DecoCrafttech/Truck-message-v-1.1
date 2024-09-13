@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TbCircleFilled } from "react-icons/tb";
 import { MdDeleteOutline } from "react-icons/md";
 import { FaRegCalendarAlt } from "react-icons/fa";
@@ -9,8 +9,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
-import { MdDelete } from "react-icons/md"; 
+import toast from 'react-hot-toast'; 
 import Select from 'react-dropdown-select';
 import {statesData} from '../../cityAndState';
 
@@ -109,7 +108,7 @@ const MyAccount = () => {
 
       const data = {
         user_id: userId,
-        state_name: ["All state and cities",...spreadOperatingstatesForDelete]
+        state_name: [...spreadOperatingstatesForDelete]
       }
 
       try {
@@ -359,8 +358,9 @@ const MyAccount = () => {
   const handleUpdateOperatingStates = async () => {
     const encodedUserId = Cookies.get("usrin");
     const spreadOperatingstates = operatingStates.map((v)=>v.label)
+    const originalStates = statesData.map((v)=>v.label)
 
-    const updateStates = checked ? ["All state and cities"] : spreadOperatingstates
+    const updateStates = checked ? originalStates : spreadOperatingstates
 
     if (updateStates.length > 0) {
       try {

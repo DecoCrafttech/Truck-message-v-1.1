@@ -312,9 +312,7 @@ function TeamDetails() {
         </div>
 
       </div>
-
-
-      <Toaster />
+ 
     </div>
   );
 }

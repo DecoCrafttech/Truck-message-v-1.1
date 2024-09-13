@@ -464,17 +464,17 @@ const WishList = () => {
     setEditingData(editObject);
     // SetSelectedFile()
 
-    // var imgg = redirectingValue[0].image
-    // var splitBySlash = imgg.split("/")
-    // var splitByDot = imgg.split(".")
-    // fetch(`https://devcdn.2ndcareers.com/${redirectingValue[0].image}`)
+    // for (var i = 0; i < editObject.images.length; i++) {
+    //   fetch(editObject.images[i])
     //     .then((res) => res.blob())
     //     .then(blob => {
-    //         const imgfile = new File([blob], splitBySlash[splitBySlash.length - 1], { type: `image/${splitByDot[splitByDot.length - 1]}` })
-    //         setImageUrlToBlob(imgfile)
+    //       const imgfile = new File([blob])
+    //       selectedfile[selectedfile.length] = imgfile
+    //       SetSelectedFile(selectedfile)
     //     })
+    // }
 
-        
+
     setDriverDetailsEditingData(editObject)
   };
 
@@ -1422,8 +1422,7 @@ const WishList = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Modal title
-              </h1>
+                Edit Truck              </h1>
               <button
                 type="button"
                 className="btn-close"
@@ -2199,7 +2198,7 @@ const WishList = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="staticBackdropLabel">
-                Modal title
+                Delete
               </h5>
               <button
                 type="button"

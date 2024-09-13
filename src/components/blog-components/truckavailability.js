@@ -9,15 +9,19 @@ import { useSelector } from 'react-redux';
 import Cookies from 'js-cookie';
 import Autocomplete from "react-google-autocomplete";
 import { HiOutlineOfficeBuilding } from 'react-icons/hi';
-import { FaRegCopy } from 'react-icons/fa';
+import Select from 'react-dropdown-select';
+import axiosInstance from '../../Services/axiosInstance';
 
 
 const TruckAvailability = () => {
+    let publicUrl = process.env.PUBLIC_URL + '/'
+
     const LoginDetails = useSelector((state) => state.login);
     const navigate = useNavigate();
 
     const [cards, setCards] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
+    const [userStateList, setUserStateList] = useState([])
     const [cardsPerPage] = useState(21); // Adjust the number of cards per page as needed
     const [filters, setFilters] = useState({
         search: '',
@@ -26,19 +30,12 @@ const TruckAvailability = () => {
     const [aadharNumber, setAadharNumber] = useState("")
     const [aadharStep, setAadharStep] = useState(1);
     const [otpNumber, setOtpNumber] = useState("")
-    const [truckBrandName, setTruckBrandName] = useState('')
+
+    const [selectToLocationSingle, setSelectToLocationSingle] = useState("")
+    const [selectToLocationMultiple, setSelectToLocationMultiple] = useState([])
 
     const truckBodyType = ["LCV", "Bus", "Open body vehicle", "Tanker", "Trailer", "Tipper"];
-    const numOfTyres = [4,
-        6,
-        10,
-        12,
-        14,
-        16,
-        18,
-        20,
-        22
-    ]
+    const numOfTyres = [4, 6, 10, 12, 14, 16, 18, 20, 22]
 
     const [editingData, setEditingData] = useState({
         vehicle_number: '',
@@ -91,8 +88,37 @@ const TruckAvailability = () => {
         }
     }
 
+    const getUserStateList = async () => {
+        try {
+            const userId = window.atob(Cookies.get("usrin"));
+            const data = {
+                user_id: userId
+            }
+
+            const res = await axiosInstance.post("/get_user_state_list", data)
+
+            if (res.data.error_code === 0) {
+                if (res.data.data) {
+                    const convertToSelect = res.data.data[0].state_list.map((val, ind) => {
+                        return { value: ind + 1, label: val }
+                    })
+                    setUserStateList(convertToSelect)
+                }
+                else {
+                    setUserStateList([])
+                }
+            } else {
+                setUserStateList([])
+            }
+
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
     useEffect(() => {
         fetchData()
+        getUserStateList()
     }, []);
 
     const handleCopy = (contactNo, cardId) => {
@@ -147,7 +173,7 @@ const TruckAvailability = () => {
             name_of_the_transport: editingData.name_of_the_transport,
             contact_no: editingData.contact_no,
             from: showingFromLocation,
-            to: showingToLocation,
+            to: selectToLocationSingle.length ? selectToLocationSingle[0].label : "",
             truck_name: editingData.truck_brand_name,
             truck_brand_name: editingData.truck_brand_name,
             tone: editingData.tone,
@@ -181,6 +207,7 @@ const TruckAvailability = () => {
                     })
                     setShowingFromLocation('')
                     setShowingToLocation('')
+                    setSelectToLocationSingle("")
 
                     toast.success(res.data.message);
                     fetchData()
@@ -253,10 +280,12 @@ const TruckAvailability = () => {
     };
 
     const handleApplyFilter = async () => {
+        const spreadMultipleLocation = selectToLocationMultiple.map((v) => v.label)
+
         const filterObj = { ...filterModelData }
         filterObj.truck_name = filterModelData.truck_brand_name
         filterObj.from_location = showingFromLocation
-        filterObj.to_location = showingToLocation
+        filterObj.to_location = spreadMultipleLocation[0]
 
         try {
             const res = await axios.post("https://truck.truckmessage.com/user_truck_details_filter", filterObj)
@@ -477,13 +506,6 @@ const TruckAvailability = () => {
                             </div>
                         </div>
 
-                        {/* <div className="col-12 col-md-6">
-                                <h6>Owner Name</h6>
-                                <div className="input-item input-item-name ">
-                                    <input type="text" name="company_name" placeholder="Name of the Owner" required />
-                                </div>
-                            </div> */}
-
                         <div className="col-12 col-md-6">
                             <h6>Contact Number</h6>
                             <div className="input-item input-item-email">
@@ -609,9 +631,10 @@ const TruckAvailability = () => {
                         </div>
                         <div className="col-12 col-md-6">
                             <h6>To</h6>
+                            {/* <Select options={userStateList} className='selectBox-innerWidth' onChange={(e) => setSelectToLocationSingle(e)} /> */}
                             <div className="input-item input-item-name">
                                 <Autocomplete name="to_location"
-                                    className="google-location location-input bg-transparent py-2 m-0"
+                                    className="google-location location-input bg-transparent py-2 mb-0"
                                     apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
                                     onPlaceSelected={(place) => {
                                         if (place) {
@@ -623,7 +646,6 @@ const TruckAvailability = () => {
                                     onChange={(e) => setShowingToLocation(e.target.value)}
                                 />
                             </div>
-
                         </div>
 
                         <div className="col-12 col-md-6">
@@ -684,7 +706,6 @@ const TruckAvailability = () => {
 
     return (
         <div>
-            <Toaster />
             <div className="ltn__product-area ltn__product-gutter mb-50 ">
                 <div className="container">
                     <div className='text-center'><h2 className='cardmodifyhead'>Truck Availability</h2></div>
@@ -702,7 +723,7 @@ const TruckAvailability = () => {
                                             <button type="button " className='cardbutton truck-brand-button ' data-bs-toggle="modal" data-bs-target="#addtruckavailability" onClick={handleTruckAvailabilityModelOpen}>+ Add Truck availability</button>
 
                                         ) :
-                                            <button type="button " className='cardbutton truck-brand-button ' data-bs-toggle="modal" data-bs-target="#loginModal">+ Add Truck availability check</button>
+                                            <button type="button " className='cardbutton truck-brand-button ' data-bs-toggle="modal" data-bs-target="#loginModal">+ Add Truck availability </button>
                                         }
                                     </div>
                                 </div>
@@ -721,13 +742,13 @@ const TruckAvailability = () => {
                                         </form>
                                     </div>
                                 </div>
-                                
-                                <div className="col-6 col-lg-2 "> 
+
+                                <div className="col-6 col-lg-2 ">
                                     <button type="button" className="btn btn-primary filterbtn" data-bs-toggle="modal" data-bs-target="#truckfilter" >Filter</button>
                                 </div>
 
-                                <div className="col-6 col-lg-2 "> 
-                                    <button type="button" className="btn btn-secondary filterbtn" onClick={()=>  fetchData()}>Clear filter</button>
+                                <div className="col-6 col-lg-2 ">
+                                    <button type="button" className="btn btn-secondary filterbtn" onClick={() => fetchData()}>Clear filter</button>
                                 </div>
 
 
@@ -759,7 +780,7 @@ const TruckAvailability = () => {
                 <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h1 className="modal-title fs-5" id="exampleModalLabel">Add Truck</h1>
+                            <h1 className="modal-title fs-5" id="exampleModalLabel">Filter</h1>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeFilterBox"></button>
                         </div>
                         <div className="modal-body ps-4 pe-4 p-">
@@ -783,23 +804,11 @@ const TruckAvailability = () => {
                                     </div>
                                     <div className="col-12 col-md-6">
                                         <h6>To</h6>
-                                        <div className="input-item input-item-name">
-                                            <Autocomplete name="to_location"
-                                                className="google-location location-input bg-transparent py-2 mb-0"
-                                                apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
-                                                onPlaceSelected={(place) => {
-                                                    if (place) {
-                                                        handleToLocation(place.address_components);
-                                                    }
-                                                }}
-                                                value={showingToLocation}
-                                                onChange={(e) => setShowingToLocation(e.target.value)}
-                                            />
-                                        </div>
+                                        <Select options={userStateList} className='selectBox-innerWidth' onChange={(e) => setSelectToLocationMultiple(e)} />
                                     </div>
 
                                     <div className="col-12 col-md-6">
-                                        <h6>Truck Name</h6>
+                                        <h6>Brand Name</h6>
 
                                         <button type="button" class="btn btn-transparent dropdown-toggle col-12 py-3 dropdown-arrow shadow-none border rounded text-start p-3" data-bs-toggle="dropdown" aria-expanded="false">
                                             {filterModelData.truck_brand_name === '' ? 'select truck' : `${filterModelData.truck_brand_name} `}
@@ -900,120 +909,138 @@ const TruckAvailability = () => {
 
             {/* card */}
             <div className='container'>
-                <div className="row row-cols-1 row-cols-md-3 g-4 mb-60 ">
-                    {currentCards.reverse().map(card => (
-                        <div className="col" key={card.id}>
-                            <div className="card h-100 shadow truckcard">
-                                <div className='card-header mt-2 border-0 mb-2'>
-                                    <h5 className="card-title cardmodify">{card.profile_name}</h5>
-                                    <p className='.fs-6 mb-0 reviewtext '>
-                                        {/* Generate the star ratings based on the response */}
-                                        {[...Array(5)].map((_, index) => (
-                                            <span key={index} className="float-right">
-                                                <i className={`text-warning fa fa-star ${index < card.rating ? '' : 'text-muted'}`}></i>
-                                            </span>
-                                        ))}
-                                        <span>({card.review_count} 4)</span>
-                                        <p className="float-end mb-0 text-b"> <strong>Posts </strong> {card.user_post}</p>
+                {currentCards.length > 0 ?
+                    <div className="row row-cols-1 row-cols-md-3 g-4 mb-60">
+                        {currentCards.reverse().map(card => (
+                            <div className="col" key={card.id}>
+                                <div className="card h-100 shadow truckcard">
+                                    <div className='card-header border-0 mb-0 '>
+                                        <p className='.fs-6 reviewtext '>
+                                            {/* Generate the star ratings based on the response */}
+                                            {[...Array(5)].map((_, index) => (
+                                                <span key={index} className="float-right">
+                                                    <i className={`text-warning fa fa-star ${index < card.rating ? '' : 'text-muted'}`}></i>
+                                                </span>
+                                            ))}
+                                            <span>({card.review_count} 4)</span>
+                                            <p className="float-end mb-0 text-b"> <strong>Posts </strong> : {card.user_post}</p>
 
-                                    </p>
-                                </div>
-                                <div className="card-body p-3 mt-2 mb-2">
-                                    <div className='row'>
-                                        <div className="col-lg-12 cardicon">
-                                            <div>
-                                                <label><FaLocationDot className="me-2 text-danger" />{card.from_location}</label>
+                                        </p>
+
+                                        <div className="cardmodify py-1 py-3">
+                                            <h5 className='mb-1'>{card.profile_name}</h5>
+                                            <div className="col-lg-12 cardicontext">
+                                                <label><HiOutlineOfficeBuilding className='me-2' />{card.company_name}</label>
                                             </div>
                                         </div>
-                                        <div className="col-lg-12 cardicon">
-                                            <div><label><FaLocationDot className='me-2 text-success' />{card.to_location}</label></div>
-                                        </div>
-                                        {/* <div className="col-lg-12 cardicon">
+                                    </div>
+
+                                    <div className="card-body p-3 mt-2 mb-2">
+                                        <div className='row'>
+                                            <div className="col-lg-12 cardicon">
+                                                <div>
+                                                    <label><FaLocationDot className="me-2 text-danger" />{card.from_location}</label>
+                                                </div>
+                                            </div>
+                                            <div className="col-lg-12 cardicon">
+                                                <div><label><FaLocationDot className='me-2 text-success' />{card.to_location}</label></div>
+                                            </div>
+                                            {/* <div className="col-lg-12 cardicon">
                                             <div><label>Distance: {"hii"}</label></div>
                                         </div> */}
-                                    </div>
-                                    <hr className="hr m-2" />
-                                    <div className='row mt-3'>
-                                        <div className="col-lg-6 cardicontext">
-                                            <div>
-                                                <label><FaWeightHanging className='me-2' />{card.tone} ton</label>
+                                        </div>
+                                        <hr className="hr m-2" />
+                                        <div className='row mt-3'>
+                                            <div className="col-lg-6 cardicontext">
+                                                <div><label><FaWeightHanging className='me-2' />{card.tone} ton</label></div>
+                                            </div>
+                                            <div className="col-lg-6 cardicontext">
+                                                <div><label><SiMaterialformkdocs className='me-2' />{card.truck_body_type}</label></div>
+                                            </div>
+                                            <div className="col-lg-6 cardicontext">
+                                                <label><GiCarWheel className='me-2' />{card.no_of_tyres} wheels</label>
+                                            </div>
+                                            <div className="col-lg-6 cardicontext">
+                                                <label><FaTruck className='me-2' />{card.truck_name}</label>
+                                            </div>
+                                            <div className="col-lg-6 cardicontext">
+                                                <label><FaTruckFast className='me-2' />{card.vehicle_number}</label>
+                                            </div>
+                                            <div className="col-lg-6 cardicontext">
+                                                <label><GiTruck className='me-2' />{card.name_of_the_transport}</label>
                                             </div>
                                         </div>
-                                        <div className="col-lg-6 cardicontext">
-                                            <div><label><SiMaterialformkdocs className='me-2' />{card.truck_body_type}</label></div>
-                                        </div>
-                                        <div className="col-lg-6 cardicontext">
-                                            <label><GiCarWheel className='me-2' />{card.no_of_tyres} wheels</label>
-                                        </div>
-                                        <div className="col-lg-6 cardicontext">
-                                            <label><FaTruck className='me-2' />{card.truck_name}</label>
-                                        </div>
-                                        <div className="col-lg-6 cardicontext">
-                                            <label><FaTruckFast className='me-2' />{card.vehicle_number}</label>
-                                        </div>
-                                        <div className="col-lg-6 cardicontext">
-                                            <label><HiOutlineOfficeBuilding className='me-2' />{card.company_name}</label>
-                                        </div>
-                                        <div className="col-lg-6 cardicontext">
-                                            <label><GiTruck className='me-2' />{card.name_of_the_transport}</label>
+                                        <div className='m-2'>
+                                            <h5 className="card-title mt-3">Description</h5>
+                                            <p className="card-text paragraph">{card.description}</p>
                                         </div>
                                     </div>
-                                    <div className='m-2'>
-                                        <h5 className="card-title mt-3">Description</h5>
-                                        <p className="card-text paragraph">{card.description}</p>
-                                    </div>
-                                </div>
-                                <div className="card-footer mb-3">
-                                    <div>
-                                        {LoginDetails.isLoggedIn ? (
-                                            <div className="d-flex flex-wrap mt-3">
-                                                {/* <div className='col-6'>
+                                    <div className="card-footer mb-3">
+                                        <div>
+                                            {LoginDetails.isLoggedIn ? (
+                                                <div className="d-flex flex-wrap mt-3">
+                                                    {/* <div className='col-6'>
                                                     <a href={`tel:${card.contact_no}`} className="btn btn-success  w-100" type="button"> <IoCall className='me-3' />Call</a>
                                                 </div> */}
-                                                <div className='col-6'>
-                                                    {/* <button className="btn btn-success w-100" type="button"> <IoCall  className='me-3' />{card.contact_no}</button> */}
-                                                    {
-                                                        viewContactId === card.id ?
-                                                            <button
-                                                                className="btn btn-success w-100"
-                                                                type="button">
-                                                                <div className="spinner-border text-light" role="status">
-                                                                    <span className="sr-only">Loading...</span>
-                                                                </div>
-                                                            </button>
-                                                            :
-
-                                                            selectedContactNum && card.contact_no === selectedContactNum ?
+                                                    <div className='col-6'>
+                                                        {/* <button className="btn btn-success w-100" type="button"> <IoCall  className='me-3' />{card.contact_no}</button> */}
+                                                        {
+                                                            viewContactId === card.id ?
                                                                 <button
                                                                     className="btn btn-success w-100"
                                                                     type="button">
-                                                                    {selectedContactNum}
+                                                                    <div className="spinner-border text-light" role="status">
+                                                                        <span className="sr-only">Loading...</span>
+                                                                    </div>
                                                                 </button>
                                                                 :
-                                                                <button
-                                                                    className="btn btn-success w-100"
-                                                                    type="button"
-                                                                    onClick={() => handleCopy(card.contact_no, card.id)}>
-                                                                    {/* <FaRegCopy className='me-2' /> */}
-                                                                    Contact
-                                                                </button>
-                                                    }
+
+                                                                selectedContactNum && card.contact_no === selectedContactNum ?
+                                                                    <button
+                                                                        className="btn btn-success w-100"
+                                                                        type="button">
+                                                                        {selectedContactNum}
+                                                                    </button>
+                                                                    :
+                                                                    <button
+                                                                        className="btn btn-success w-100"
+                                                                        type="button"
+                                                                        onClick={() => handleCopy(card.contact_no, card.id)}>
+                                                                        {/* <FaRegCopy className='me-2' /> */}
+                                                                        Contact
+                                                                    </button>
+                                                        }
+                                                    </div>
+                                                    <div className='col-6'>
+                                                        <button className="btn cardbutton w-100" type="button" onClick={() => handleMessageClick(card)}>Message</button>
+                                                    </div>
                                                 </div>
-                                                <div className='col-6'>
-                                                    <button className="btn cardbutton w-100" type="button" onClick={() => handleMessageClick(card)}>Message</button>
+                                            ) :
+                                                <div className="d-grid gap-2">
+                                                    <button className="btn cardbutton" type="button" data-bs-toggle="modal" data-bs-target="#loginModal">View Details</button>
                                                 </div>
-                                            </div>
-                                        ) :
-                                            <div className="d-grid gap-2">
-                                                <button className="btn cardbutton" type="button" data-bs-toggle="modal" data-bs-target="#loginModal">View Details</button>
-                                            </div>
-                                        }
+                                            }
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                        ))}
+                    </div>
+                    :
+                    <div className='row justify-content-center align-items-center emptyCardHeight'>
+                        <div className='col text-center'>
+                            <img src={publicUrl + "assets/img/Folder_empty.png"} width={100} height={100} />
+                            <p>No Data Available</p>
+
+                            {LoginDetails.isLoggedIn ?
+                                <button type="button" className='btn btn-primary col-12 col-md-6 col-lg-4 col-xl-3' data-bs-toggle="modal" data-bs-target="#addtruckavailability" onClick={handleTruckAvailabilityModelOpen}>Click here to Add Load</button>
+                                :
+                                <button type="button " className='btn btn-primary col-12 col-md-6 col-lg-4 col-xl-3' data-bs-toggle="modal" data-bs-target="#loginModal">Click here to Add Truck</button>
+                            }
+
                         </div>
-                    ))}
-                </div>
+                    </div>
+                }
                 <div className='pagination'>
                     <ul className='pagination-list'>
                         {Array.from({ length: totalPages }, (_, index) => (

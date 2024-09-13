@@ -11,6 +11,8 @@ import Autocomplete from "react-google-autocomplete";
 import { HiOutlineOfficeBuilding } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
 import { FaRegCopy } from 'react-icons/fa';
+import Select from 'react-dropdown-select';
+import axiosInstance from '../../Services/axiosInstance';
 
 
 const BlogGrid = () => {
@@ -57,7 +59,7 @@ const BlogGrid = () => {
         truck_body_type: "",
         no_of_tyres: "",
         description: '',
-        truck_name : ''
+        truck_name: ''
     })
 
     const [aadharNumber, setAadharNumber] = useState("")
@@ -67,9 +69,9 @@ const BlogGrid = () => {
     const [viewContactId, setviewContactId] = useState(null)
 
     const [contactError, setContactError] = useState(''); // State to manage contact number validation error
+    const [userStateList, setUserStateList] = useState([])
+    const [selectToLocationMultiple, setSelectToLocationMultiple] = useState([])
 
-
-    const formRef = useRef(null);
 
     const fetchData = async () => {
         try {
@@ -84,8 +86,38 @@ const BlogGrid = () => {
         }
     };
 
+    const getUserStateList = async () => {
+        try {
+            const userId = window.atob(Cookies.get("usrin"));
+            const data = {
+                user_id: userId
+            }
+
+            const res = await axiosInstance.post("/get_user_state_list", data)
+
+            if (res.data.error_code === 0) {
+                if (res.data.data) {
+                    const convertToSelect = res.data.data[0].state_list.map((val, ind) => {
+                        return { value: ind + 1, label: val }
+                    })
+                    setUserStateList(convertToSelect)
+                }
+                else {
+                    setUserStateList([])
+                }
+            } else {
+                setUserStateList([])
+            }
+
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+
     useEffect(() => {
         fetchData();
+        getUserStateList();
     }, []);
 
     const handleFilterChange = (e) => {
@@ -242,9 +274,11 @@ const BlogGrid = () => {
     };
 
     const handleApplyFilter = async () => {
+        const spreadMultipleLocation = selectToLocationMultiple.map((v) => v.label)
+
         const filterObj = { ...filterModelData }
         filterObj.from_location = showingFromLocation
-        filterObj.to_location = showingToLocation
+        filterObj.to_location = spreadMultipleLocation[0]
 
         try {
             const res = await axios.post("https://truck.truckmessage.com/user_driver_details_filter", filterObj, {
@@ -586,7 +620,6 @@ const BlogGrid = () => {
 
     return (
         <div>
-            <Toaster />
             <div className="ltn__product-area ltn__product-gutter mb-50 ">
                 <div className="container">
                     <div className='text-center ' ><h2 className='cardmodifyhead'>Driver Availability</h2></div>
@@ -624,12 +657,12 @@ const BlogGrid = () => {
                                     </div>
                                 </div>
 
-                                <div className="col-6 col-lg-2 "> 
+                                <div className="col-6 col-lg-2 ">
                                     <button type="button" className="btn btn-primary filterbtn" data-bs-toggle="modal" data-bs-target="#driverfilter" >Filter</button>
                                 </div>
 
-                                <div className="col-6 col-lg-2 "> 
-                                    <button type="button" className="btn btn-secondary filterbtn" onClick={()=>  fetchData()}>Clear filter</button>
+                                <div className="col-6 col-lg-2 ">
+                                    <button type="button" className="btn btn-secondary filterbtn" onClick={() => fetchData()}>Clear filter</button>
                                 </div>
 
 
@@ -687,7 +720,7 @@ const BlogGrid = () => {
 
                                     <div className="col-12 col-md-6">
                                         <h6>To</h6>
-                                        <div className="input-item input-item-name">
+                                        {/* <div className="input-item input-item-name">
                                             <Autocomplete name="to_location"
                                                 className="google-location location-input bg-transparent py-2"
                                                 apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
@@ -699,7 +732,8 @@ const BlogGrid = () => {
                                                 value={showingToLocation}
                                                 onChange={(e) => setShowingToLocation(e.target.value)}
                                             />
-                                        </div>
+                                        </div> */}
+                                        <Select options={userStateList} className='selectBox-innerWidth' onChange={(e) => setSelectToLocationMultiple(e)} />
                                     </div>
 
                                     <div className="col-12 col-md-6 m-0">
@@ -733,7 +767,7 @@ const BlogGrid = () => {
                                             }
                                         </ul >
                                     </div>
-                                    
+
                                     {/* <div className="col-12 col-md-6">
                                         <h6>Ton</h6>
                                         <div className="input-item input-item-name ltn__custom-icon">
@@ -756,9 +790,8 @@ const BlogGrid = () => {
                     {currentCards.reverse().map(card => (
                         <div className="col" key={card.id}>
                             <div className="card h-100 shadow truckcard">
-                                <div className='card-header mt-2 border-0 mb-2'>
-                                    <h5 className="card-title cardmodify">{card.profile_name}</h5>
-                                    <p className='.fs-6 mb-0 reviewtext '>
+                                <div className='card-header border-0 mb-0 '>
+                                    <p className='.fs-6 reviewtext '>
                                         {/* Generate the star ratings based on the response */}
                                         {[...Array(5)].map((_, index) => (
                                             <span key={index} className="float-right">
@@ -766,9 +799,16 @@ const BlogGrid = () => {
                                             </span>
                                         ))}
                                         <span>({card.review_count} 4)</span>
-                                        <p className="float-end mb-0 text-b"> <strong>Posts </strong> {card.user_post}</p>
+                                        <p className="float-end mb-0 text-b"> <strong>Posts </strong> : {card.user_post}</p>
 
                                     </p>
+
+                                    <div className="cardmodify py-1 py-3">
+                                        <h5 className='mb-1'>{card.profile_name}</h5>
+                                        <div className="col-lg-12 cardicontext">
+                                            <label><HiOutlineOfficeBuilding className='me-2' />{card.company_name}</label>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div className="card-body p-3 mt-2 mb-2">
@@ -797,9 +837,6 @@ const BlogGrid = () => {
                                         </div> */}
                                         <div className="col-lg-6 cardicontext">
                                             <label><FaTruckFast className='me-2' />{card.vehicle_number}</label>
-                                        </div>
-                                        <div className="col-lg-6 cardicontext">
-                                            <label><HiOutlineOfficeBuilding className='me-2' />{card.company_name}</label>
                                         </div>
                                     </div>
                                     <div className='m-2'>

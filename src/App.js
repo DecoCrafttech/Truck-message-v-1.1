@@ -54,7 +54,7 @@ function App() {
 
   return (
     <>
-      <Toaster />
+      <Toaster  position="top-right" />
 
       <BrowserRouter basename={process.env.PUBLIC_URL}>
         <Navbar />

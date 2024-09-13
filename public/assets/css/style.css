@@ -20443,3 +20443,12 @@ input[type=number] {
 .react-dropdown-select-dropdown{
   width: 100% !important;
 }
+
+.react-dropdown-select.selectBox-innerWidth{
+  padding: 1.2rem !important;
+  border-radius: 6px !important;
+}
+
+.emptyCardHeight{
+  height: 20rem;
+}

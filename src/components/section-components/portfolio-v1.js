@@ -12,12 +12,21 @@ import { useNavigate } from 'react-router-dom';
 
 
 const PortfolioV1 = () => {
+    let publicUrl = process.env.PUBLIC_URL + '/'
+
     const LoginDetails = useSelector((state) => state.login);
     const navigate = useNavigate();
 
     const [cards, setCards] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
+    const [showingFromLocation, setShowingFromLocation] = useState("");
+    const [showingToLocation, setShowingToLocation] = useState("");
+
     const [cardsPerPage] = useState(21); // Adjust the number of cards per page as needed
+    const truckBodyType = ["LCV", "Open body vehicle", "Tanker", "Trailer", "Tipper"];
+    const numOfTyres = [4, 6, 10, 12, 14, 16, 18, 20, 22];
+
+
     const [filters, setFilters] = useState({
         search: '',
     });
@@ -33,6 +42,16 @@ const PortfolioV1 = () => {
         tone: ""
     })
 
+    const [editingData, setEditingData] = useState({
+        company_name: '',
+        contact_no: '',
+        material: '',
+        tone: '',
+        truck_body_type: '',
+        no_of_tyres: '',
+        description: ''
+    })
+
     const [contactError, setContactError] = useState(''); // State to manage contact number validation error
 
     const [aadharNumber, setAadharNumber] = useState("")
@@ -40,16 +59,13 @@ const PortfolioV1 = () => {
     const [otpNumber, setOtpNumber] = useState("");
     const [selectedContactNum, setSelectedContactNum] = useState(null)
 
-    const formRef = useRef(null);
-
     const fetchData = async () => {
         window.scrollTo(0, 0)
         try {
             await axios.get('https://truck.truckmessage.com/all_load_details')
                 .then(response => {
                     if (response.data.success && Array.isArray(response.data.data)) {
-                        console.log(response.data.data)
-                        setCards(response.data.data);
+                        setCards(response.data.data.reverse());
                     } else {
                         console.error('Unexpected response format:', response.data);
                     }
@@ -63,8 +79,10 @@ const PortfolioV1 = () => {
         }
     }
 
+
     useEffect(() => {
         fetchData()
+        // getUserStateList()
     }, []);
 
     const handleFilterChange = (e) => {
@@ -111,47 +129,59 @@ const PortfolioV1 = () => {
         return contactNumberPattern.test(contact);
     };
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const contactNumber = formData.get('contact_no');
+    const handleSubmit = async () => {
+        try {
+            const userId = window.atob(Cookies.get("usrin"));
+            const data = {
+                company_name: editingData.company_name,
+                contact_no: editingData.contact_no,
+                from: showingFromLocation,
+                to: showingToLocation,
+                material: editingData.material,
+                tone: editingData.tone,
+                truck_body_type: editingData.truck_body_type,
+                no_of_tyres: editingData.no_of_tyres,
+                description: editingData.description,
+                user_id: userId
+            };
+            if (data.company_name && data.contact_no && data.from && data.to && data.material && data.tone && data.truck_body_type && data.no_of_tyres && data.description) {
+                if (!validateContactNumber(editingData.contact_no)) {
+                    setContactError('Please enter a valid 10-digit contact number.');
+                    return;
+                }
 
-        if (!validateContactNumber(contactNumber)) {
-            setContactError('Please enter a valid 10-digit contact number.');
-            return;
-        }
+                await axios.post('https://truck.truckmessage.com/load_details', data, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
 
-        const userId = window.atob(Cookies.get("usrin"));
-        const data = {
-            company_name: formData.get('company_name'),
-            contact_no: contactNumber,
-            from: formData.get('from_location'),
-            to: formData.get('to_location'),
-            material: formData.get('material'),
-            tone: formData.get('tone'),
-            truck_body_type: formData.get('truck_body_type'),
-            no_of_tyres: formData.get('tyre_count'),
-            description: formData.get('description'),
-            user_id: userId
-        };
-
-        axios.post('https://truck.truckmessage.com/load_details', data, {
-            headers: {
-                'Content-Type': 'application/json'
+                })
+                    .then(response => {
+                        toast.success('Load posted successfully!');
+                        document.getElementById("clodeBuySellModel").click()
+                        fetchData()
+                        setEditingData({
+                            company_name: '',
+                            contact_no: '',
+                            material: '',
+                            tone: '',
+                            truck_body_type: '',
+                            no_of_tyres: '',
+                            description: ''
+                        })
+                        setShowingFromLocation("")
+                        setShowingToLocation("")
+                    })
+                    .catch(error => {
+                        toast.error('Failed to submit the form.');
+                        console.error('There was an error!', error);
+                    });
+            } else {
+                toast.error('Some fields are missing');
             }
-
-        })
-            .then(response => {
-                toast.success('Loas posted successfully!');
-                formRef.current.reset();
-                setContactError('');
-                document.getElementById("clodeBuySellModel").click()
-                fetchData()
-            })
-            .catch(error => {
-                toast.error('Failed to submit the form.');
-                console.error('There was an error!', error);
-            });
+        } catch (err) {
+            console.log(err)
+        }
     };
 
     const filteredCards = filterCards(cards);
@@ -170,8 +200,7 @@ const PortfolioV1 = () => {
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
 
-    const [showingFromLocation, setShowingFromLocation] = useState("");
-    const [showingToLocation, setShowingToLocation] = useState("");
+
     const [editCompanyFromLocation, setEditCompanyFromLocation] = useState({
         city: "",
         state: "",
@@ -383,133 +412,180 @@ const PortfolioV1 = () => {
 
             case 4:
                 return <div className="ltn__appointment-inner">
-                    <form ref={formRef} onSubmit={handleSubmit}>
-                        <div className="row">
-                            <div className="col-12 col-md-6">
-                                <h6>Company Name</h6>
+                    <div className="row gy-4">
+                        <div className="col-12 col-md-6">
+                            <h6>Company Name</h6>
+                            <div className="input-item input-item-name">
+                                <input
+                                    type="text"
+                                    className="mb-0"
+                                    name="company_name"
+                                    placeholder="Name of the Company"
+                                    value={editingData.company_name}
+                                    onChange={(e) =>
+                                        setEditingData({
+                                            ...editingData,
+                                            company_name: e.target.value,
+                                        })
+                                    }
+                                    required
+                                />
+                            </div>
+                        </div>
 
-                                <div className="input-item input-item-name ">
-                                    <input type="text" name="company_name" placeholder="Name of the Company" required />
-                                </div>
+                        <div className="col-12 col-md-6">
+                            <h6>Contact Number</h6>
+                            <div className="input-item input-item-email">
+                                <input
+                                    type="tel"
+                                    name="contact_no"
+                                    className="mb-0"
+                                    placeholder="Type your contact number"
+                                    value={editingData.contact_no}
+                                    onChange={(e) =>
+                                        setEditingData({
+                                            ...editingData,
+                                            contact_no: e.target.value,
+                                        })
+                                    }
+                                    required
+                                />
+                                {contactError && (
+                                    <p style={{ color: "red" }}>{contactError}</p>
+                                )}
+                            </div>
+                        </div>
 
+                        <div className="col-12 col-md-6">
+                            <h6>From</h6>
+                            <div className="input-item input-item-name">
+                                <Autocomplete name="from_location"
+                                    className="google-location location-input bg-transparent py-2 mb-0"
+                                    apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
+                                    onPlaceSelected={(place) => {
+                                        if (place) {
+                                            handleFromLocation(place.address_components);
+                                        }
+                                    }}
+                                    required
+                                    value={showingFromLocation}
+                                    onChange={(e) => setShowingFromLocation(e.target.value)}
+                                />
                             </div>
-                            <div className="col-12 col-md-6">
-                                <h6>Contact Number</h6>
-                                <div className="input-item input-item-email">
-                                    <input
-                                        type="text"
-                                        name="contact_no"
-                                        placeholder="Enter your contact number"
-                                        maxLength="10"
-                                        pattern="\d{10}"
-                                        required
-                                        title="Please enter a 10-digit contact number"
-                                    />
-                                    {contactError && <p style={{ color: 'red' }}>{contactError}</p>}
-                                </div>
+                        </div>
+                        <div className="col-12 col-md-6">
+                            <h6>To</h6>
+                            <div className="input-item input-item-name">
+                                <Autocomplete name="to_location"
+                                    className="google-location location-input bg-transparent py-2 mb-0"
+                                    apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
+                                    onPlaceSelected={(place) => {
+                                        if (place) {
+                                            handleToLocation(place.address_components);
+                                        }
+                                    }}
+                                    required
+                                    value={showingToLocation}
+                                    onChange={(e) => setShowingToLocation(e.target.value)}
+                                />
                             </div>
+                        </div>
 
-                        </div>
-                        <div className="row">
-                            <div className="col-12 col-md-6">
-                                <h6>From</h6>
-                                <div className="input-item input-item-name">
-                                    <Autocomplete name="from_location"
-                                        className="google-location location-input bg-transparent py-2"
-                                        apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
-                                        onPlaceSelected={(place) => {
-                                            if (place) {
-                                                handleFromLocation(place.address_components);
-                                            }
-                                        }}
-                                        required
-                                        value={showingFromLocation}
-                                        onChange={(e) => setShowingFromLocation(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-                            <div className="col-12 col-md-6">
-                                <h6>To</h6>
-                                <div className="input-item input-item-name">
-                                    <Autocomplete name="to_location"
-                                        className="google-location location-input bg-transparent py-2"
-                                        apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
-                                        onPlaceSelected={(place) => {
-                                            if (place) {
-                                                handleToLocation(place.address_components);
-                                            }
-                                        }}
-                                        required
-                                        value={showingToLocation}
-                                        onChange={(e) => setShowingToLocation(e.target.value)}
-                                    />
-                                </div>
+                        <div className="col-12 col-md-6">
+                            <h6>Material</h6>
+                            <div className="input-item">
+                                <input
+                                    type="text"
+                                    name="material"
+                                    className="mb-0"
+                                    placeholder="What type of material"
+                                    value={editingData.material}
+                                    onChange={(e) =>
+                                        setEditingData({
+                                            ...editingData,
+                                            material: e.target.value,
+                                        })
+                                    }
+                                    required
+                                />
+                                {contactError && (
+                                    <p style={{ color: "red" }}>{contactError}</p>
+                                )}
                             </div>
                         </div>
-                        <div className="row">
-                            <div className="col-12 col-md-6">
-                                <h6>Material</h6>
-                                <div className="input-item input-item-name ">
-                                    <input type="text" name="material" placeholder="What type of material" required />
-                                </div>
-                            </div>
-                            <div className="col-12 col-md-6">
-                                <h6>Ton</h6>
-                                <div className="input-item input-item-name ">
-                                    <input type="number" name="tone" placeholder="Example: 2 tons" required />
-                                </div>
-                            </div>
-                        </div>
-                        <div className="row">
-                            <div className="col-12 col-md-6">
-                                <h6>Truck Body Type</h6>
-                                <div className="input-item">
-                                    <select className="nice-select" name="truck_body_type" required>
-                                        <option value="open_body">Open Body</option>
-                                        <option value="container">Container</option>
-                                        <option value="trailer">Trailer</option>
-                                        <option value="tanker">Tanker</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div className="col-12 col-md-6">
-                                <h6>No. of Tyres</h6>
-                                <div className="input-item">
-                                    <select className="nice-select" name="tyre_count" required>
-                                        <option value="4">4</option>
-                                        <option value="6">6</option>
-                                        <option value="10">10</option>
-                                        <option value="12">12</option>
-                                        <option value="14">14</option>
-                                        <option value="16">16</option>
-                                        <option value="18">18</option>
-                                        <option value="20">20</option>
-                                        <option value="22">22</option>
-                                    </select>
-                                </div>
+
+                        <div className="col-12 col-md-6">
+                            <h6>Ton</h6>
+                            <div className="input-item">
+                                <input
+                                    type="text"
+                                    name="tone"
+                                    className="mb-0"
+                                    placeholder="Example: 2 tons"
+                                    value={editingData.tone}
+                                    onChange={(e) =>
+                                        setEditingData({
+                                            ...editingData,
+                                            tone: e.target.value,
+                                        })
+                                    }
+                                    required
+                                />
+                                {contactError && (
+                                    <p style={{ color: "red" }}>{contactError}</p>
+                                )}
                             </div>
                         </div>
-                        <div className="row">
-                            <div className="col-12">
-                                <h6>Descriptions </h6>
-                                <div className="input-item input-item-textarea ltn__custom-icon">
-                                    <textarea name="description" placeholder="Enter a text here" />
-                                </div>
+
+                        <div className="col-12 col-md-6 mt-3">
+                            <h6>Truck Body Type</h6>
+                            <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                                {editingData.truck_body_type === '' ? 'select body type' : `${editingData.truck_body_type}`}
+                            </button>
+                            <ul class="dropdown-menu col-11 dropdown-ul">
+                                {
+                                    truckBodyType.map((bodyType) => {
+                                        return <li onClick={() => setEditingData({
+                                            ...editingData, truck_body_type: bodyType,
+                                        })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{bodyType}</a></li>
+                                    })
+                                }
+                            </ul >
+                        </div>
+
+                        <div className="col-12 col-md-6 m-0 mt-3">
+                            <h6>No. of Tyres</h6>
+                            <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                                {editingData.no_of_tyres === '' ? 'select number of tyres' : `${editingData.no_of_tyres}`}
+                            </button>
+                            <ul class="dropdown-menu col-11 dropdown-ul">
+                                {
+                                    numOfTyres.map((numOfTyresVal) => {
+                                        return <li onClick={() => setEditingData({
+                                            ...editingData, no_of_tyres: numOfTyresVal,
+                                        })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{numOfTyresVal}</a></li>
+                                    })
+                                }
+                            </ul >
+                        </div>
+
+                        <div className="col-12">
+                            <h6>Descriptions </h6>
+                            <div className="input-item input-item-textarea ltn__custom-icon">
+                                <textarea name="description" placeholder="Enter a text here" onChange={(e) => setEditingData({
+                                    ...editingData, description: e.target.value,
+                                })} />
                             </div>
                         </div>
-                        <div className="modal-footer btn-wrapper text-center mt-4">
-                            <button className="btn theme-btn-1 text-uppercase" type="submit">Submit</button>
-                        </div>
-                    </form>
+                    </div>
+                    <div className="modal-footer btn-wrapper text-center mt-4">
+                        <button className="btn theme-btn-1 text-uppercase" type="button" onClick={handleSubmit}>Submit</button>
+                    </div>
                 </div>
 
             default:
                 break;
         }
-    }
-
-    const handleGetDistance = (from, to) => {
-
     }
 
     const handleMessageClick = (card) => {
@@ -595,84 +671,85 @@ const PortfolioV1 = () => {
                         </div>
                         <div className="modal-body ps-4 pe-4 p-">
                             <div className="ltn__appointment-inner ">
-                                <form ref={formRef} onSubmit={handleSubmit}>
-                                    <div className="row">
-                                        <div className="col-12 col-md-6">
-                                            <h6>From</h6>
-                                            <div className="input-item input-item-name">
-                                                <Autocomplete name="from_location"
-                                                    className="google-location location-input bg-transparent py-2"
-                                                    apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
-                                                    onPlaceSelected={(place) => {
-                                                        if (place) {
-                                                            handleFromLocation(place.address_components);
-                                                        }
-                                                    }}
-                                                    value={showingFromLocation}
-                                                    onChange={(e) => setShowingFromLocation(e.target.value)}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="col-12 col-md-6">
-                                            <h6>To</h6>
-                                            <div className="input-item input-item-name">
-                                                <Autocomplete name="to_location"
-                                                    className="google-location location-input bg-transparent py-2"
-                                                    apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
-                                                    onPlaceSelected={(place) => {
-                                                        if (place) {
-                                                            handleToLocation(place.address_components);
-                                                        }
-                                                    }}
-                                                    value={showingToLocation}
-                                                    onChange={(e) => setShowingToLocation(e.target.value)}
-                                                />
-                                            </div>
+                                <div className="row gy-4">
+                                    <div className="col-12 col-md-6">
+                                        <h6>From</h6>
+                                        <div className="input-item input-item-name">
+                                            <Autocomplete name="from_location"
+                                                className="google-location location-input bg-transparent py-2 mb-0"
+                                                apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
+                                                onPlaceSelected={(place) => {
+                                                    if (place) {
+                                                        handleFromLocation(place.address_components);
+                                                    }
+                                                }}
+                                                value={showingFromLocation}
+                                                onChange={(e) => setShowingFromLocation(e.target.value)}
+                                            />
                                         </div>
                                     </div>
-                                    <div className="row">
-                                        <div className="col-12 col-md-6">
-                                            <h6>Truck Body Type</h6>
-                                            <div className="input-item">
-                                                <select className="nice-select" name="truck_body_type" required>
-                                                    <option value="trailer">Open body vehicle</option>
-                                                    <option value="tanker">Tanker</option>
-                                                    <option value="tanker">Trailer</option>
-                                                    <option value="tanker">Tipper</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div className="col-12 col-md-6">
-                                            <h6>No. of Tyres</h6>
-                                            <div className="input-item">
-                                                <select className="nice-select" name="tyre_count" onChange={(e) => SetfilterModelData({ ...filterModelData, no_of_tyres: e.target.value })}>
-                                                    <option value="6">6</option>
-                                                    <option value="10">10</option>
-                                                    <option value="12">12</option>
-                                                    <option value="14">14</option>
-                                                    <option value="16">16</option>
-                                                    <option value="18">18</option>
-                                                    <option value="20">20</option>
-                                                    <option value="22">22</option>
-                                                </select>
-                                            </div>
+                                    <div className="col-12 col-md-6">
+                                        <h6>To</h6>
+                                        <div className="input-item input-item-name">
+                                            <Autocomplete name="to_location"
+                                                className="google-location location-input bg-transparent py-2 mb-0"
+                                                apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
+                                                onPlaceSelected={(place) => {
+                                                    if (place) {
+                                                        handleToLocation(place.address_components);
+                                                    }
+                                                }}
+                                                value={showingToLocation}
+                                                onChange={(e) => setShowingToLocation(e.target.value)}
+                                            />
                                         </div>
                                     </div>
-                                    <div className="row mb-0" >
-                                        <div className="col-12 col-md-6">
-                                            <h6>Material</h6>
-                                            <div className="input-item input-item-name ltn__custom-icon">
-                                                <input type="text" name="material" placeholder="What type of material" onChange={(e) => SetfilterModelData({ ...filterModelData, material: e.target.value })} />
-                                            </div>
-                                        </div>
-                                        <div className="col-12 col-md-6">
-                                            <h6>Ton</h6>
-                                            <div className="input-item input-item-name ltn__custom-icon">
-                                                <input type="text" name="tone" placeholder="Example: 2 tones" onChange={(e) => SetfilterModelData({ ...filterModelData, tone: e.target.value })} />
-                                            </div>
+
+                                    <div className="col-12 col-md-6">
+                                        <h6>Truck Body Type</h6>
+                                        <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                                            {filterModelData.truck_body_type === '' ? 'select body type' : `${filterModelData.truck_body_type}`}
+                                        </button>
+                                        <ul class="dropdown-menu col-11 dropdown-ul">
+                                            {
+                                                truckBodyType.map((bodyType) => {
+                                                    return <li onClick={() => SetfilterModelData({
+                                                        ...filterModelData, truck_body_type: bodyType,
+                                                    })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{bodyType}</a></li>
+                                                })
+                                            }
+                                        </ul >
+                                    </div>
+
+                                    <div className="col-12 col-md-6">
+                                        <h6>No. of Tyres</h6>
+                                        <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                                            {filterModelData.no_of_tyres === '' ? 'select number of tyres' : `${filterModelData.no_of_tyres}`}
+                                        </button>
+                                        <ul class="dropdown-menu col-11 dropdown-ul">
+                                            {
+                                                numOfTyres.map((numOfTyresVal) => {
+                                                    return <li onClick={() => SetfilterModelData({
+                                                        ...filterModelData, no_of_tyres: numOfTyresVal,
+                                                    })} className="cup mt-0 py-2 dropdown-list-hover"><a class="dropdown-item text-decoration-none">{numOfTyresVal}</a></li>
+                                                })
+                                            }
+                                        </ul >
+                                    </div>
+
+                                    <div className="col-12 col-md-6">
+                                        <h6>Material</h6>
+                                        <div className="input-item input-item-name ltn__custom-icon">
+                                            <input type="text" name="material" placeholder="What type of material" onChange={(e) => SetfilterModelData({ ...filterModelData, material: e.target.value })} />
                                         </div>
                                     </div>
-                                </form>
+                                    <div className="col-12 col-md-6">
+                                        <h6>Ton</h6>
+                                        <div className="input-item input-item-name ltn__custom-icon">
+                                            <input type="text" name="tone" placeholder="Example: 2 tones" onChange={(e) => SetfilterModelData({ ...filterModelData, tone: e.target.value })} />
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div className="modal-footer">
@@ -686,121 +763,134 @@ const PortfolioV1 = () => {
 
             {/* card  */}
             <div className='container'>
-                <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-5 mb-60 ">
-                    {currentCards.reverse().map(card => (
-                        <div className="col " key={card.id}>
-                            <div className="card h-100 shadow truckcard">
-                                <div className='card-header border-0 mb-0 '>
-                                    <p className='.fs-6 reviewtext '>
-                                        {/* Generate the star ratings based on the response */}
-                                        {[...Array(5)].map((_, index) => (
-                                            <span key={index} className="float-right">
-                                                <i className={`text-warning fa fa-star ${index < card.rating ? '' : 'text-muted'}`}></i>
-                                            </span>
-                                        ))}
-                                        <span>({card.review_count} 4)</span>
-                                        <p className="float-end mb-0 text-b"> <strong>Posts </strong> : {card.user_post}</p>
+                {
+                    currentCards.length > 0 ?
+                        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-5 mb-60 ">
+                            {currentCards.reverse().map(card => (
+                                <div className="col " key={card.id}>
+                                    <div className="card h-100 shadow truckcard">
+                                        <div className='card-header border-0 mb-0 '>
+                                            <p className='.fs-6 reviewtext '>
+                                                {/* Generate the star ratings based on the response */}
+                                                {[...Array(5)].map((_, index) => (
+                                                    <span key={index} className="float-right">
+                                                        <i className={`text-warning fa fa-star ${index < card.rating ? '' : 'text-muted'}`}></i>
+                                                    </span>
+                                                ))}
+                                                <span>({card.review_count} 4)</span>
+                                                <p className="float-end mb-0 text-b"> <strong>Posts </strong> : {card.user_post}</p>
 
-                                    </p>
+                                            </p>
 
-                                    <div className="cardmodify py-1 py-3">
-                                        <h5 className='mb-1'>{card.profile_name}</h5>
-                                        <div className="col-lg-12 cardicontext">
-                                            <label><HiOutlineOfficeBuilding className='me-2' />{card.company_name}</label>
-                                        </div>
-                                    </div>
-
-
-
-                                </div>
-
-                                <div className="card-body p-3 mt-2 mb-2">
-                                    <div className='row'>
-                                        <div className="col-lg-12 cardicon">
-                                            <div>
-                                                <label><FaLocationDot className="me-2 text-danger" />{card.from_location}</label>
+                                            <div className="cardmodify py-1 py-3">
+                                                <h5 className='mb-1'>{card.profile_name}</h5>
+                                                <div className="col-lg-12 cardicontext">
+                                                    <label><HiOutlineOfficeBuilding className='me-2' />{card.company_name}</label>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="col-lg-12 cardicon">
-                                            <div><label><FaLocationDot className='me-2 text-success' />{card.to_location}</label></div>
-                                        </div>
 
-                                        {handleGetDistance(card.from_location, card.to_location)}
-                                    </div>
-                                    <hr className="hr m-2" />
-                                    <div className='row mt-3'>
-                                        <div className="col-lg-6 cardicontext">
-                                            <div>
-                                                <label><FaWeightHanging className='me-2' />{card.tone} ton</label>
+                                        <div className="card-body p-3 mt-2 mb-2">
+                                            <div className='row'>
+                                                <div className="col-lg-12 cardicon">
+                                                    <div>
+                                                        <label><FaLocationDot className="me-2 text-danger" />{card.from_location}</label>
+                                                    </div>
+                                                </div>
+                                                <div className="col-lg-12 cardicon">
+                                                    <div><label><FaLocationDot className='me-2 text-success' />{card.to_location}</label></div>
+                                                </div>
+                                            </div>
+                                            <hr className="hr m-2" />
+                                            <div className='row mt-3'>
+                                                <div className="col-lg-6 cardicontext">
+                                                    <div>
+                                                        <label><FaWeightHanging className='me-2' />{card.tone} ton</label>
+                                                    </div>
+                                                </div>
+                                                <div className="col-lg-6 cardicontext">
+                                                    <div><label><SiMaterialformkdocs className='me-2' />{card.material}</label></div>
+                                                </div>
+                                                <div className="col-lg-6 cardicontext">
+                                                    <label><GiCarWheel className='me-2' />{card.no_of_tyres} wheels</label>
+                                                </div>
+                                                <div className="col-lg-6 cardicontext">
+                                                    <label><FaTruck className='me-2' />{card.truck_body_type}</label>
+                                                </div>
+
+                                            </div>
+                                            <div className='m-2'>
+                                                <h5 className="card-title mt-3">Description</h5>
+                                                <p className="card-text paragraph">{card.description}</p>
                                             </div>
                                         </div>
-                                        <div className="col-lg-6 cardicontext">
-                                            <div><label><SiMaterialformkdocs className='me-2' />{card.material}</label></div>
-                                        </div>
-                                        <div className="col-lg-6 cardicontext">
-                                            <label><GiCarWheel className='me-2' />{card.no_of_tyres} wheels</label>
-                                        </div>
-                                        <div className="col-lg-6 cardicontext">
-                                            <label><FaTruck className='me-2' />{card.truck_body_type}</label>
-                                        </div>
-
-                                    </div>
-                                    <div className='m-2'>
-                                        <h5 className="card-title mt-3">Description</h5>
-                                        <p className="card-text paragraph">{card.description}</p>
-                                    </div>
-                                </div>
-                                <div className="card-footer mb-3">
-                                    <div>
-                                        {LoginDetails.isLoggedIn ? (
-                                            <div className="d-flex flex-wrap mt-3">
-                                                {/* <div className='col-6'>
+                                        <div className="card-footer mb-3">
+                                            <div>
+                                                {LoginDetails.isLoggedIn ? (
+                                                    <div className="d-flex flex-wrap mt-3">
+                                                        {/* <div className='col-6'>
                                                     <a href={`tel:${card.contact_no}`} className="btn btn-success  w-100" type="button"> <IoCall className='me-3' />Call</a>
                                                 </div> */}
-                                                <div className='col-6'>
-                                                    {/* <button className="btn btn-success w-100" type="button"> <IoCall  className='me-3' />{card.contact_no}</button> */}
-                                                    {
-                                                        viewContactId === card.id ?
-                                                            <button
-                                                                className="btn btn-success w-100"
-                                                                type="button">
-                                                                <div className="spinner-border text-light" role="status">
-                                                                    <span className="sr-only">Loading...</span>
-                                                                </div>
-                                                            </button>
-                                                            :
+                                                        <div className='col-6'>
+                                                            {/* <button className="btn btn-success w-100" type="button"> <IoCall  className='me-3' />{card.contact_no}</button> */}
+                                                            {
+                                                                viewContactId === card.id ?
+                                                                    <button
+                                                                        className="btn btn-success w-100"
+                                                                        type="button">
+                                                                        <div className="spinner-border text-light" role="status">
+                                                                            <span className="sr-only">Loading...</span>
+                                                                        </div>
+                                                                    </button>
+                                                                    :
 
-                                                            selectedContactNum && card.contact_no === selectedContactNum ?
-                                                                <button
-                                                                    className="btn btn-success w-100"
-                                                                    type="button">
-                                                                    {selectedContactNum}
-                                                                </button>
-                                                                :
-                                                                <button
-                                                                    className="btn btn-success w-100"
-                                                                    type="button"
-                                                                    onClick={() => handleCopy(card.contact_no, card.id)}>
-                                                                    {/* <FaRegCopy className='me-2' /> */}
-                                                                    Contact
-                                                                </button>
-                                                    }
-                                                </div>
-                                                <div className='col-6'>
-                                                    <button className="btn cardbutton w-100" type="button" onClick={() => handleMessageClick(card)}>Message</button>
-                                                </div>
+                                                                    selectedContactNum && card.contact_no === selectedContactNum ?
+                                                                        <button
+                                                                            className="btn btn-success w-100"
+                                                                            type="button">
+                                                                            {selectedContactNum}
+                                                                        </button>
+                                                                        :
+                                                                        <button
+                                                                            className="btn btn-success w-100"
+                                                                            type="button"
+                                                                            onClick={() => handleCopy(card.contact_no, card.id)}>
+                                                                            {/* <FaRegCopy className='me-2' /> */}
+                                                                            Contact
+                                                                        </button>
+                                                            }
+                                                        </div>
+                                                        <div className='col-6'>
+                                                            <button className="btn cardbutton w-100" type="button" onClick={() => handleMessageClick(card)}>Message</button>
+                                                        </div>
+                                                    </div>
+                                                ) :
+                                                    <div className="d-grid gap-2">
+                                                        <button className="btn cardbutton" type="button" data-bs-toggle="modal" data-bs-target="#loginModal">View Details</button>
+                                                    </div>
+                                                }
                                             </div>
-                                        ) :
-                                            <div className="d-grid gap-2">
-                                                <button className="btn cardbutton" type="button" data-bs-toggle="modal" data-bs-target="#loginModal">View Details</button>
-                                            </div>
-                                        }
+                                        </div>
                                     </div>
                                 </div>
+                            ))}
+                        </div>
+                        :
+                        <div className='row justify-content-center align-items-center emptyCardHeight'>
+                            <div className='col text-center'>
+                                <img src={publicUrl + "assets/img/Folder_empty.png"} width={100} height={100} />
+                                <p>No Data Available</p>
+
+                                {LoginDetails.isLoggedIn ?
+                                    <button type="button" className='btn btn-primary col-12 col-md-6 col-lg-4 col-xl-3' data-bs-toggle="modal" data-bs-target="#addloadavailability" onClick={handleloadAvailabilityModelOpen}>Click here to Add Load</button>
+                                    :
+                                    <button type="button " className='btn btn-primary col-12 col-md-6 col-lg-4 col-xl-3' data-bs-toggle="modal" data-bs-target="#loginModal">Click here to Add Load</button>
+                                }
+                                
                             </div>
                         </div>
-                    ))}
-                </div>
+                }
+
                 <div className='pagination'>
                     <ul className='pagination-list'>
                         {Array.from({ length: totalPages }, (_, index) => (
@@ -821,8 +911,3 @@ const PortfolioV1 = () => {
 }
 
 export default PortfolioV1;
-
-
-
-
-
