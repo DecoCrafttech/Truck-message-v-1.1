@@ -26,7 +26,6 @@ const ExpenseDetails = () => {
         if (userId && params.id) {
             try {
                 const res = await axios.post('https://truck.truckmessage.com/initial_cash_in_out', { load_trip_id: params.id })
-                console.log(res)
                 if (res.data.error_code === 0) {
                     setLoadCashDetails(res.data.data.length > 0 ? res.data.data : [])
                 }
@@ -78,8 +77,6 @@ const ExpenseDetails = () => {
         }
     };
 
-    
-
     const downloadCSV = () => {
         let csvContent = "data:text/csv;charset=utf-8,";
 
@@ -125,8 +122,6 @@ const ExpenseDetails = () => {
         document.body.removeChild(link);
     };
 
-
-
     const handleFormChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
@@ -163,12 +158,12 @@ const ExpenseDetails = () => {
                 <div className="container py-2">
                     <div className='my-4 row d-flex justify-content-between align-items-center'>
                         <button type='button' className='btn btn-transparent border shadow-none col-12 col-md-4 col-lg-2 col-xl-1' onClick={() => pageRender('/expense-calculator')}>
-                        <IoChevronBackCircleOutline className='me-2' />
-                        Back
+                            <IoChevronBackCircleOutline className='me-2' />
+                            Back
                         </button>
                         <button className="btn btn-primary mt-3 col-12 col-md-6 col-lg-4 col-xl-2" onClick={downloadCSV}>
-                        <MdFileDownload className='me-2' />
-                        Download report
+                            <MdFileDownload className='me-2' />
+                            Download report
                         </button>
                     </div>
 

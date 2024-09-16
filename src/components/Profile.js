@@ -6,7 +6,6 @@ const Profile = () => {
     <>
         {/* <Page_header headertitle="My profile" /> */}
         <MyAccount/>
-        
     </>
   )
 }

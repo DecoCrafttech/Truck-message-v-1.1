@@ -50,8 +50,8 @@ const WishList = () => {
     16,
     18,
     20,
-    22
-  ]
+    22]
+
   const [contactError, setContactError] = useState("");
   const [editingData, setEditingData] = useState({
     company_name: "",

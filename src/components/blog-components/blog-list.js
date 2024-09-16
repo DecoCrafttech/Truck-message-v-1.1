@@ -16,7 +16,7 @@ const BlogList = () => {
   const LoginDetails = useSelector((state) => state.login);
 
   const [yearData, setYearData] = useState([]);
-  const truckBodyType = ["LCV", "Bus", "Open body vehicle", "Tanker", "Trailer", "Tipper"];
+  const truckBodyType = ["LCV", "Container", "Open body vehicle", "Tanker", "Trailer", "Tipper"];
   const truckBrand = [
     "Ashok Leyland",
     "Tata",
@@ -163,8 +163,6 @@ const BlogList = () => {
     setIsDataFiltered(true);
 
     try {
-
-      console.log(filterObj)
       const res = await axios.post(
         "https://truck.truckmessage.com/user_buy_sell_filter",
         filterObj,
@@ -176,7 +174,13 @@ const BlogList = () => {
       );
 
       if (res.data.error_code === 0) {
-        setCards(res.data.data);
+        const reOrder = res.data.data.sort(function (a, b) {
+          if (new Date(a.updt) > new Date(b.updt)) {
+            return -1
+          }
+        })
+        setCards(reOrder)
+
         toast.success(res.data.message);
         document.getElementById("closeFilterBox").click();
       } else {
@@ -237,7 +241,12 @@ const BlogList = () => {
         .get("https://truck.truckmessage.com/all_buy_sell_details")
         .then((response) => {
           if (response.data.success && Array.isArray(response.data.data)) {
-            setCards(response.data.data);
+            const reOrder = response.data.data.sort(function (a, b) {
+              if (new Date(a.updt) > new Date(b.updt)) {
+                return -1
+              }
+            })
+            setCards(reOrder)
           } else {
             console.error("Unexpected response format:", response.data);
           }
@@ -368,7 +377,7 @@ const BlogList = () => {
     formData.append("truck_body_type", editingData.truck_body_type)
     formData.append("no_of_tyres", editingData.no_of_tyres)
 
-    if (editingData.no_of_tyres || editingData.truck_body_type || edit.vehicle_number || edit.owner_name || edit.brand || edit.contact_no || edit.description || edit.price || edit.kms_driven || showingBuyAndSellLocation || edit.model) {
+    if (editingData.no_of_tyres || editingData.truck_body_type || edit.vehicle_number || edit.owner_name || edit.brand || edit.contact_no || edit.price || edit.kms_driven || showingBuyAndSellLocation || edit.model) {
       if (multipleImages.length > 0) {
         setCreateVehicleLoading(true);
 
@@ -659,7 +668,7 @@ const BlogList = () => {
               <div className="col-12 col-md-6">
                 <h6>Brand</h6>
                 <button type="button" class="btn btn-transparent shadow-none border dropdown-toggle col-12 py-3 dropdown-arrow text-start" data-bs-toggle="dropdown" aria-expanded="false">
-                  {editingData.brand === '' ? 'select model' : `${editingData.brand}`}
+                  {editingData.brand === '' ? 'select Brand name' : `${editingData.brand}`}
                 </button>
                 <ul class="dropdown-menu col-11 dropdown-ul">
                   {
@@ -1267,7 +1276,7 @@ const BlogList = () => {
                     })
                   }
                 </ul >
-              </div> 
+              </div>
             </div >
 
             <div className="col-12 px-0">
@@ -1308,6 +1317,8 @@ const BlogList = () => {
               <div className="container-fluid">
                 <div className="row border-bottom">
                   <div className="col-lg-12 mb-2">
+                  <div className='text-center'><h2 className='cardmodifyhead'>Buy and Sell</h2></div>
+
                     <div className="ltn__shop-options">
                       <ul>
                         <li>
@@ -1406,7 +1417,7 @@ const BlogList = () => {
                   </div>
                 </div>
               ) : currentCards.length ? (
-                currentCards.reverse().map((card) => (
+                currentCards.map((card) => (
                   <div
                     className="col-12 col-sm-6 col-xxl-4 p-2"
                     key={card.buy_sell_id}
@@ -1477,8 +1488,8 @@ const BlogList = () => {
 
                             <div className="col-12 text-center mt-4 mb-2">
                               <div className="col card-title fs-5 me-4">
-                              <FaIndianRupeeSign className="me-2" />
-                              {card.price}
+                                <FaIndianRupeeSign className="me-2" />
+                                {card.price}
                               </div>
                             </div>
                           </div>

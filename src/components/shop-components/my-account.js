@@ -9,9 +9,9 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast'; 
+import toast from 'react-hot-toast';
 import Select from 'react-dropdown-select';
-import {statesData} from '../../cityAndState';
+import { statesData } from '../../cityAndState';
 
 const MyAccount = () => {
   const [profileData, setProfileData] = useState(null);
@@ -36,7 +36,7 @@ const MyAccount = () => {
   const [operatingStateString, setoperatingStateString] = useState('')
   const [operatingStateStringdupli, setoperatingStateStringdupli] = useState('')
   const [checked, setChecked] = useState(false)
-  const [stateCitySelectedData,setstateCitySelectedData]=useState([])
+  const [stateCitySelectedData, setstateCitySelectedData] = useState([])
 
   const LoginDetails = useSelector((state) => state.login);
   const pageRender = useNavigate();
@@ -76,8 +76,8 @@ const MyAccount = () => {
             setChecked(false)
           }
         }
-        const updateOperatingStatesUi = statesData.filter((v)=> res.data.data[0].state_list.includes(v.label))
-        setOperatingStatesUi( res.data.data[0].state_list)
+        const updateOperatingStatesUi = statesData.filter((v) => res.data.data[0].state_list.includes(v.label))
+        setOperatingStatesUi(res.data.data[0].state_list)
         setOperatingStates(updateOperatingStatesUi)
         setOperatingStatesDupli(updateOperatingStatesUi)
       }
@@ -98,13 +98,13 @@ const MyAccount = () => {
     }
   };
 
-  
+
 
   const handleDeleteOperatingState = async (deletingValue) => {
     const encodedUserId = Cookies.get("usrin");
     if (encodedUserId) {
       const userId = window.atob(encodedUserId);
-      const spreadOperatingstatesForDelete = operatingStatesDupli.map((v)=>v.label)
+      const spreadOperatingstatesForDelete = operatingStatesDupli.map((v) => v.label)
 
       const data = {
         user_id: userId,
@@ -118,7 +118,7 @@ const MyAccount = () => {
           handleGetOperatingStates()
 
           document.getElementById("closeOperatingStatesModel").click()
-        } 
+        }
       } catch (err) {
         console.log(err)
       }
@@ -126,10 +126,10 @@ const MyAccount = () => {
 
   }
 
-  
+
 
   const handleCheckbox = async (e) => {
-    setChecked(e.target.checked) 
+    setChecked(e.target.checked)
 
     if (operatingStates.length > 0) {
       const encodedUserId = Cookies.get("usrin");
@@ -357,8 +357,8 @@ const MyAccount = () => {
 
   const handleUpdateOperatingStates = async () => {
     const encodedUserId = Cookies.get("usrin");
-    const spreadOperatingstates = operatingStates.map((v)=>v.label)
-    const originalStates = statesData.map((v)=>v.label)
+    const spreadOperatingstates = operatingStates.map((v) => v.label)
+    const originalStates = statesData.map((v) => v.label)
 
     const updateStates = checked ? originalStates : spreadOperatingstates
 
@@ -400,13 +400,14 @@ const MyAccount = () => {
           <div className="col-lg-12 ">
             <div className="ltn__product-tab-area">
               <div className="container">
-                <div className="row h-100">
-                  <div className='col-lg-4 col-md-4 d-inline-flex '>
+                <div className="row">
+                  <div className='col-12 col-md-6 col-xl-4'>
                     <div className="ltn-author-introducing clearfix mb-3 w-100 text-center">
                       <img src={userProfile.profile_image_name || ''} width={180} height={180} className="rounded-circle" alt="Profile" />
                     </div>
                   </div>
-                  <div className='col-lg-8 col-md-4'>
+
+                  <div className='col-12 col-md-6 col-xl-4'>
                     <div className="ltn-author-introducing clearfix mb-3 ps-5 ">
                       <div className="author-info ">
                         <h2>{userProfile.name || 'No Name'}</h2>
@@ -430,22 +431,6 @@ const MyAccount = () => {
                                 <p><FaUsersGear className='me-3' /> {userProfile.category || 'Not Available'}</p>
                               </div>
                             </li>
-                            <li className='py-3'>
-                              <div className='row align-items-center'>
-                                <div className="col-9">
-                                  <div className="footer-address-icon"></div>
-                                  <div className="footer-address-info">
-                                    <p> <GrMapLocation className='me-3' />   {operatingStatesUi.length ? operatingStatesUi.join(', ') : 'Not Available'}</p>
-                                  </div>
-                                </div>
-
-                                <div className="col-3 text-center">
-                                  <button type="button" className="btn btn-sm text-decoration-underline w-75" data-bs-toggle="modal" data-bs-target="#operatingStatesModel">
-                                    Edit
-                                  </button>
-                                </div>
-                              </div>
-                            </li>
                           </ul>
                         </div>
                       </div>
@@ -455,6 +440,27 @@ const MyAccount = () => {
                       </button>
                     </div>
                   </div>
+
+                  <div className=' col-12 col-md-12 col-xl-4 d-inline-flex align-content-stretch'>
+                    <div className="ltn-author-introducing clearfix mb-3 px-3">
+                      <div className='row align-items-center'>
+                        <div className="col-10">
+                          <div className="footer-address-icon"></div>
+                          <div className="footer-address-info">
+                            <p> <GrMapLocation className='me-3' />{operatingStatesUi.length ? operatingStatesUi.join(',') : 'Operating states'}</p>
+                          </div>
+                        </div>
+
+                        <div className="col-2 text-center">
+                          <button type="button" className="btn btn-sm text-decoration-underline" data-bs-toggle="modal" data-bs-target="#operatingStatesModel">
+                            Edit
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+
                   <div className="mb-3 col-lg-12">
                     <button type="button" className="btn btn-danger text-uppercase" data-bs-toggle="modal" data-bs-target="#vehicleNumber">Add My Truck</button>
                   </div>
@@ -706,7 +712,7 @@ const MyAccount = () => {
                                 disabled={checked}
                               /> */}
 
-                              <Select multi options={statesData} onChange={(values) => setOperatingStates(values)} values={[...operatingStates]} disabled={checked}/>
+                              <Select multi options={statesData} onChange={(values) => setOperatingStates(values)} values={[...operatingStates]} disabled={checked} />
 
                               {/* <div className='row g-2 mb-3'>
                                 {!checked ?

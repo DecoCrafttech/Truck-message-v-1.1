@@ -34,7 +34,7 @@ const TruckAvailability = () => {
     const [selectToLocationSingle, setSelectToLocationSingle] = useState("")
     const [selectToLocationMultiple, setSelectToLocationMultiple] = useState([])
 
-    const truckBodyType = ["LCV", "Bus", "Open body vehicle", "Tanker", "Trailer", "Tipper"];
+    const truckBodyType = ["LCV", "Container", "Open body vehicle", "Tanker", "Trailer", "Tipper"];
     const numOfTyres = [4, 6, 10, 12, 14, 16, 18, 20, 22]
 
     const [editingData, setEditingData] = useState({
@@ -75,7 +75,13 @@ const TruckAvailability = () => {
             await axios.get('https://truck.truckmessage.com/all_truck_details')
                 .then(response => {
                     if (response.data.success && Array.isArray(response.data.data)) {
-                        setCards(response.data.data);
+                        const reOrder = response.data.data.sort(function(a,b){
+                            if(new Date(a.updt) > new Date(b.updt)){
+                                return -1
+                            }
+                        })
+ 
+                        setCards(reOrder)
                     } else {
                         console.error('Unexpected response format:', response.data);
                     }
@@ -173,7 +179,7 @@ const TruckAvailability = () => {
             name_of_the_transport: editingData.name_of_the_transport,
             contact_no: editingData.contact_no,
             from: showingFromLocation,
-            to: selectToLocationSingle.length ? selectToLocationSingle[0].label : "",
+            to: showingToLocation,
             truck_name: editingData.truck_brand_name,
             truck_brand_name: editingData.truck_brand_name,
             tone: editingData.tone,
@@ -183,8 +189,10 @@ const TruckAvailability = () => {
             user_id: userId
         };
 
+        console.log(data)
+
         try {
-            if (data.vehicle_number && data.company_name && data.name_of_the_transport && data.contact_no && data.from && data.to && data.truck_brand_name && data.truck_brand_name && data.tone && data.truck_body_type && data.no_of_tyres && data.description) {
+            if (data.vehicle_number && data.company_name && data.name_of_the_transport && data.contact_no && data.from && data.to && data.truck_brand_name && data.truck_brand_name && data.tone && data.truck_body_type && data.no_of_tyres) {
                 if (!validateContactNumber(data.contact_no)) {
                     setContactError('Please enter a valid 10-digit contact number.');
                     return;
@@ -285,13 +293,20 @@ const TruckAvailability = () => {
         const filterObj = { ...filterModelData }
         filterObj.truck_name = filterModelData.truck_brand_name
         filterObj.from_location = showingFromLocation
-        filterObj.to_location = spreadMultipleLocation[0]
+        filterObj.to_location = spreadMultipleLocation
 
         try {
             const res = await axios.post("https://truck.truckmessage.com/user_truck_details_filter", filterObj)
 
             if (res.data.error_code === 0) {
-                setCards(res.data.data)
+                const reOrder = res.data.data.sort(function(a,b){
+                    if(new Date(a.updt) > new Date(b.updt)){
+                        return -1
+                    }
+                })
+
+                setCards(reOrder)
+                
                 toast.success(res.data.message)
                 document.getElementById("closeFilterBox").click()
 
@@ -560,10 +575,10 @@ const TruckAvailability = () => {
                         </div>
 
                         <div className="col-12 col-md-6">
-                            <h6>Truck Name</h6>
+                            <h6>Brand Name</h6>
 
                             <button type="button" class="btn btn-transparent dropdown-toggle col-12 py-3 dropdown-arrow shadow-none border rounded text-start p-3" data-bs-toggle="dropdown" aria-expanded="false">
-                                {editingData.truck_brand_name === '' ? 'select truck' : `${editingData.truck_brand_name} `}
+                                {editingData.truck_brand_name === '' ? 'select Brand name' : `${editingData.truck_brand_name} `}
                             </button>
                             <ul class="dropdown-menu  cup shadow-0 col-11 dropdown-ul">
                                 <li onClick={() => setEditingData({
@@ -804,7 +819,7 @@ const TruckAvailability = () => {
                                     </div>
                                     <div className="col-12 col-md-6">
                                         <h6>To</h6>
-                                        <Select options={userStateList} className='selectBox-innerWidth' onChange={(e) => setSelectToLocationMultiple(e)} />
+                                        <Select multi options={userStateList} className='selectBox-innerWidth' onChange={(e) => setSelectToLocationMultiple(e)} />
                                     </div>
 
                                     <div className="col-12 col-md-6">
@@ -911,7 +926,7 @@ const TruckAvailability = () => {
             <div className='container'>
                 {currentCards.length > 0 ?
                     <div className="row row-cols-1 row-cols-md-3 g-4 mb-60">
-                        {currentCards.reverse().map(card => (
+                        {currentCards.map(card => (
                             <div className="col" key={card.id}>
                                 <div className="card h-100 shadow truckcard">
                                     <div className='card-header border-0 mb-0 '>

@@ -26,7 +26,7 @@ const BlogGrid = () => {
         search: '',
     });
 
-    const truckBodyType = ["LCV", "Bus", "Open body vehicle", "Tanker", "Trailer", "Tipper"];
+    const truckBodyType = ["LCV", "Container", "Open body vehicle", "Tanker", "Trailer", "Tipper"];
     const numOfTyres = [4,
         6,
         10,
@@ -77,7 +77,12 @@ const BlogGrid = () => {
         try {
             const response = await axios.get('https://truck.truckmessage.com/all_driver_details');
             if (response.data.success && Array.isArray(response.data.data)) {
-                setCards(response.data.data);
+                const reOrder = response.data.data.sort(function(a,b){
+                    if(new Date(a.updt) > new Date(b.updt)){
+                        return -1
+                    }
+                })
+                setCards(reOrder)
             } else {
                 console.error('Unexpected response format:', response.data);
             }
@@ -175,7 +180,7 @@ const BlogGrid = () => {
         };
 
         try {
-            if (data.vehicle_number && data.company_name && data.driver_name && data.contact_no && data.from && data.to && data.truck_body_type && data.no_of_tyres && data.description) {
+            if (data.vehicle_number && data.company_name && data.driver_name && data.contact_no && data.from && data.to && data.truck_body_type && data.no_of_tyres) {
                 if (!validateContactNumber(data.contact_no)) {
                     setContactError('Please enter a valid 10-digit contact number.');
                     return;
@@ -278,7 +283,7 @@ const BlogGrid = () => {
 
         const filterObj = { ...filterModelData }
         filterObj.from_location = showingFromLocation
-        filterObj.to_location = spreadMultipleLocation[0]
+        filterObj.to_location = spreadMultipleLocation
 
         try {
             const res = await axios.post("https://truck.truckmessage.com/user_driver_details_filter", filterObj, {
@@ -288,7 +293,13 @@ const BlogGrid = () => {
             })
 
             if (res.data.error_code === 0) {
-                setCards(res.data.data)
+                const reOrder = res.data.data.sort(function(a,b){
+                    if(new Date(a.updt) > new Date(b.updt)){
+                        return -1
+                    }
+                })
+                setCards(reOrder)
+
                 toast.success(res.data.message)
                 document.getElementById("closeFilterBox").click()
             } else {
@@ -695,7 +706,7 @@ const BlogGrid = () => {
                 <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h1 className="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                            <h1 className="modal-title fs-5" id="exampleModalLabel">Filter</h1>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeFilterBox"></button>
                         </div>
                         <div className="modal-body ps-4 pe-4 p-">
@@ -733,7 +744,7 @@ const BlogGrid = () => {
                                                 onChange={(e) => setShowingToLocation(e.target.value)}
                                             />
                                         </div> */}
-                                        <Select options={userStateList} className='selectBox-innerWidth' onChange={(e) => setSelectToLocationMultiple(e)} />
+                                        <Select multi options={userStateList} className='selectBox-innerWidth' onChange={(e) => setSelectToLocationMultiple(e)} />
                                     </div>
 
                                     <div className="col-12 col-md-6 m-0">
@@ -787,7 +798,7 @@ const BlogGrid = () => {
             {/* card */}
             <div className='container'>
                 <div className="row row-cols-1 row-cols-md-3 g-4 mb-60 ">
-                    {currentCards.reverse().map(card => (
+                    {currentCards.map(card => (
                         <div className="col" key={card.id}>
                             <div className="card h-100 shadow truckcard">
                                 <div className='card-header border-0 mb-0 '>

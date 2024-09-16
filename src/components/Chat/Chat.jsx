@@ -3,6 +3,7 @@ import axios from "axios";
 import { useLocation } from "react-router-dom";
 import { LuRefreshCcw } from "react-icons/lu";
 import Cookies from "js-cookie";
+import { CiLight } from "react-icons/ci";
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -29,11 +30,11 @@ const ChatView = () => {
 
       if (response.data.error_code === 0) {
 
-        const filterUser = response.data.data.filter((v)=>{
+        const filterUser = response.data.data.filter((v) => {
           return v.person_id != window.atob(userId)
         })
 
-        const sortByData = filterUser.sort(function(a,b){
+        const sortByData = filterUser.sort(function (a, b) {
           return new Date(b.last_time) - new Date(a.last_time);
         })
 
@@ -41,36 +42,34 @@ const ChatView = () => {
           return findUSer.person_id == personId;
         });
 
-        console.log(findUser,filterUser,window.atob(userId))
+        if (findUser.length === 0) {
+          if (personId) {
+            const getUserProfileResponse = await axios.post('https://truck.truckmessage.com/get_user_profile', {
+              user_id: personId
+            })
 
-        if(findUser.length === 0){
-          const getUserProfileResponse = await axios.post('https://truck.truckmessage.com/get_user_profile',{
-            user_id: personId
-          })
- 
-          if(getUserProfileResponse.data.data.length > 0){
-            const userProfileNotInList = {
-              last_msg:'',
-              last_time:'',
-              person_id:parseInt(getUserProfileResponse.data.data[1].user_id),
-              profile_image_name:getUserProfileResponse.data.data[1].profile_image_name,
-              profile_name:getUserProfileResponse.data.data[1].name
+            if (getUserProfileResponse.data.data.length > 0) {
+              const userProfileNotInList = {
+                last_msg: '',
+                last_time: '',
+                person_id: parseInt(getUserProfileResponse.data.data[1].user_id),
+                profile_image_name: getUserProfileResponse.data.data[1].profile_image_name,
+                profile_name: getUserProfileResponse.data.data[1].name
+              }
+
+              const addUserInList = [userProfileNotInList, ...sortByData]
+              setUserList(addUserInList);
             }
-
-            const addUserInList = [userProfileNotInList,...sortByData]
-            
-            setUserList(addUserInList);
+            setPersonId(personId);
+            fetchChatMessages(personId);
+          } else {
+            setUserList(sortByData);
           }
-
-          setPersonId(personId);
-          fetchChatMessages(personId);
-        }else{
+        } else {
           setUserList(sortByData);
           setPersonId(personId);
           fetchChatMessages(personId);
         }
-
-        
       }
     } catch (err) {
       console.error("Error getting user list:", err);
@@ -164,9 +163,8 @@ const ChatView = () => {
               return (
                 <button
                   key={userIndex}
-                  className={`chat-person-card mb-2 d-flex align-items-center ${
-                    users.person_id == personId ? "active" : ""
-                  }`}
+                  className={`chat-person-card mb-2 d-flex align-items-center ${users.person_id == personId ? "active" : ""
+                    }`}
                   onClick={() => {
                     handleSelectConversation("Conversation 1", users.person_id);
                   }}
@@ -214,11 +212,10 @@ const ChatView = () => {
               return (
                 <div
                   key={index}
-                  className={`message col-12 row flex-row mb-3 ${
-                    msg.chat_id == window.atob(userId)
-                      ? "text-end"
-                      : "text-start"
-                  }`}
+                  className={`message col-12 row flex-row mb-3 ${msg.chat_id == window.atob(userId)
+                    ? "text-end"
+                    : "text-start"
+                    }`}
                 >
                   {msg.chat_id != window.atob(userId) ? (
                     <div className="col-1 text-center">
@@ -233,11 +230,10 @@ const ChatView = () => {
 
                   <div className="col-11">
                     <div
-                      className={`message-content col-6 p-2 rounded ${
-                        msg.chat_id == window.atob(userId)
-                          ? "bg-primary text-white text-start"
-                          : "bg-light text-dark"
-                      }`}
+                      className={`message-content col-6 p-2 rounded ${msg.chat_id == window.atob(userId)
+                        ? "bg-primary text-white text-start"
+                        : "bg-light text-dark"
+                        }`}
                     >
                       <div>{msg.message}</div>
                       <div className="small">

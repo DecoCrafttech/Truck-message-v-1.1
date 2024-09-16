@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import axios from 'axios';
@@ -7,13 +7,14 @@ import Slider from 'react-slick';
 
 
 const ShopDetails = () => {
-	let publicUrl = process.env.PUBLIC_URL + '/';
-	let sliderRef = useRef(null);
-	const navigate =useNavigate();
+	const navigate = useNavigate();
 
 	const [Images, setImages] = useState([]);
 	const [currentImage, setCurrentImage] = useState("")
 	const [isOpen, setIsOpen] = useState(false);
+	const [selectedContactNum, setSelectedContactNum] = useState(null)
+	const [selectedContactNumLoading, setSelectedContactNumLoading] = useState(false)
+
 
 	const pageRender = useNavigate();
 
@@ -112,9 +113,21 @@ const ShopDetails = () => {
 	}
 
 	const handleMessageClick = (card) => {
-		console.log(card,"card")
-        navigate(`/chat?person_id=${card.user_id}`);
-    };
+		console.log(card, "card")
+		navigate(`/chat?person_id=${card.user_id}`);
+	};
+
+
+	const handleCopy = (contactNo) => {
+		setSelectedContactNum(null)
+		setSelectedContactNumLoading(true)
+
+		// setviewContactId(cardId)
+		setTimeout(() => {
+			setSelectedContactNum(contactNo)
+			setSelectedContactNumLoading(false)
+		}, 800)
+	};
 
 	return <div className="ltn__shop-details-area pb-10">
 		<div className="container">
@@ -189,7 +202,31 @@ const ShopDetails = () => {
 									<div className='d-flex justify-content-center align-items-center gap-2 col-12 p-0'>
 										<div className='col-6 p-0'>
 											{/* <button type="button" className="btn btn-success p-2">call</button> */}
-											< a href={`tel:${data.contact_no}`} className='btn btn-success p-2 w-100'>Call</a>
+											{/* < a href={`tel:${data.contact_no}`} className='btn btn-success p-2 w-100'>Call</a> */}
+											{
+												selectedContactNum ?
+													<button
+														className="btn btn-success w-100"
+														type="button">
+														{selectedContactNum}
+													</button>
+													:
+													selectedContactNumLoading ?
+														<button
+															className="btn btn-success w-100"
+															type="button">
+															<div className="spinner-border text-light" role="status">
+																<span className="sr-only">Loading...</span>
+															</div>
+														</button>
+														:
+														<button
+															className="btn btn-success w-100"
+															type="button"
+															onClick={() => handleCopy(data.contact_no)}>
+															{selectedContactNum ? selectedContactNum : "Contact"}
+														</button>
+											}
 										</div>
 										<button type="button" className="btn btn-danger p-2 " onClick={() => handleMessageClick(data)}>Message</button>
 									</div>

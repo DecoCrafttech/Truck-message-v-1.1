@@ -48,7 +48,7 @@ class ContactForm extends Component {
 					<div className="row">
 						<div className="col-lg-12">
 							<div className="ltn__form-box contact-form-box box-shadow white-bg">
-								<h4 className="title-2">Get A Quote</h4>
+								<h4 className="title-2">Contact Us</h4>
 								<form id="contact-form" action={publicUrl+"mail.php"} method="post">
 									<div className="row">
 										<div className="col-md-6">

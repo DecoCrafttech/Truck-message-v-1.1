@@ -23,7 +23,7 @@ const PortfolioV1 = () => {
     const [showingToLocation, setShowingToLocation] = useState("");
 
     const [cardsPerPage] = useState(21); // Adjust the number of cards per page as needed
-    const truckBodyType = ["LCV", "Open body vehicle", "Tanker", "Trailer", "Tipper"];
+    const truckBodyType = ["LCV", "Open body vehicle", "Tanker", "Trailer", "Tipper","Container"];
     const numOfTyres = [4, 6, 10, 12, 14, 16, 18, 20, 22];
 
 
@@ -65,7 +65,13 @@ const PortfolioV1 = () => {
             await axios.get('https://truck.truckmessage.com/all_load_details')
                 .then(response => {
                     if (response.data.success && Array.isArray(response.data.data)) {
-                        setCards(response.data.data.reverse());
+                        const reOrder = response.data.data.sort(function(a,b){
+                            if(new Date(a.updt) > new Date(b.updt)){
+                                return -1
+                            }
+                        })
+        
+                        setCards(reOrder)
                     } else {
                         console.error('Unexpected response format:', response.data);
                     }
@@ -78,7 +84,6 @@ const PortfolioV1 = () => {
             console.log(err)
         }
     }
-
 
     useEffect(() => {
         fetchData()
@@ -144,7 +149,7 @@ const PortfolioV1 = () => {
                 description: editingData.description,
                 user_id: userId
             };
-            if (data.company_name && data.contact_no && data.from && data.to && data.material && data.tone && data.truck_body_type && data.no_of_tyres && data.description) {
+            if (data.company_name && data.contact_no && data.from && data.to && data.material && data.tone && data.truck_body_type && data.no_of_tyres) {
                 if (!validateContactNumber(editingData.contact_no)) {
                     setContactError('Please enter a valid 10-digit contact number.');
                     return;
@@ -255,7 +260,13 @@ const PortfolioV1 = () => {
             })
 
             if (res.data.error_code === 0) {
-                setCards(res.data.data)
+                const reOrder = res.data.data.sort(function(a,b){
+                    if(new Date(a.updt) > new Date(b.updt)){
+                        return -1
+                    }
+                })
+                setCards(reOrder)
+
                 toast.success(res.data.message)
                 document.getElementById("closeFilterBox").click()
             } else {
@@ -766,7 +777,7 @@ const PortfolioV1 = () => {
                 {
                     currentCards.length > 0 ?
                         <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-5 mb-60 ">
-                            {currentCards.reverse().map(card => (
+                            {currentCards.map(card => (
                                 <div className="col " key={card.id}>
                                     <div className="card h-100 shadow truckcard">
                                         <div className='card-header border-0 mb-0 '>
