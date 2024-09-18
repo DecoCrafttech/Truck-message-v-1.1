@@ -582,7 +582,7 @@ const PortfolioV1 = () => {
 
                         <div className="col-12">
                             <h6>Descriptions </h6>
-                            <div className="input-item input-item-textarea ltn__custom-icon">
+                            <div className="input-item input-item-textarea">
                                 <textarea name="description" placeholder="Enter a text here" onChange={(e) => setEditingData({
                                     ...editingData, description: e.target.value,
                                 })} />
@@ -590,7 +590,7 @@ const PortfolioV1 = () => {
                         </div>
                     </div>
                     <div className="modal-footer btn-wrapper text-center mt-4">
-                        <button className="btn theme-btn-1 text-uppercase" type="button" onClick={handleSubmit}>Submit</button>
+                        <button className="btn btn-primary theme-btn-1 text-uppercase" type="button" onClick={handleSubmit}>Submit</button>
                     </div>
                 </div>
 
@@ -788,7 +788,7 @@ const PortfolioV1 = () => {
                                                         <i className={`text-warning fa fa-star ${index < card.rating ? '' : 'text-muted'}`}></i>
                                                     </span>
                                                 ))}
-                                                <span>({card.review_count} 4)</span>
+                                                <span>({card.user_review_count} )</span>
                                                 <p className="float-end mb-0 text-b"> <strong>Posts </strong> : {card.user_post}</p>
 
                                             </p>

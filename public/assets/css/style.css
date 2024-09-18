@@ -20452,3 +20452,32 @@ input[type=number] {
 .emptyCardHeight{
   height: 20rem;
 }
+
+
+/* Custom styles for the Contact Form */
+.form-check {
+  margin-bottom: 15px;
+}
+
+.form-check-input {
+  margin-right: 10px;
+}
+
+.form-check-label {
+  margin-right: 20px;
+}
+
+.invalid-feedback {
+  display: block;
+}
+
+
+
+
+
+@media (min-width: 768px) {
+  .form-check {
+    margin-bottom: 0;
+  }
+}
+

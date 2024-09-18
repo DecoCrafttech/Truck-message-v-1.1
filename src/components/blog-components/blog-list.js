@@ -16,7 +16,7 @@ const BlogList = () => {
   const LoginDetails = useSelector((state) => state.login);
 
   const [yearData, setYearData] = useState([]);
-  const truckBodyType = ["LCV", "Container", "Open body vehicle", "Tanker", "Trailer", "Tipper"];
+  const truckBodyType = ["LCV", "Container", "Open body vehicle", "Tanker", "Trailer", "Tipper", "Bus "];
   const truckBrand = [
     "Ashok Leyland",
     "Tata",
@@ -1449,7 +1449,7 @@ const BlogList = () => {
                                     ></i>
                                   </span>
                                 ))}
-                                <span>({card.review_count} 4)</span>
+                                <span>({card.user_review_count} 4)</span>
                                 <p className="float-end mb-0 text-b">
                                   {" "}
                                   <strong>Posts </strong> {card.user_post}

@@ -1,103 +1,225 @@
-import React, { Component } from 'react';
-import { toast } from 'react-hot-toast'; // Import toast
+import React, { useState } from 'react';
+import axios from 'axios';
+import toast, { Toaster } from 'react-hot-toast';
 
-class ContactForm extends Component {
+const ContactForm = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    contactNumber: '',
+    category: '',
+    message: ''
+  });
 
-	componentDidMount() {
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false); // Lazy loading state
 
-		const $ = window.$;
+  // Email validation function
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
-		// Get the form.
-		var form = $('#contact-form');
+  // Contact number validation function (10 digits)
+  const validateContactNumber = (contactNumber) => {
+    const phoneRegex = /^[0-9]{10}$/;
+    return phoneRegex.test(contactNumber);
+  };
 
-		// Set up an event listener for the contact form.
-		$(form).submit(function(e) {
-			// Stop the browser from submitting the form.
-			e.preventDefault();
+  // Handle form field changes
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+    setErrors({
+      ...errors,
+      [e.target.name]: '',
+    });
+  };
 
-			// Serialize the form data.
-			var formData = $(form).serialize();
+  // Validate the entire form
+  const validateForm = () => {
+    const newErrors = {};
+    let isValid = true;
 
-			// Submit the form using AJAX.
-			$.ajax({
-				type: 'POST',
-				url: $(form).attr('action'),
-				data: formData
-			})
-			.done(function(response) {
-				// Show success toast message
-				toast.success('Submitted successfully!');
+    // Validate name
+    if (!formData.name) {
+      newErrors.name = 'Name is required';
+      isValid = false;
+    }
 
-				// Clear the form.
-				$('#contact-form input,#contact-form textarea').val('');
-			})
-			.fail(function(data) {
-				// Show error toast message
-				toast.error('Oops! An error occurred and your message could not be sent.');
-			});
-		});
-	}
+    // Validate email
+    if (!validateEmail(formData.email)) {
+      newErrors.email = 'Invalid email format';
+      isValid = false;
+    }
 
-	render() {
+    // Validate contact number
+    if (!validateContactNumber(formData.contactNumber)) {
+      newErrors.contactNumber = 'Contact number must be a 10-digit number';
+      isValid = false;
+    }
 
-		let publicUrl = process.env.PUBLIC_URL+'/';
+    // Validate category
+    if (!formData.category) {
+      newErrors.category = 'Please select a category';
+      isValid = false;
+    }
 
-		return (
-			<div className="ltn__contact-message-area mb-5">
-				<div className="container">
-					<div className="row">
-						<div className="col-lg-12">
-							<div className="ltn__form-box contact-form-box box-shadow white-bg">
-								<h4 className="title-2">Contact Us</h4>
-								<form id="contact-form" action={publicUrl+"mail.php"} method="post">
-									<div className="row">
-										<div className="col-md-6">
-											<div className="input-item input-item-name ltn__custom-icon">
-												<input type="text" name="name" placeholder="Enter your name" />
-											</div>
-										</div>
-										<div className="col-md-6">
-											<div className="input-item input-item-email ltn__custom-icon">
-												<input type="email" name="email" placeholder="Enter email address" />
-											</div>
-										</div>
-										<div className="col-md-6">
-											<div className="input-item">
-												<select className="nice-select" name="service">
-													<option>Select Service Type</option>
-													<option>Logistics</option>
-													<option>Lorry Contractors</option>
-													<option>Load Booking Agent</option>
-													<option>Driver</option>
-													<option>Lorry Buy & Sell Dealer/Owner</option>
-												</select>
-											</div>
-										</div>
-										<div className="col-md-6">
-											<div className="input-item input-item-phone ltn__custom-icon">
-												<input type="text" name="phone" placeholder="Enter phone number" />
-											</div>
-										</div>
-									</div>
-									<div className="input-item input-item-textarea ltn__custom-icon">
-										<textarea name="message" placeholder="Enter message" defaultValue={""} />
-									</div>
-									<p>
-										<label className="input-info-save mb-0">
-											<input type="checkbox" name="agree" /> Save my name, email, and website in this browser for the next time I comment.
-										</label>
-									</p>
-									<div className="mt-0">
-										<button className="text-uppercase" type="submit">Submit</button>
-									</div>
-								</form>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		);
-	}
-}
+    // Validate message
+    if (!formData.message) {
+      newErrors.message = 'Message is required';
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Check if the form is valid
+    if (!validateForm()) {
+      toast.error('Please fill in all required fields correctly.');
+      return;
+    }
+
+    setIsSubmitting(true); // Start lazy loading
+
+    try {
+      // Prepare the payload for the API
+      const payload = {
+        user_name: formData.name,
+        contact_no: formData.contactNumber,
+        email_id: formData.email,
+        category: formData.category,
+        message: formData.message
+      };
+
+      // Make POST request with Axios
+      const response = await axios.post('https://truck.truckmessage.com/contact_us', payload);
+
+      if (response.status === 200) {
+        toast.success('Form submitted successfully!');
+        // Reset form fields after successful submission
+        setFormData({
+          name: '',
+          email: '',
+          contactNumber: '',
+          category: '',
+          message: ''
+        });
+      } else {
+        toast.error('Failed to submit the form. Please try again later.');
+      }
+    } catch (error) {
+      toast.error('An error occurred. Please try again.');
+      console.error(error);
+    } finally {
+      setIsSubmitting(false); // End lazy loading
+    }
+  };
+
+  return (
+    <div className="container mt-5">
+      <Toaster position="top-right" />
+      <h2>Contact Us</h2>
+      <form onSubmit={handleSubmit}>
+        <div className="row">
+          <div className="col-md-6">
+            <div className="mb-2">
+              <label htmlFor="name" className="form-label">Name</label>
+              <input
+                type="text"
+                className={`form-control ${errors.name ? 'is-invalid' : ''}`}
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+              />
+              {errors.name && <div className="invalid-feedback">{errors.name}</div>}
+            </div>
+          </div>
+
+          <div className="col-md-6">
+            <div className="mb-2">
+              <label htmlFor="contactNumber" className="form-label">Contact Number</label>
+              <input
+                type="tel"
+                className={`form-control ${errors.contactNumber ? 'is-invalid' : ''}`}
+                id="contactNumber"
+                name="contactNumber"
+                value={formData.contactNumber}
+                onChange={handleChange}
+                required
+              />
+              {errors.contactNumber && <div className="invalid-feedback">{errors.contactNumber}</div>}
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-2">
+          <label htmlFor="email" className="form-label">Email</label>
+          <input
+            type="email"
+            className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+          {errors.email && <div className="invalid-feedback">{errors.email}</div>}
+        </div>
+
+        <fieldset className="mb-2">
+          <legend className="col-form-label"><strong>Category</strong></legend>
+          <div className="row">
+            {['Lorry Owner', 'Logistics', 'Lorry Contractors', 'Load Booking Agent', 'Driver', 'Lorry Buy & Sell Dealer/Owner'].map((category) => (
+              <div className="col-md-4" key={category}>
+                <div className="form-check">
+                  <input
+                    className={`form-check-input ${errors.category ? 'is-invalid' : ''}`}
+                    type="radio"
+                    id={category}
+                    name="category"
+                    value={category}
+                    checked={formData.category === category}
+                    onChange={handleChange}
+                    required
+                  />
+                  <label className="form-check-label" htmlFor={category}>{category}</label>
+                </div>
+              </div>
+            ))}
+          </div>
+          {errors.category && <div className="invalid-feedback d-block">{errors.category}</div>}
+        </fieldset>
+
+        <div className="mb-3">
+          <label htmlFor="message" className="form-label">Message</label>
+          <textarea
+            className={`form-control ${errors.message ? 'is-invalid' : ''}`}
+            id="message"
+            name="message"
+            rows="4"
+            value={formData.message}
+            onChange={handleChange}
+            required
+          />
+          {errors.message && <div className="invalid-feedback">{errors.message}</div>}
+        </div>
+
+        <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+          {isSubmitting ? 'Submitting...' : 'Submit'}
+        </button>
+      </form>
+    </div>
+  );
+};
 
 export default ContactForm;

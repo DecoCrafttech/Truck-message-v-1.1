@@ -937,7 +937,7 @@ const TruckAvailability = () => {
                                                     <i className={`text-warning fa fa-star ${index < card.rating ? '' : 'text-muted'}`}></i>
                                                 </span>
                                             ))}
-                                            <span>({card.review_count} 4)</span>
+                                            <span>({card.user_review_count} 4)</span>
                                             <p className="float-end mb-0 text-b"> <strong>Posts </strong> : {card.user_post}</p>
 
                                         </p>
