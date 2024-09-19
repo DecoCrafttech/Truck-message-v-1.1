@@ -11,6 +11,7 @@ import Autocomplete from "react-google-autocomplete";
 import { HiOutlineOfficeBuilding } from 'react-icons/hi';
 import Select from 'react-dropdown-select';
 import axiosInstance from '../../Services/axiosInstance';
+import { RiMapPinTimeFill } from 'react-icons/ri';
 
 
 const TruckAvailability = () => {
@@ -960,6 +961,8 @@ const TruckAvailability = () => {
                                             <div className="col-lg-12 cardicon">
                                                 <div><label><FaLocationDot className='me-2 text-success' />{card.to_location}</label></div>
                                             </div>
+                                            <p className='datetext'><strong><RiMapPinTimeFill className='me-2' />Posted on :</strong> {card.updt.slice(5, 25)}</p>
+
                                             {/* <div className="col-lg-12 cardicon">
                                             <div><label>Distance: {"hii"}</label></div>
                                         </div> */}

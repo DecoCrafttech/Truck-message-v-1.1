@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { FaWeightHanging, FaTruck, FaLocationDot } from "react-icons/fa6";
 import { HiOutlineOfficeBuilding } from "react-icons/hi";
 import { SiMaterialformkdocs } from "react-icons/si";
+import { RiMapPinTimeFill } from "react-icons/ri";
 import { GiCarWheel } from "react-icons/gi";
 import { useSelector } from 'react-redux';
 import Cookies from 'js-cookie';
@@ -811,6 +812,7 @@ const PortfolioV1 = () => {
                                                 <div className="col-lg-12 cardicon">
                                                     <div><label><FaLocationDot className='me-2 text-success' />{card.to_location}</label></div>
                                                 </div>
+                                                <p className='datetext'><strong><RiMapPinTimeFill className='me-2' />Posted on :</strong> {card.updt.slice(5, 25)}</p>
                                             </div>
                                             <hr className="hr m-2" />
                                             <div className='row mt-3'>

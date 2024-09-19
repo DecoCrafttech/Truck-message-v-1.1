@@ -4,7 +4,6 @@ import toast, { Toaster } from 'react-hot-toast';
 import { FaWeightHanging, FaTruck, FaLocationDot, FaTruckFast } from "react-icons/fa6";
 import { SiMaterialformkdocs } from "react-icons/si";
 import { GiCarWheel } from "react-icons/gi";
-import { IoCall } from "react-icons/io5";
 import { useSelector } from 'react-redux';
 import Cookies from 'js-cookie';
 import Autocomplete from "react-google-autocomplete";
@@ -13,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaRegCopy } from 'react-icons/fa';
 import Select from 'react-dropdown-select';
 import axiosInstance from '../../Services/axiosInstance';
+import { RiMapPinTimeFill } from 'react-icons/ri';
 
 
 const BlogGrid = () => {
@@ -832,6 +832,7 @@ const BlogGrid = () => {
                                         <div className="col-lg-12 cardicon">
                                             <div><label><FaLocationDot className='me-2 text-success' />{card.to_location}</label></div>
                                         </div>
+                                        <p className='datetext'><strong><RiMapPinTimeFill className='me-2' />Posted on :</strong> {card.updt.slice(5, 25)}</p>
                                     </div>
                                     <hr className="hr m-2" />
                                     <div className='row mt-3'>

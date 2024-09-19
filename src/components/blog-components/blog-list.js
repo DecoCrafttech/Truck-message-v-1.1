@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { FaUserAlt } from "react-icons/fa";
 import { FaIndianRupeeSign, FaTruckFast } from "react-icons/fa6";
 import { BsFillCalendar2DateFill } from "react-icons/bs";
-import { RiPinDistanceFill } from "react-icons/ri";
+import { RiMapPinTimeFill, RiPinDistanceFill } from "react-icons/ri";
 import { FaLocationDot } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import Cookies from "js-cookie";
@@ -1449,10 +1449,10 @@ const BlogList = () => {
                                     ></i>
                                   </span>
                                 ))}
-                                <span>({card.user_review_count} 4)</span>
+                                <span>({card.user_review_count})</span>
                                 <p className="float-end mb-0 text-b">
                                   {" "}
-                                  <strong>Posts </strong> {card.user_post}
+                                  <strong>Posts </strong> ({card.user_post})
                                 </p>
                               </p>
                               <h5 className="card-title mt-2 text-wrap">
@@ -1467,6 +1467,7 @@ const BlogList = () => {
                             {card.location}
                           </label>
                         </div>
+                        <p className='datetext mb-3'><strong><RiMapPinTimeFill className='me-2' />Posted on :</strong> {card.updt.slice(5, 25)}</p>
                         <div>
                           <div className="row">
                             <div className="col-6 col-md-6 cardicontext">
@@ -1501,7 +1502,7 @@ const BlogList = () => {
                             className="apara"
                             onClick={() => handleSaveBusAndSellId(card)}
                           >
-                            view details{" "}
+                            view details {" "}
                           </Link>{" "}
                           <link></link>
                         </div>
